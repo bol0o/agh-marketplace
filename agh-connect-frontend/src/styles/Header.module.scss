@@ -1,0 +1,200 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.header {
+	position: sticky;
+	top: 0;
+	z-index: 40; // Nad treścią, ale pod modalem (zazwyczaj modale mają 50+)
+	background-color: $color-white;
+	border-bottom: 1px solid $color-border;
+	height: 72px;
+	display: flex;
+	align-items: center;
+}
+
+.container {
+	width: 100%;
+	max-width: 1440px; // Trochę szerzej dla dashboardu
+	margin: 0 auto;
+	padding: 0 16px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 24px;
+
+	@include md {
+		padding: 0 32px;
+	}
+}
+
+// --- LEWA STRONA (LOGO) ---
+// Na mobile sidebar może zasłaniać logo, ale w headerze warto je mieć jako "Home"
+.logoArea {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	text-decoration: none;
+	color: $color-text;
+	min-width: fit-content;
+
+	.logoIcon {
+		width: 36px;
+		height: 36px;
+		background-color: $color-primary;
+		color: white;
+		border-radius: 8px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-weight: 800;
+		font-size: 1.2rem;
+	}
+
+	.logoText {
+		font-weight: 800;
+		font-size: 1.1rem;
+		display: none; // Ukryte na bardzo małych ekranach
+
+		@include sm {
+			display: block;
+		}
+	}
+}
+
+// --- ŚRODEK (WYSZUKIWARKA) ---
+.searchContainer {
+	flex: 1;
+	max-width: 500px;
+	position: relative;
+	display: none; // Na mobile ukrywamy, pokazujemy lupę w akcjach (opcjonalnie)
+
+	@include md {
+		display: block;
+	}
+
+	svg {
+		position: absolute;
+		left: 12px;
+		top: 50%;
+		transform: translateY(-50%);
+		color: #9ca3af;
+		pointer-events: none;
+	}
+
+	input {
+		width: 100%;
+		padding: 10px 16px 10px 40px;
+		background-color: $color-bg;
+		border: 1px solid transparent;
+		border-radius: 12px;
+		font-size: 0.9rem;
+		transition: all 0.2s;
+		outline: none;
+
+		&:focus {
+			background-color: white;
+			border-color: $color-primary;
+			box-shadow: 0 0 0 4px rgba($color-primary, 0.1);
+		}
+	}
+}
+
+// --- PRAWA STRONA (AKCJE) ---
+.actions {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+
+	@include md {
+		gap: 16px;
+	}
+}
+
+.iconBtn {
+	position: relative;
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: $color-text-light;
+	transition: all 0.2s;
+	background-color: transparent;
+	border: 1px solid transparent;
+
+	&:hover {
+		background-color: $color-bg;
+		color: $color-primary;
+	}
+
+	&.active {
+		background-color: #fef2f2;
+		color: $color-primary;
+		border-color: #fee2e2;
+	}
+}
+
+// Czerwona kropka powiadomień
+.badge {
+	position: absolute;
+	top: 2px;
+	right: 2px;
+	min-width: 18px;
+	height: 18px;
+	background-color: $color-primary;
+	color: white;
+	font-size: 0.65rem;
+	font-weight: 700;
+	border-radius: 9px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border: 2px solid white; // Biała obwódka dla oddzielenia
+}
+
+// --- PROFIL UŻYTKOWNIKA ---
+.userProfile {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding-left: 16px;
+	margin-left: 8px;
+	border-left: 1px solid $color-border;
+	cursor: pointer;
+
+	.userInfo {
+		display: none; // Ukryte na mobile
+		text-align: right;
+		line-height: 1.2;
+
+		@include lg {
+			display: block;
+		}
+
+		.userName {
+			display: block;
+			font-size: 0.9rem;
+			font-weight: 700;
+			color: $color-text;
+		}
+
+		.userRole {
+			font-size: 0.75rem;
+			color: $color-text-light;
+		}
+	}
+
+	.avatar {
+		width: 40px;
+		height: 40px;
+		border-radius: 50%;
+		overflow: hidden;
+		border: 2px solid $color-bg;
+		position: relative;
+
+		img {
+			object-fit: cover;
+		}
+	}
+}
