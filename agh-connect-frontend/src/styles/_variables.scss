@@ -1,0 +1,28 @@
+// Kolory (AGH i inne)
+$color-primary: #dc2626; // Twój red-600
+$color-primary-hover: #b91c1c; // Twój red-700
+$color-dark: #111827; // gray-900
+$color-text: #374151; // gray-700
+$color-text-light: #6b7280; // gray-500
+$color-bg: #f9fafb; // gray-50
+$color-white: #ffffff;
+$color-border: #e5e7eb; // gray-200
+
+$color-secondary: #9333ea;
+
+// Spacing (odpowiedniki p-4, m-2 itp.)
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 16px;
+$spacing-lg: 24px;
+$spacing-xl: 32px;
+
+// Radius
+$radius-sm: 6px;
+$radius-md: 12px;
+$radius-lg: 16px;
+$radius-circle: 50%;
+
+// Cienie
+$shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+$shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
