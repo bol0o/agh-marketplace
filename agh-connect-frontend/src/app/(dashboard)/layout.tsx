@@ -1,25 +1,17 @@
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import '../globals.scss';
 import { Header } from '@/components/shared/Header';
+import { Sidebar } from '@/components/shared/Sidebar';
+import styles from '@/styles/DashboardLayout.module.scss';
 
-const inter = Inter({
-	subsets: ['latin'],
-	variable: '--font-inter',
-	display: 'swap',
-});
-
-export const metadata: Metadata = {
-	title: 'AGH Connect',
-	description: 'Studencki Marketplace AGH',
-};
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
 	return (
-		<html lang="pl">
+		<div className={styles.wrapper}>
 			<Header />
-			{/* 3. Dodanie klasy fontu do body */}
-			<body className={inter.variable}>{children}</body>
-		</html>
+
+			<div className={styles.container}>
+				<Sidebar />
+
+				<main className={styles.mainContent}>{children}</main>
+			</div>
+		</div>
 	);
 }
