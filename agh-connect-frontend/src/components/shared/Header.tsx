@@ -24,9 +24,16 @@ import styles from '@/styles/Header.module.scss';
 export function Header() {
 	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 	const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+
 	const pathname = usePathname();
 
-	const isHomePage = pathname === '/';
+	const isActive = (path: string) => {
+		if (path === '/home') {
+			return pathname === '/home';
+		}
+
+		return pathname.startsWith(path);
+	};
 
 	useEffect(() => {
 		if (isMobileMenuOpen) {
@@ -40,7 +47,6 @@ export function Header() {
 		<>
 			<header className={styles.header}>
 				<div className={styles.container}>
-					{/* LEWA STRONA */}
 					<div className={styles.leftSection}>
 						<button
 							className={styles.hamburgerBtn}
@@ -49,50 +55,67 @@ export function Header() {
 							<Menu size={24} />
 						</button>
 
-						<Link href="/" className={styles.logo}>
-							<span>AGH Connect</span>
+						<Link href={'/home'}>
+							<div className={styles.logo}>
+								<div className={styles.logoIcon}>A</div>
+								<span>AGH Connect</span>
+							</div>
 						</Link>
 					</div>
 
-					{/* ŚRODEK (Szukajka Desktop) */}
 					<div className={styles.searchSection}>
 						<div className={styles.searchWrapper}>
-							{!isHomePage && (
-								<div>
-									<input type="text" placeholder="Szukaj notatek, sprzętu..." />
-									<button>
-										<Search size={18} />
-									</button>
-								</div>
-							)}
+							<div>
+								<input type="text" placeholder="Szukaj notatek, sprzętu..." />
+								<button>
+									<Search size={18} />
+								</button>
+							</div>
 						</div>
 					</div>
 
-					{/* PRAWA STRONA */}
 					<div className={styles.rightSection}>
-						{/* DESKTOP NAV */}
 						<div className={styles.desktopNav}>
 							<nav className={styles.navLinks}>
-								<Link href="/home">Home</Link>
-								<Link href="/marketplace">Oferty</Link>
+								<Link
+									href="/home"
+									className={isActive('/home') ? styles.active : ''}
+								>
+									Home
+								</Link>
+								<Link
+									href="/marketplace"
+									className={isActive('/marketplace') ? styles.active : ''}
+								>
+									Oferty
+								</Link>
 							</nav>
 
 							<div className={styles.desktopIcons}>
-								<Link href="/chats" className={styles.iconBtn} title="Wiadomości">
+								<Link
+									href="/chats"
+									className={`${styles.iconBtn} ${isActive('/chats') ? styles.active : ''}`}
+									title="Wiadomości"
+								>
 									<MessageSquare size={20} />
 								</Link>
+
 								<Link
 									href="/notifications"
-									className={styles.iconBtn}
+									className={`${styles.iconBtn} ${isActive('/notifications') ? styles.active : ''}`}
 									title="Powiadomienia"
 								>
 									<Bell size={20} />
 								</Link>
-								<Link href="/cart" className={styles.iconBtn} title="Koszyk">
+
+								<Link
+									href="/cart"
+									className={`${styles.iconBtn} ${isActive('/cart') ? styles.active : ''}`}
+									title="Koszyk"
+								>
 									<ShoppingCart size={20} />
 								</Link>
 
-								{/* DROPDOWN PROFILU */}
 								<div className={styles.userDropdownWrapper}>
 									<button className={styles.userBtn}>
 										<div className={styles.avatarPlaceholder}>
@@ -107,13 +130,15 @@ export function Header() {
 											<p>jan@student.agh.edu.pl</p>
 										</div>
 										<div className={styles.dropdownLinks}>
-											<Link href="/profile">
+											<Link href="/user">
 												<User size={16} /> Twój Profil
 											</Link>
-											<Link href="/orders">
+
+											<Link href="/user/orders">
 												<Package size={16} /> Zamówienia
 											</Link>
-											<Link href="/settings">
+
+											<Link href="/user/orders">
 												<Settings size={16} /> Ustawienia
 											</Link>
 										</div>
@@ -127,16 +152,15 @@ export function Header() {
 							</div>
 						</div>
 
-						{/* MOBILE ICONS */}
 						<div className={styles.mobileActions}>
-							{!isHomePage && (
-								<button onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}>
-									<Search size={22} />
-								</button>
-							)}
-							<Link href="/cart">
+							<button onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}>
+								<Search size={22} />
+							</button>
+
+							<Link href="/cart" className={isActive('/cart') ? styles.active : ''}>
 								<ShoppingCart size={22} />
 							</Link>
+
 							<Link href="/profile" className={styles.mobileAvatar}>
 								<div>
 									<User size={18} />
@@ -146,7 +170,6 @@ export function Header() {
 					</div>
 				</div>
 
-				{/* MOBILE SEARCH (Rozwijane) */}
 				{isMobileSearchOpen && (
 					<div className={styles.mobileSearchBar}>
 						<form onSubmit={(e) => e.preventDefault()} className={styles.relative}>
@@ -157,7 +180,23 @@ export function Header() {
 				)}
 			</header>
 
-			{/* MOBILE MENU (Drawer) */}
+			<MobileHeaderMenu
+				isMobileMenuOpen={isMobileMenuOpen}
+				setIsMobileMenuOpen={setIsMobileMenuOpen}
+			/>
+		</>
+	);
+}
+
+function MobileHeaderMenu({
+	isMobileMenuOpen,
+	setIsMobileMenuOpen,
+}: {
+	isMobileMenuOpen: boolean;
+	setIsMobileMenuOpen: (newOpenState: boolean) => void;
+}) {
+	return (
+		<>
 			<div
 				className={`${styles.backdrop} ${isMobileMenuOpen ? styles.open : ''}`}
 				onClick={() => setIsMobileMenuOpen(false)}
@@ -177,25 +216,19 @@ export function Header() {
 							<p>Przeglądaj</p>
 							<nav>
 								<MobileLink
-									href="/"
+									href="/home"
 									icon={<Home size={20} />}
 									onClick={() => setIsMobileMenuOpen(false)}
 								>
-									Strona Główna
+									Home
 								</MobileLink>
+
 								<MobileLink
-									href="/products"
+									href="/marketplace"
 									icon={<LayoutGrid size={20} />}
 									onClick={() => setIsMobileMenuOpen(false)}
 								>
 									Oferty
-								</MobileLink>
-								<MobileLink
-									href="/auctions"
-									icon={<Gavel size={20} />}
-									onClick={() => setIsMobileMenuOpen(false)}
-								>
-									Aukcje
 								</MobileLink>
 							</nav>
 						</div>
@@ -211,6 +244,7 @@ export function Header() {
 								>
 									Wiadomości
 								</MobileLink>
+
 								<MobileLink
 									href="/notifications"
 									icon={<Bell size={20} />}
@@ -226,14 +260,15 @@ export function Header() {
 							<p>Konto</p>
 							<nav>
 								<MobileLink
-									href="/orders"
+									href="/user/orders"
 									icon={<Package size={20} />}
 									onClick={() => setIsMobileMenuOpen(false)}
 								>
 									Twoje Zamówienia
 								</MobileLink>
+
 								<MobileLink
-									href="/settings"
+									href="/user/settings"
 									icon={<Settings size={20} />}
 									onClick={() => setIsMobileMenuOpen(false)}
 								>
@@ -261,7 +296,6 @@ export function Header() {
 	);
 }
 
-// Komponent Pomocniczy (Mobile Link)
 function MobileLink({
 	href,
 	icon,
@@ -275,12 +309,27 @@ function MobileLink({
 	onClick: () => void;
 	badge?: number;
 }) {
+	const pathname = usePathname();
+
+	const isActive = (path: string) => {
+		if (path === '/' || path === '/home') {
+			return pathname === '/' || pathname === '/home';
+		}
+
+		return pathname.startsWith(path);
+	};
+
 	return (
-		<Link href={href} onClick={onClick} className={styles.mobileLink}>
+		<Link
+			href={href}
+			onClick={onClick}
+			className={`${styles.mobileLink} ${isActive(href) ? styles.active : ''}`}
+		>
 			<div className={styles.left}>
 				<span className={styles.icon}>{icon}</span>
 				<span>{children}</span>
 			</div>
+
 			<div className={styles.right}>
 				{badge && <span className={styles.badge}>{badge}</span>}
 				<ChevronRight size={16} className={styles.chevron} />

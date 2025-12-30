@@ -1,7 +1,6 @@
 @use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
-// --- GŁÓWNY HEADER ---
 .header {
 	position: sticky;
 	top: 0;
@@ -13,9 +12,8 @@
 }
 
 .container {
-	display: flex;
-	height: 64px; // h-16
-	align-items: center;
+	@include flex-center;
+	height: 64px;
 	justify-content: space-between;
 	padding: 0 16px;
 	width: 100%;
@@ -28,10 +26,8 @@
 	}
 }
 
-// --- LEWA STRONA ---
 .leftSection {
-	display: flex;
-	align-items: center;
+	@include flex-center;
 	gap: 12px;
 }
 
@@ -54,22 +50,29 @@
 .logo {
 	display: flex;
 	align-items: center;
-	gap: 8px;
-	text-decoration: none;
+	gap: 10px;
+	font-weight: 800;
+	font-size: 1.2rem;
+	color: #000;
+	letter-spacing: -0.02em;
 
-	span {
-		font-size: 1.25rem;
-		font-weight: 800;
-		color: $color-primary;
-		letter-spacing: -0.025em;
+	.logoIcon {
+		background-color: $color-primary;
+		color: white;
+		height: 36px;
+		width: 36px;
+		border-radius: 8px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-weight: 900;
 	}
 }
 
-// --- ŚRODEK (SEARCH) ---
 .searchSection {
-	display: none; // Hidden on mobile
+	display: none;
 	flex: 1;
-	max-width: 672px; // max-w-2xl
+	max-width: 672px;
 	padding: 0 32px;
 
 	@include lg {
@@ -83,9 +86,9 @@
 
 	input {
 		width: 100%;
-		border-radius: 9999px; // Full pill
-		border: 1px solid #d1d5db; // gray-300
-		background-color: $color-bg-alt; // gray-50
+		border-radius: 9999px;
+		border: 1px solid #d1d5db;
+		background-color: $color-bg-alt;
 		padding: 10px 48px 10px 20px;
 		font-size: 0.875rem;
 		transition: all 0.2s;
@@ -94,7 +97,7 @@
 		&:focus {
 			border-color: $color-primary;
 			background-color: white;
-			box-shadow: 0 0 0 4px rgba($color-primary, 0.1); // ring-red-100
+			box-shadow: 0 0 0 4px rgba($color-primary, 0.1);
 		}
 	}
 
@@ -105,17 +108,16 @@
 		transform: translateY(-50%);
 		padding: 6px;
 		border-radius: 50%;
-		color: #9ca3af; // gray-400
+		color: #9ca3af;
 		transition: colors 0.2s;
 
 		&:hover {
-			background-color: #fef2f2; // red-50
+			background-color: #fef2f2;
 			color: $color-primary;
 		}
 	}
 }
 
-// --- PRAWA STRONA ---
 .rightSection {
 	display: flex;
 	align-items: center;
@@ -125,7 +127,6 @@
 	}
 }
 
-// Desktop Nav & Icons
 .desktopNav {
 	display: none;
 	align-items: center;
@@ -140,15 +141,48 @@
 	display: flex;
 	align-items: center;
 	gap: 24px;
-	font-size: 1rem;
+	font-size: 0.875rem;
 	font-weight: 500;
-	color: $color-text-secondary;
 
 	a {
-		transition: color 0.2s;
+		color: $color-text-secondary;
+		transition: all 0.2s;
+		text-decoration: none;
+		padding: 6px 0;
+		border-bottom: 2px solid transparent;
+
 		&:hover {
 			color: $color-primary;
 		}
+
+		&.active {
+			color: $color-primary;
+			font-weight: 700;
+			border-bottom-color: $color-primary;
+		}
+	}
+}
+
+.iconBtn {
+	position: relative;
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: $color-text-secondary;
+	transition: all 0.2s;
+	background-color: transparent;
+
+	&:hover {
+		background-color: $color-bg-alt;
+		color: $color-primary;
+	}
+
+	&.active {
+		background-color: #fef2f2;
+		color: $color-primary;
 	}
 }
 
@@ -158,27 +192,12 @@
 	gap: 8px;
 	border-left: 1px solid $color-border;
 	padding-left: 24px;
-
-	.iconBtn {
-		padding: 8px;
-		color: $color-text-secondary;
-		border-radius: 50%;
-		transition: colors 0.2s;
-		display: flex; // Fix dla SVG
-
-		&:hover {
-			background-color: $color-bg-alt;
-			color: $color-primary;
-		}
-	}
 }
 
-// Dropdown Profilu
 .userDropdownWrapper {
 	position: relative;
 	margin-left: 8px;
 
-	// Przycisk otwierający
 	.userBtn {
 		display: flex;
 		align-items: center;
@@ -190,8 +209,8 @@
 		transition: all 0.2s;
 
 		&:hover {
-			border-color: #fecaca; // red-200
-			background-color: #fef2f2; // red-50
+			border-color: #fecaca;
+			background-color: #fef2f2;
 		}
 
 		.avatarPlaceholder {
@@ -212,7 +231,6 @@
 		}
 	}
 
-	// Menu rozwijane
 	.dropdownMenu {
 		position: absolute;
 		right: 0;
@@ -225,14 +243,12 @@
 		overflow: hidden;
 		z-index: 50;
 
-		// Logika Hover (widoczność)
 		opacity: 0;
 		visibility: hidden;
 		transform: translateY(10px);
 		transition: all 0.2s ease-in-out;
 	}
 
-	// To sprawia, że menu się pokazuje po najechaniu na Wrapper
 	&:hover .dropdownMenu {
 		opacity: 1;
 		visibility: visible;
@@ -304,7 +320,6 @@
 	}
 }
 
-// Mobile Actions (Prawy górny róg na telefonie)
 .mobileActions {
 	display: flex;
 	align-items: center;
@@ -347,7 +362,6 @@
 	}
 }
 
-// Mobile Search Bar (Rozwijany)
 .mobileSearchBar {
 	display: block;
 	border-top: 1px solid $color-border;
@@ -386,8 +400,6 @@
 	}
 }
 
-// --- MOBILE DRAWER (MENU BOCZNE) ---
-
 .backdrop {
 	position: fixed;
 	inset: 0;
@@ -396,12 +408,10 @@
 	backdrop-filter: blur(4px);
 	transition: opacity 0.3s;
 
-	// Stan zamknięty
 	opacity: 0;
 	visibility: hidden;
 	pointer-events: none;
 
-	// Stan otwarty
 	&.open {
 		opacity: 1;
 		visibility: visible;
@@ -425,10 +435,8 @@
 	box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 	transition: transform 0.3s ease-in-out;
 
-	// Stan zamknięty
 	transform: translateX(-100%);
 
-	// Stan otwarty
 	&.open {
 		transform: translateX(0);
 	}
@@ -553,27 +561,43 @@
 	}
 }
 
-// Link w Mobile Menu
 .mobileLink {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 	border-radius: 12px;
 	padding: 12px;
-	font-size: 0.875rem;
+	font-size: 0.9rem;
 	font-weight: 500;
-	color: $color-text-main;
+	color: #374151;
 	transition: all 0.2s;
+	text-decoration: none;
+	margin-bottom: 4px;
 
 	&:hover {
-		background-color: #fef2f2;
-		color: #b91c1c;
+		background-color: #f9fafb;
+		color: #dc2626;
 
 		.icon {
-			color: $color-primary;
+			color: #dc2626;
 		}
 		.chevron {
-			color: #f87171;
+			color: #fca5a5;
+		}
+	}
+
+	&.active {
+		background-color: #fef2f2;
+		color: #dc2626;
+		font-weight: 700;
+
+		.icon {
+			color: #dc2626;
+		}
+
+		.chevron {
+			color: #dc2626;
+			opacity: 1;
 		}
 	}
 
@@ -594,21 +618,21 @@
 		gap: 8px;
 
 		.badge {
-			height: 20px;
-			min-width: 20px;
-			padding: 0 6px;
-			border-radius: 99px;
 			background-color: $color-primary;
 			color: white;
-			font-size: 0.65rem;
-			font-weight: 700;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-		}
 
-		.chevron {
-			color: #d1d5db;
+			font-size: 0.75rem;
+			font-weight: 700;
+			line-height: 1;
+
+			min-width: 20px;
+			height: 20px;
+			padding: 0 6px;
+			border-radius: 99px;
+
+			@include flex-center;
+
+			box-shadow: 0 2px 4px rgba($color-primary, 0.3);
 		}
 	}
 }

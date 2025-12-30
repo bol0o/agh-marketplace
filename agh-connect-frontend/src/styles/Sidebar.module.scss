@@ -228,6 +228,23 @@
 		}
 	}
 
+	&.active {
+		background-color: #fef2f2; // Bardzo jasne czerwone tło
+		color: $color-primary; // Czerwony tekst
+		font-weight: 700; // Pogrubienie
+
+		.icon {
+			color: $color-primary; // Czerwona ikona
+		}
+
+		// Opcjonalnie: ukrywamy strzałkę, jeśli jest aktywny, lub też ją kolorujemy
+		.chevron {
+			color: #fca5a5;
+			opacity: 1;
+			transform: translateX(0);
+		}
+	}
+
 	.content {
 		display: flex;
 		align-items: center;

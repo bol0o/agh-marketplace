@@ -19,21 +19,11 @@ import styles from '@/styles/Sidebar.module.scss';
 
 export type ListingType = 'all' | 'buy_now' | 'auction';
 
-interface FilterState {
-	minPrice: string;
-	maxPrice: string;
-	condition: string[];
-	auctionStatus: string[];
-}
-
-// --- GŁÓWNY KOMPONENT SIDEBAR ---
 export function Sidebar() {
 	const pathname = usePathname();
 	const isMarketplacePage = pathname.startsWith('/marketplace');
 	const [isMobileOpen, setIsMobileOpen] = useState(false);
 
-	// Jeśli nie jesteśmy na marketplace, nie pokazujemy nic na mobile
-	// Na desktopie pokazujemy Sidebar z linkami
 	return (
 		<>
 			{/* DESKTOP SIDEBAR */}
@@ -41,19 +31,19 @@ export function Sidebar() {
 				<SidebarContent isMarketplacePage={isMarketplacePage} />
 			</aside>
 
-			{/* MOBILE TRIGGER BUTTON (Tylko na Marketplace) */}
+			{/* MOBILE TRIGGER (Tylko Marketplace) */}
 			{isMarketplacePage && (
 				<div className={styles.mobileTriggerWrapper}>
 					<button
 						className={styles.mobileFilterBtn}
 						onClick={() => setIsMobileOpen(true)}
 					>
-						<SlidersHorizontal size={18} /> Filtrowanie i Sortowanie
+						<SlidersHorizontal size={18} /> Kategorie i Filtry
 					</button>
 				</div>
 			)}
 
-			{/* MOBILE DRAWER (MODAL) */}
+			{/* MOBILE DRAWER */}
 			{isMobileOpen && (
 				<div className={styles.mobileDrawerOverlay} onClick={() => setIsMobileOpen(false)}>
 					<div className={styles.mobileDrawer} onClick={(e) => e.stopPropagation()}>
@@ -64,6 +54,17 @@ export function Sidebar() {
 							</button>
 						</div>
 						<div className={styles.drawerBody}>
+							{/* 1. DODANO KATEGORIE NA MOBILE */}
+							<CategoryNav onNavigate={() => setIsMobileOpen(false)} />
+
+							{/* Separator estetyczny */}
+							<div className="my-6 border-b border-gray-100" />
+
+							<h3 className={styles.sectionTitle} style={{ marginTop: '24px' }}>
+								<Filter size={14} /> Opcje filtrowania
+							</h3>
+
+							{/* 2. FILTRY */}
 							<FilterLogicContent closeDrawer={() => setIsMobileOpen(false)} />
 						</div>
 						<div className={styles.drawerFooter}>
@@ -81,7 +82,7 @@ export function Sidebar() {
 	);
 }
 
-// --- ZAWARTOŚĆ SIDEBARA (Kategorie + Filtry lub InfoBox) ---
+// --- DESKTOP CONTENT ---
 function SidebarContent({ isMarketplacePage }: { isMarketplacePage: boolean }) {
 	return (
 		<>
@@ -92,17 +93,7 @@ function SidebarContent({ isMarketplacePage }: { isMarketplacePage: boolean }) {
 				{isMarketplacePage ? <FilterLogicContent /> : <InfoBox />}
 			</div>
 
-			<div className={styles.section}>
-				<h3 className={styles.sectionTitle}>
-					<Tag size={14} /> Kategorie
-				</h3>
-				<nav className={styles.navLinks}>
-					<SidebarLink href="/marketplace?cat=elektronika" label="Elektronika" />
-					<SidebarLink href="/marketplace?cat=ksiazki" label="Książki i Notatki" />
-					<SidebarLink href="/marketplace?cat=akademik" label="Do Akademika" />
-					<SidebarLink href="/marketplace?cat=uslugi" label="Usługi Studenckie" />
-				</nav>
-			</div>
+			<CategoryNav />
 
 			<div className={styles.section}>
 				<h3 className={styles.sectionTitle}>
@@ -130,73 +121,104 @@ function SidebarContent({ isMarketplacePage }: { isMarketplacePage: boolean }) {
 	);
 }
 
-// --- LOGIKA FILTRÓW (Wydzielona, by używać na Mobile i Desktop) ---
 function FilterLogicContent({ closeDrawer }: { closeDrawer?: () => void }) {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 
-	const [listingType, setListingType] = useState<ListingType>('all');
-	const [filters, setFilters] = useState<FilterState>({
-		minPrice: '',
-		maxPrice: '',
-		condition: [],
-		auctionStatus: [],
+	// Pobieramy dane z URL
+	const currentType = (searchParams.get('type') as ListingType) || 'all';
+	const currentConditions = searchParams.get('condition')?.split(',').filter(Boolean) || [];
+	const currentStatus = searchParams.get('status')?.split(',').filter(Boolean) || [];
+
+	// Stan lokalny inputów ceny
+	const [price, setPrice] = useState({
+		min: searchParams.get('minPrice') || '',
+		max: searchParams.get('maxPrice') || '',
 	});
 
+	const minPriceParam = searchParams.get('minPrice');
+	const maxPriceParam = searchParams.get('maxPrice');
+
+	// 2. Synchronizacja URL -> Inputy
 	useEffect(() => {
-		const type = searchParams.get('type') as ListingType;
-		if (type) setListingType(type);
-		setFilters({
-			minPrice: searchParams.get('minPrice') || '',
-			maxPrice: searchParams.get('maxPrice') || '',
-			condition: searchParams.get('condition')?.split(',') || [],
-			auctionStatus: searchParams.get('status')?.split(',') || [],
+		setPrice({
+			min: minPriceParam || '',
+			max: maxPriceParam || '',
 		});
-	}, [searchParams]);
 
-	const applyFilters = (newType: ListingType, newFilters: FilterState) => {
-		const params = new URLSearchParams();
-		if (newType !== 'all') params.set('type', newType);
-		if (newFilters.minPrice) params.set('minPrice', newFilters.minPrice);
-		if (newFilters.maxPrice) params.set('maxPrice', newFilters.maxPrice);
-		if (newFilters.condition.length > 0)
-			params.set('condition', newFilters.condition.join(','));
-		if (newFilters.auctionStatus.length > 0)
-			params.set('status', newFilters.auctionStatus.join(','));
-
-		router.push(`/marketplace?${params.toString()}`);
+		// 3. Tablica zależności zawiera teraz stringi, a nie obiekt
+	}, [minPriceParam, maxPriceParam]);
+	const updateURL = (key: string, value: string | null) => {
+		const params = new URLSearchParams(searchParams.toString());
+		if (value) params.set(key, value);
+		else params.delete(key);
+		router.push(`/marketplace?${params.toString()}`, { scroll: false });
 	};
 
 	const handleTypeChange = (type: ListingType) => {
-		setListingType(type);
-		applyFilters(type, filters);
+		updateURL('type', type === 'all' ? null : type);
 	};
 
-	const handleCheckboxChange = (category: keyof FilterState, value: string) => {
-		setFilters((prev) => {
-			const current = prev[category] as string[];
-			const updated = current.includes(value)
-				? current.filter((item) => item !== value)
-				: [...current, value];
-			const newFilters = { ...prev, [category]: updated };
-			applyFilters(listingType, newFilters);
-			return newFilters;
-		});
+	const handleCheckboxChange = (
+		paramName: 'condition' | 'status',
+		currentValues: string[],
+		value: string
+	) => {
+		const newValues = currentValues.includes(value)
+			? currentValues.filter((v) => v !== value)
+			: [...currentValues, value];
+		updateURL(paramName, newValues.length > 0 ? newValues.join(',') : null);
 	};
 
+	// --- 1. ZABEZPIECZENIE PRZED UJEMNYMI (onChange) ---
 	const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target;
-		setFilters((prev) => ({ ...prev, [name]: value }));
+
+		// Jeśli wartość jest ujemna, ignorujemy zmianę (nie pozwalamy wpisać minusa)
+		if (value !== '' && Number(value) < 0) return;
+
+		setPrice((prev) => ({ ...prev, [name === 'minPrice' ? 'min' : 'max']: value }));
 	};
 
+	// --- 2. INTELIGENTNA WALIDACJA (onBlur / Enter) ---
 	const commitPriceFilter = () => {
-		applyFilters(listingType, filters);
+		let finalMin = price.min;
+		let finalMax = price.max;
+
+		// Konwersja na liczby do porównania
+		const numMin = finalMin ? Number(finalMin) : -1;
+		const numMax = finalMax ? Number(finalMax) : -1;
+
+		// LOGIKA: Jeśli oba pola są wypełnione i Min > Max -> Zamień je miejscami
+		// Np. Użytkownik wpisał Od: 100, Do: 50 -> My robimy Od: 50, Do: 100
+		if (finalMin && finalMax && numMin > numMax) {
+			const temp = finalMin;
+			finalMin = finalMax;
+			finalMax = temp;
+			// Aktualizujemy też stan wizualny inputów od razu, żeby użytkownik widział zamianę
+			setPrice({ min: finalMin, max: finalMax });
+		}
+
+		const params = new URLSearchParams(searchParams.toString());
+
+		if (finalMin) params.set('minPrice', finalMin);
+		else params.delete('minPrice');
+
+		if (finalMax) params.set('maxPrice', finalMax);
+		else params.delete('maxPrice');
+
+		router.push(`/marketplace?${params.toString()}`, { scroll: false });
 	};
 
 	const clearFilters = () => {
-		const resetFilters = { minPrice: '', maxPrice: '', condition: [], auctionStatus: [] };
-		setFilters(resetFilters);
-		applyFilters(listingType, resetFilters);
+		const params = new URLSearchParams(searchParams.toString());
+		params.delete('type');
+		params.delete('minPrice');
+		params.delete('maxPrice');
+		params.delete('condition');
+		params.delete('status');
+		setPrice({ min: '', max: '' });
+		router.push(`/marketplace?${params.toString()}`, { scroll: false });
 		if (closeDrawer) closeDrawer();
 	};
 
@@ -205,19 +227,19 @@ function FilterLogicContent({ closeDrawer }: { closeDrawer?: () => void }) {
 			<div className={styles.typeToggle}>
 				<button
 					onClick={() => handleTypeChange('all')}
-					className={`${styles.toggleBtn} ${listingType === 'all' ? styles.active : ''}`}
+					className={`${styles.toggleBtn} ${currentType === 'all' ? styles.active : ''}`}
 				>
 					Wszystkie
 				</button>
 				<button
 					onClick={() => handleTypeChange('buy_now')}
-					className={`${styles.toggleBtn} ${listingType === 'buy_now' ? styles.active : ''}`}
+					className={`${styles.toggleBtn} ${currentType === 'buy_now' ? styles.active : ''}`}
 				>
 					Oferty
 				</button>
 				<button
 					onClick={() => handleTypeChange('auction')}
-					className={`${styles.toggleBtn} ${listingType === 'auction' ? styles.active : ''}`}
+					className={`${styles.toggleBtn} ${currentType === 'auction' ? styles.active : ''}`}
 				>
 					Aukcje
 				</button>
@@ -231,18 +253,22 @@ function FilterLogicContent({ closeDrawer }: { closeDrawer?: () => void }) {
 							type="number"
 							name="minPrice"
 							placeholder="Od"
-							value={filters.minPrice}
+							min="0" // HTML5 constraint
+							value={price.min}
 							onChange={handlePriceChange}
 							onBlur={commitPriceFilter}
+							onKeyDown={(e) => e.key === 'Enter' && commitPriceFilter()}
 						/>
 						<span>-</span>
 						<input
 							type="number"
 							name="maxPrice"
 							placeholder="Do"
-							value={filters.maxPrice}
+							min="0" // HTML5 constraint
+							value={price.max}
 							onChange={handlePriceChange}
 							onBlur={commitPriceFilter}
+							onKeyDown={(e) => e.key === 'Enter' && commitPriceFilter()}
 						/>
 					</div>
 				</div>
@@ -252,37 +278,45 @@ function FilterLogicContent({ closeDrawer }: { closeDrawer?: () => void }) {
 					<div className="space-y-1">
 						<Checkbox
 							label="Nowy"
-							checked={filters.condition.includes('new')}
-							onChange={() => handleCheckboxChange('condition', 'new')}
+							checked={currentConditions.includes('new')}
+							onChange={() =>
+								handleCheckboxChange('condition', currentConditions, 'new')
+							}
 						/>
 						<Checkbox
 							label="Używany"
-							checked={filters.condition.includes('used')}
-							onChange={() => handleCheckboxChange('condition', 'used')}
+							checked={currentConditions.includes('used')}
+							onChange={() =>
+								handleCheckboxChange('condition', currentConditions, 'used')
+							}
 						/>
 						<Checkbox
 							label="Uszkodzony"
-							checked={filters.condition.includes('damaged')}
-							onChange={() => handleCheckboxChange('condition', 'damaged')}
+							checked={currentConditions.includes('damaged')}
+							onChange={() =>
+								handleCheckboxChange('condition', currentConditions, 'damaged')
+							}
 						/>
 					</div>
 				</div>
 
-				{(listingType === 'auction' || listingType === 'all') && (
+				{(currentType === 'auction' || currentType === 'all') && (
 					<div className={styles.filterGroup}>
 						<label>Status aukcji</label>
 						<div className="space-y-1">
 							<Checkbox
 								label="Kończące się (< 24h)"
-								checked={filters.auctionStatus.includes('ending_soon')}
+								checked={currentStatus.includes('ending_soon')}
 								onChange={() =>
-									handleCheckboxChange('auctionStatus', 'ending_soon')
+									handleCheckboxChange('status', currentStatus, 'ending_soon')
 								}
 							/>
 							<Checkbox
 								label="Bez ofert kupna"
-								checked={filters.auctionStatus.includes('no_bids')}
-								onChange={() => handleCheckboxChange('auctionStatus', 'no_bids')}
+								checked={currentStatus.includes('no_bids')}
+								onChange={() =>
+									handleCheckboxChange('status', currentStatus, 'no_bids')
+								}
 							/>
 						</div>
 					</div>
@@ -317,8 +351,57 @@ function SidebarLink({
 	label: string;
 	icon?: React.ReactNode;
 }) {
+	const pathname = usePathname();
+	const searchParams = useSearchParams();
+
+	// 1. Sprawdzamy czy to link kategorii (czy zawiera "?cat=")
+	const isCategoryLink = href.includes('?cat=');
+
+	// 2. Budujemy docelowy URL
+	let finalHref = href;
+
+	if (isCategoryLink) {
+		// Parsujemy parametry z linku (np. cat=elektronika)
+		const [targetPath, targetQuery] = href.split('?');
+		const targetParams = new URLSearchParams(targetQuery);
+		const targetCat = targetParams.get('cat');
+
+		// Kopiujemy OBECNE parametry z URL przeglądarki
+		const currentParams = new URLSearchParams(searchParams.toString());
+
+		// Ustawiamy nową kategorię (lub usuwamy jeśli kliknięto tę samą - opcjonalne)
+		if (targetCat) {
+			currentParams.set('cat', targetCat);
+		}
+
+		// Jeśli jesteśmy na innej stronie niż marketplace, musimy tam wrócić
+		// ale z zachowaniem parametrów
+		finalHref = `${targetPath}?${currentParams.toString()}`;
+	}
+
+	// 3. Logika aktywnego linku (Poprawiona z poprzedniej odpowiedzi)
+	let isActive = false;
+	if (href.includes('?')) {
+		const [targetPath, targetQuery] = href.split('?');
+		const targetParams = new URLSearchParams(targetQuery);
+		const isPathMatch = pathname === targetPath;
+
+		let areParamsMatch = true;
+		targetParams.forEach((value, key) => {
+			if (searchParams.get(key) !== value) areParamsMatch = false;
+		});
+		isActive = isPathMatch && areParamsMatch;
+	} else {
+		isActive = href === '/' ? pathname === '/' : pathname.startsWith(href);
+	}
+
 	return (
-		<Link href={href} className={styles.navLink}>
+		<Link
+			href={finalHref}
+			className={`${styles.navLink} ${isActive ? styles.active : ''}`}
+			// Opcjonalnie: prevent scroll reset dla płynności
+			scroll={false}
+		>
 			<div className={styles.content}>
 				{icon && <span className={styles.icon}>{icon}</span>}
 				<span className="truncate">{label}</span>
@@ -343,5 +426,25 @@ function Checkbox({
 			<div className={styles.checkmark}></div>
 			<span className={styles.labelText}>{label}</span>
 		</label>
+	);
+}
+
+// Nowy komponent pomocniczy (na dole pliku)
+function CategoryNav({ onNavigate }: { onNavigate?: () => void }) {
+	// Wrapper div onClick przechwytuje kliknięcia w linki (Event Bubbling)
+	// Dzięki temu nie musimy przerabiać skomplikowanego SidebarLinka
+	return (
+		<div className={styles.section}>
+			<h3 className={styles.sectionTitle}>
+				<Tag size={14} /> Kategorie
+			</h3>
+			<nav className={styles.navLinks} onClick={onNavigate}>
+				<SidebarLink href="/marketplace?cat=elektronika" label="Elektronika" />
+				<SidebarLink href="/marketplace?cat=ksiazki" label="Książki i Notatki" />
+				<SidebarLink href="/marketplace?cat=akademik" label="Do Akademika" />
+				<SidebarLink href="/marketplace?cat=uslugi" label="Usługi Studenckie" />
+				<SidebarLink href="/marketplace?cat=inne" label="Inne" />
+			</nav>
+		</div>
 	);
 }
