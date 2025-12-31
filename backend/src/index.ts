@@ -4,6 +4,8 @@ import dotenv from "dotenv";
 import authRoutes from "./routes/auth.routes";
 import productRoutes from "./routes/product.routes";
 import cartRoutes from "./routes/cart.routes";
+import orderRoutes from "./routes/order.routes";
+import reviewRoutes from "./routes/review.routes";
 
 dotenv.config();
 
@@ -17,6 +19,8 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/cart", cartRoutes);
+app.use("/api/orders", orderRoutes);
+app.use("/api/reviews", reviewRoutes);
 
 app.get("/", (req, res) => {
   res.send("Backend is running");

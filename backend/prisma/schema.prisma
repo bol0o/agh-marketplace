@@ -9,29 +9,27 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// MODELE 
-
 // 1. Użytkownik
 model User {
-  id              String    @id @default(uuid())
-  email           String    @unique
-  passwordHash    String
-  firstName       String
-  lastName        String
-  studentId       String?   @unique // Nr albumu
-  role            Role      @default(STUDENT)
+  id            String    @id @default(uuid())
+  email         String    @unique
+  passwordHash  String
+  firstName     String
+  lastName      String
+  studentId     String?   @unique
+  role          Role      @default(STUDENT)
   
-  // Bezpieczeństwo 
-  refreshToken    String?
+  refreshToken  String?
 
-  // Relacje
-  products        Product[] @relation("SellerProducts")
-  orders          Order[]
-  reviews         Review[]
-  cart            Cart?
+  products      Product[] @relation("SellerProducts")
+  orders        Order[]
+  cart          Cart?
 
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  reviewsWritten  Review[]  @relation("WrittenReviews")  // Opinie, które ja wystawiłem innym
+  reviewsReceived Review[]  @relation("ReceivedReviews") // Opinie, które inni wystawili mnie
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }
 
 enum Role {
@@ -42,21 +40,19 @@ enum Role {
 
 // 2. Produkt
 model Product {
-  id          String   @id @default(uuid())
+  id          String    @id @default(uuid())
   title       String
   description String
   price       Float
   category    Category
   imageUrl    String?
   
-  // Kto sprzedaje
-  seller      User     @relation("SellerProducts", fields: [sellerId], references: [id])
+  seller      User      @relation("SellerProducts", fields: [sellerId], references: [id])
   sellerId    String
 
   // Relacje
   cartItems   CartItem[]
   orderItems  OrderItem[]
-  reviews     Review[]
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -72,23 +68,23 @@ enum Category {
 
 // 3. Koszyk
 model Cart {
-  id        String     @id @default(uuid())
-  user      User       @relation(fields: [userId], references: [id])
-  userId    String     @unique
+  id        String    @id @default(uuid())
+  user      User      @relation(fields: [userId], references: [id])
+  userId    String    @unique
   
   items     CartItem[]
   
-  updatedAt DateTime   @updatedAt
+  updatedAt DateTime  @updatedAt
 }
 
 model CartItem {
-  id        String   @id @default(uuid())
-  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  id        String    @id @default(uuid())
+  cart      Cart      @relation(fields: [cartId], references: [id], onDelete: Cascade)
   cartId    String
-  product   Product  @relation(fields: [productId], references: [id])
+  product   Product   @relation(fields: [productId], references: [id])
   productId String
   
-  quantity  Int      @default(1)
+  quantity  Int       @default(1)
 
   @@unique([cartId, productId])
 }
@@ -107,14 +103,14 @@ model Order {
 }
 
 model OrderItem {
-  id        String  @id @default(uuid())
-  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  orderId   String
-  product   Product @relation(fields: [productId], references: [id])
-  productId String
+  id          String  @id @default(uuid())
+  order       Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId     String
+  product     Product @relation(fields: [productId], references: [id])
+  productId   String
   
-  quantity  Int
-  priceAtTime Float // Cena w momencie zakupu
+  quantity    Int
+  priceAtTime Float 
 }
 
 enum OrderStatus {
@@ -123,17 +119,22 @@ enum OrderStatus {
   CANCELLED
 }
 
-// 5. Opinie
+// 5. Opinie (User -> User)
 model Review {
-  id        String   @id @default(uuid())
-  rating    Int
-  comment   String?
+  id          String    @id @default(uuid())
+  rating      Int       // Ocena 1-5
+  comment     String?
   
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String
+  // Autor opinii
+  reviewer    User      @relation("WrittenReviews", fields: [reviewerId], references: [id])
+  reviewerId  String
   
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productId String
+  // Oceniany użytkownik (np. Sprzedawca)
+  reviewee    User      @relation("ReceivedReviews", fields: [revieweeId], references: [id])
+  revieweeId  String
 
-  createdAt DateTime @default(now())
+  createdAt   DateTime  @default(now())
+
+  // Zabezpieczenie: Jedna opinia od jednej osoby dla jednego użytkownika
+  @@unique([reviewerId, revieweeId])
 }

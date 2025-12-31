@@ -10,6 +10,6 @@ const router = Router();
 
 router.get("/", authenticateToken, getCart); // GET /api/cart
 router.post("/add", authenticateToken, addToCart); // POST /api/cart/items
-router.delete("/remove", authenticateToken, removeFromCart); // DELETE /api/cart/items/123
+router.delete("/remove/:itemId", authenticateToken, removeFromCart); // DELETE /api/cart/items/123
 
 export default router;
