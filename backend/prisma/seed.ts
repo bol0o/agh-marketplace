@@ -13,7 +13,7 @@ async function main() {
   await prisma.product.deleteMany();
   await prisma.user.deleteMany();
 
-  console.log("🗑️  Baza wyczyszczona");
+  console.log("Baza wyczyszczona");
 
   // 2. Haszowanie hasła (hasło: "student123")
   const passwordHash = await bcrypt.hash("student123", 10);
@@ -50,7 +50,7 @@ async function main() {
     },
   });
 
-  console.log("👥 Utworzono użytkowników (Hasło: student123)");
+  console.log("Utworzono użytkowników (Hasło: student123)");
 
   // 4. Tworzenie produktów
   const products = await prisma.product.createMany({
@@ -83,7 +83,7 @@ async function main() {
     ],
   });
 
-  console.log("📦 Dodano produkty");
+  console.log("Dodano produkty");
 }
 
 main()

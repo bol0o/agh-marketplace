@@ -1,6 +1,9 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import authRoutes from "./routes/auth.routes";
+import productRoutes from "./routes/product.routes";
+import cartRoutes from "./routes/cart.routes";
 
 dotenv.config();
 
@@ -10,11 +13,15 @@ const port = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
-// Prosty endpoint testowy
+// Routes
+app.use("/api/auth", authRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/cart", cartRoutes);
+
 app.get("/", (req, res) => {
-  res.json({ message: "AGH Marketplace Backend działa! 🚀" });
+  res.send("Backend is running");
 });
 
 app.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
+  console.log(`Server is running on http://localhost:${port}`);
 });
