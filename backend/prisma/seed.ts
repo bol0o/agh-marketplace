@@ -1,10 +1,25 @@
-import { PrismaClient, Category, Role } from "@prisma/client";
+import "dotenv/config"; // 1. Load env vars first
+import { PrismaClient, Role, Category } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import { fakerPL as faker } from "@faker-js/faker";
 
 const prisma = new PrismaClient();
 
 async function main() {
-  // 1. Wyczyść bazę
+  console.log("Starting seeding process...");
+
+  //PASSWORDS FROM ENV
+  const rawAdminPass = process.env.ADMIN_PASSWORD;
+  const rawStudentPass = process.env.STUDENT_PASSWORD;
+
+  //Validation: Ensure passwords exist in .env
+  if (!rawAdminPass || !rawStudentPass) {
+    throw new Error(
+      "Error: ADMIN_PASSWORD or STUDENT_PASSWORD missing in .env file"
+    );
+  }
+
+  //CLEAR DATABASE
   await prisma.review.deleteMany();
   await prisma.cartItem.deleteMany();
   await prisma.cart.deleteMany();
@@ -13,77 +28,117 @@ async function main() {
   await prisma.product.deleteMany();
   await prisma.user.deleteMany();
 
-  console.log("Baza wyczyszczona");
+  console.log("Database cleared.");
 
-  // 2. Haszowanie hasła (hasło: "student123")
-  const passwordHash = await bcrypt.hash("student123", 10);
+  //HASH PASSWORDS FROM ENV
+  //Password for regular students
+  const studentPassword = await bcrypt.hash(rawStudentPass, 10);
+  //Password for Admins/Team
+  const adminPassword = await bcrypt.hash(rawAdminPass, 10);
 
-  // 3. Tworzenie użytkowników
-  const admin = await prisma.user.create({
+  //Create Lecturer Account (Admin)
+  const lecturer = await prisma.user.create({
     data: {
-      email: "admin@agh.edu.pl",
-      passwordHash,
-      firstName: "Admin",
-      lastName: "Systemowy",
+      email: "prowadzacy@agh.edu.pl",
+      passwordHash: adminPassword,
+      firstName: "Prowadzący",
+      lastName: "Zajęcia",
       role: Role.ADMIN,
     },
   });
+  console.log("Created Lecturer (Admin): prowadzacy@agh.edu.pl");
 
-  const student = await prisma.user.create({
+  const kaczmar = await prisma.user.create({
     data: {
-      email: "student@student.agh.edu.pl",
-      passwordHash,
-      firstName: "Jan",
-      lastName: "Kowalski",
-      studentId: "123456",
-      role: Role.STUDENT,
+      email: "kaczmar@student.agh.edu.pl",
+      passwordHash: adminPassword,
+      firstName: "Kaczmar",
+      lastName: "Dev",
+      studentId: "111111",
+      role: Role.ADMIN,
     },
   });
+  console.log("Created Your Account (Admin): kaczmar@student.agh.edu.pl");
 
-  const teacher = await prisma.user.create({
+  const bolek = await prisma.user.create({
     data: {
-      email: "prow@agh.edu.pl",
-      passwordHash,
-      firstName: "Dr",
-      lastName: "Prowadzący",
-      role: Role.TEACHER,
+      email: "bolek@student.agh.edu.pl",
+      passwordHash: adminPassword,
+      firstName: "Bolek",
+      lastName: "Programista",
+      studentId: "222222",
+      role: Role.ADMIN,
     },
   });
+  console.log("Created Bolek's Account (Admin): bolek@student.agh.edu.pl");
 
-  console.log("Utworzono użytkowników (Hasło: student123)");
+  //STUDENTS
 
-  // 4. Tworzenie produktów
-  const products = await prisma.product.createMany({
-    data: [
-      {
-        title: "Analiza Matematyczna - Krysicki Włodarski",
-        description:
-          "Klasyk. Stan dobry, trochę popłakana na stronach z całkami.",
-        price: 45.0,
-        category: Category.BOOKS,
-        sellerId: student.id,
-        imageUrl: "https://placehold.co/600x400/png?text=Ksiazka",
-      },
-      {
-        title: "Kalkulator Casio FX-991EX",
-        description: "Liczy macierze i całki. Niezbędny na egzamin.",
-        price: 80.0,
-        category: Category.ELECTRONICS,
-        sellerId: student.id,
-        imageUrl: "https://placehold.co/600x400/png?text=Kalkulator",
-      },
-      {
-        title: "Bluza Wydziałowa WIEiT",
-        description: "Rozmiar L, nowa, nieśmigana.",
-        price: 120.0,
-        category: Category.CLOTHING,
-        sellerId: student.id,
-        imageUrl: "https://placehold.co/600x400/png?text=Bluza",
-      },
-    ],
-  });
+  // 8. Generate 20 random students
+  const users = [kaczmar, bolek, lecturer];
 
-  console.log("Dodano produkty");
+  for (let i = 0; i < 20; i++) {
+    const firstName = faker.person.firstName();
+    const lastName = faker.person.lastName();
+
+    const user = await prisma.user.create({
+      data: {
+        email: faker.internet.email({
+          firstName,
+          lastName,
+          provider: "student.agh.edu.pl",
+        }),
+        passwordHash: studentPassword,
+        firstName,
+        lastName,
+        studentId: faker.string.numeric(6),
+        role: Role.STUDENT,
+      },
+    });
+    users.push(user);
+  }
+
+  //PRODUCTS
+
+  // 9. Generate 50 products
+  const categories = Object.values(Category);
+
+  for (let i = 0; i < 50; i++) {
+    const randomUser = users[Math.floor(Math.random() * users.length)];
+    const randomCategory =
+      categories[Math.floor(Math.random() * categories.length)];
+
+    let title = faker.commerce.productName();
+    let imageText = "Produkt";
+
+    if (randomCategory === "BOOKS") {
+      title = "Podręcznik: " + faker.lorem.words(3);
+      imageText = "Ksiazka";
+    } else if (randomCategory === "ELECTRONICS") {
+      title =
+        faker.commerce.productAdjective() + " " + faker.commerce.product();
+      imageText = "Elektronika";
+    } else if (randomCategory === "CLOTHING") {
+      title = "Bluza " + faker.commerce.productMaterial();
+      imageText = "Ciuchy";
+    }
+
+    await prisma.product.create({
+      data: {
+        title: title,
+        description: faker.commerce.productDescription(),
+        price: parseFloat(faker.commerce.price({ min: 10, max: 500 })),
+        category: randomCategory,
+        imageUrl: `https://placehold.co/600x400/png?text=${imageText}+${i}`,
+        sellerId: randomUser.id,
+        createdAt: faker.date.past(),
+      },
+    });
+  }
+
+  console.log("Seeding finished successfully!");
+  console.log(`Admin Password: ${rawAdminPass}`);
+  console.log(`Student Password: ${rawStudentPass}`);
 }
 
 main()

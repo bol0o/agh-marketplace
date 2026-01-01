@@ -83,30 +83,40 @@ export const getProduct = async (req: Request, res: Response) => {
   }
 };
 
-//Create new product
+// Create new product
 export const createProduct = async (req: AuthRequest, res: Response) => {
   try {
-    const { title, description, price, category, imageUrl } = req.body;
+    //Extract text data from request body
+    //When using FormData, all fields come as strings initially
+    const { title, description, price, category } = req.body;
+
+    //Extract image URL from Cloudinary response
+    //The middleware automatically uploads to Cloudinary and puts the result in req.file
+    const imageUrl = req.file ? req.file.path : null;
+
     const sellerId = req.user?.userId;
 
+    //Check authentication
     if (!sellerId) {
       return res.status(401).json({ error: "Musisz być zalogowany" });
     }
 
+    //Save product to db
     const product = await prisma.product.create({
       data: {
         title,
         description,
+        //Convert string to number (FormData sends numbers as strings)
         price: Number(price),
         category,
-        imageUrl,
+        imageUrl: imageUrl, //store the Cloudinary URL
         sellerId,
       },
     });
 
     res.status(201).json(product);
   } catch (error) {
-    console.error(error);
+    console.error("Error creating product:", error);
     res.status(500).json({ error: "Nie udało się dodać produktu" });
   }
 };
