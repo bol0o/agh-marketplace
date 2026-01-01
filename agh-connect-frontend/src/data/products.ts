@@ -1,0 +1,78 @@
+// src/data/products.ts
+
+import { Product } from '@/components/marketplace/ProductCard';
+
+export const ALL_PRODUCTS: (Product & { category: string; condition: string })[] = [
+	{
+		id: '1',
+		title: 'MacBook Pro M1 2020 - Stan Idealny',
+		price: 3400,
+		type: 'auction',
+		category: 'elektronika',
+		condition: 'used',
+		image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca4?auto=format&fit=crop&q=80&w=1000',
+	},
+	{
+		id: '2',
+		title: 'Kalkulator naukowy Casio FX-991EX',
+		price: 45,
+		type: 'auction',
+		category: 'elektronika',
+		condition: 'used',
+		image: 'https://images.unsplash.com/photo-1587145820266-a5951eebebb1?auto=format&fit=crop&q=80&w=1000',
+	},
+	{
+		id: '3',
+		title: 'Notatki z Analizy Matematycznej 1',
+		price: 15,
+		type: 'buy_now',
+		category: 'ksiazki',
+		condition: 'used',
+		image: 'https://images.unsplash.com/photo-1544396821-4dd40b938ad3?auto=format&fit=crop&q=80&w=1000',
+	},
+	{
+		id: '4',
+		title: 'Monitor Dell 24 cale IPS',
+		price: 210,
+		type: 'auction',
+		category: 'elektronika',
+		condition: 'used',
+		image: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&q=80&w=1000',
+	},
+	{
+		id: '5',
+		title: 'Podręcznik do Fizyki Halliday',
+		price: 80,
+		type: 'buy_now',
+		category: 'ksiazki',
+		condition: 'new',
+		image: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&q=80&w=1000',
+	},
+	{
+		id: '6',
+		title: 'Wynajem miejsca w pokoju DS1 Alfa',
+		price: 600,
+		type: 'buy_now',
+		category: 'akademik',
+		condition: 'new',
+		image: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&q=80&w=1000',
+	},
+	{
+		id: '7',
+		title: 'iPhone 13 128GB Uszkodzony ekran',
+		price: 900,
+		type: 'auction',
+		category: 'elektronika',
+		condition: 'damaged',
+		image: 'https://images.unsplash.com/photo-1512054502232-120ea26faa4f?auto=format&fit=crop&q=80&w=1000',
+	},
+	{
+		id: '8',
+		title: 'Korepetycje z Javy',
+		price: 50,
+		type: 'buy_now',
+		category: 'uslugi',
+		condition: 'new',
+		image: 'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&q=80&w=1000',
+	},
+];

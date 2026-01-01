@@ -1,0 +1,105 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.wrapper {
+	background-color: white;
+	padding: $spacing-lg;
+	border-radius: $spacing-md;
+	border: 1px solid $color-border;
+}
+
+.header {
+	margin-bottom: 32px;
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+
+	@include md {
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+	}
+}
+
+.titleGroup {
+	h1 {
+		font-size: 1.5rem;
+		font-weight: 800;
+		color: $color-text-main;
+		margin-bottom: 4px;
+		text-transform: capitalize; // Żeby "elektronika" była z dużej
+	}
+
+	p {
+		color: $color-text-secondary;
+		font-size: 0.9rem;
+	}
+}
+
+.resultsCount {
+	font-weight: 600;
+	color: $color-text-secondary;
+	background-color: white;
+	padding: 8px 16px;
+	border-radius: 20px;
+	border: 1px solid $color-border;
+	font-size: 0.85rem;
+}
+
+// --- GRID PRODUKTÓW ---
+.grid {
+	display: grid;
+	grid-template-columns: repeat(1, 1fr);
+	gap: 24px;
+	padding-bottom: 40px;
+
+	@include sm {
+		grid-template-columns: repeat(2, 1fr);
+	}
+	@include lg {
+		grid-template-columns: repeat(3, 1fr);
+	}
+	@include xl {
+		grid-template-columns: repeat(4, 1fr);
+	}
+}
+
+// --- PUSTY STAN (BRAK WYNIKÓW) ---
+.emptyState {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 64px 20px;
+	text-align: center;
+	background-color: white;
+	border-radius: 16px;
+	border: 1px dashed $color-border;
+
+	h3 {
+		font-size: 1.1rem;
+		font-weight: 700;
+		color: $color-text-main;
+		margin-top: 16px;
+		margin-bottom: 8px;
+	}
+
+	p {
+		color: $color-text-secondary;
+		max-width: 400px;
+		margin-bottom: 24px;
+	}
+
+	.resetBtn {
+		padding: 10px 20px;
+		background-color: $color-primary;
+		color: white;
+		border-radius: 8px;
+		font-weight: 600;
+		transition: background-color 0.2s;
+
+		&:hover {
+			background-color: darken($color-primary, 5%);
+		}
+	}
+}

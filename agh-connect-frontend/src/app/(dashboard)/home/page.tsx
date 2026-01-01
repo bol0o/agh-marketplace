@@ -3,7 +3,6 @@ import { ProductCarousel } from '@/components/marketplace/ProductCarousel';
 import { Product } from '@/components/marketplace/ProductCard';
 import styles from '@/styles/home.module.scss';
 
-// MOCK DATA (Dane tymczasowe, póki nie ma backendu)
 const HOT_AUCTIONS: Product[] = [
 	{
 		id: '1',
@@ -69,31 +68,26 @@ const NEW_OFFERS: Product[] = [
 export default function HomePage() {
 	return (
 		<div>
-			{/* HERO SECTION (bez zmian) */}
 			<section className={styles.hero}>
 				<h1>Cześć, Jan! 👋</h1>
 				<p>Sprawdź co nowego na kampusie...</p>
 			</section>
 
-			{/* 2. GORĄCE AUKCJE - KARUZELA */}
 			<section className={styles.section}>
 				<div className={styles.sectionHeader}>
 					<h2>🔥 Gorące licytacje</h2>
 					<Link href="/marketplace?type=auction">Zobacz wszystkie &rarr;</Link>
 				</div>
 
-				{/* Zamiast div.grid i mapowania, używamy karuzeli */}
 				<ProductCarousel products={HOT_AUCTIONS} />
 			</section>
 
-			{/* 3. OSTATNIO DODANE - KARUZELA */}
 			<section className={styles.section}>
 				<div className={styles.sectionHeader}>
 					<h2>✨ Świeżo wystawione</h2>
 					<Link href="/marketplace?type=buy_now">Przeglądaj oferty &rarr;</Link>
 				</div>
 
-				{/* Używamy karuzeli ponownie */}
 				<ProductCarousel products={NEW_OFFERS} />
 			</section>
 		</div>
