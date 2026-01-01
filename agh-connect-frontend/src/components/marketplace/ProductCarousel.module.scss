@@ -1,0 +1,35 @@
+@use '@/styles/variables' as *;
+
+.carouselContainer {
+	padding-bottom: 40px; // Miejsce na kropki pod kartami
+
+	// Naprawa wysokości kart
+	:global(.swiper-wrapper) {
+		align-items: stretch; // Rozciągnij slajdy do wysokości najwyższego
+	}
+
+	:global(.swiper-slide) {
+		height: auto; // Slajd ma zająć dostępną wysokość
+
+		// Upewniamy się, że Twoja karta w środku też się rozciąga
+		> a,
+		> div {
+			height: 100%;
+		}
+	}
+
+	// Stylizacja kropek (Pagination)
+	:global(.swiper-pagination-bullet) {
+		background: #d1d5db; // Szary nieaktywny
+		opacity: 1;
+		width: 8px;
+		height: 8px;
+		transition: all 0.2s;
+	}
+
+	:global(.swiper-pagination-bullet-active) {
+		background: $color-primary; // Czerwony aktywny
+		width: 20px; // Rozciągnięta "pastylka" jak w iOS
+		border-radius: 4px;
+	}
+}

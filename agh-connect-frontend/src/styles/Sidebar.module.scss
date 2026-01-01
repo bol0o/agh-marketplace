@@ -5,14 +5,13 @@
 	display: none;
 	width: 280px;
 	flex-shrink: 0;
-	padding: 32px 0;
+	padding: 32px 10px 0 10px;
 	position: sticky;
 	top: 64px;
 	height: calc(100vh - 64px);
 	overflow-y: auto;
 	overflow-x: hidden;
 
-	// Custom scrollbar
 	scrollbar-width: thin;
 	scrollbar-color: $color-border transparent;
 
@@ -58,7 +57,6 @@
 	}
 }
 
-// --- TYPE TOGGLE ---
 .typeToggle {
 	display: flex;
 	background-color: #f3f4f6;
@@ -90,7 +88,6 @@
 	}
 }
 
-// --- FILTERS CONTAINER ---
 .filtersContainer {
 	display: flex;
 	flex-direction: column;
@@ -100,14 +97,12 @@
 
 .filterGroup {
 	label {
-		display: block;
 		font-size: 0.85rem;
 		font-weight: 700;
 		color: $color-text-main;
 	}
 }
 
-// --- INPUTY CENY (BEZ STRZAŁEK) ---
 .priceInputs {
 	display: flex;
 	align-items: center;
@@ -148,25 +143,83 @@
 	}
 }
 
-// Trzeba poprawić
+.itemStateFilters,
+.auctionStatusFilters {
+	display: flex;
+	flex-direction: column;
+	margin-top: 5px;
+	gap: 10px;
+}
+
 .checkboxLabel {
 	display: flex;
 	align-items: center;
+	justify-content: flex-start;
 	cursor: pointer;
-	padding: 8px 0;
+	user-select: none;
+	gap: 10px;
+}
 
-	.labelText {
-		font-size: 1rem;
-		color: $color-text-secondary;
-		font-weight: 500;
-		line-height: 1.2;
-		user-select: none;
+.hiddenInput {
+	position: absolute;
+	opacity: 0;
+	cursor: pointer;
+	height: 0;
+	width: 0;
+}
+
+.checkmark {
+	position: relative;
+	height: 24px;
+	width: 24px;
+	background-color: #fff;
+	border: 2px solid #ccc;
+	border-radius: 4px;
+	transition: all 0.2s ease-in-out;
+	flex-shrink: 0;
+	box-sizing: border-box;
+
+	&::before,
+	&::after {
+		content: '';
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 60%;
+		height: 3px;
+		background-color: white;
+		opacity: 0;
+		transition: opacity 0.2s;
 	}
 
-	input:checked ~ .labelText {
-		color: $color-text-main;
-		font-weight: 600;
+	&::before {
+		transform: translate(-50%, -50%) rotate(45deg);
 	}
+
+	&::after {
+		transform: translate(-50%, -50%) rotate(-45deg);
+	}
+}
+
+.labelText {
+	font-size: 0.85rem;
+	color: #333;
+	line-height: 1.2;
+	font-weight: 600;
+}
+
+.hiddenInput:checked ~ .checkmark {
+	background-color: $color-primary;
+	border-color: $color-primary;
+
+	&::before,
+	&::after {
+		opacity: 1;
+	}
+}
+
+.checkboxLabel:hover input ~ .checkmark {
+	border-color: #ff4d4d;
 }
 
 .clearBtn {
@@ -197,7 +250,6 @@
 	}
 }
 
-// --- NAV LINKS ---
 .navLinks {
 	display: flex;
 	flex-direction: column;
@@ -229,15 +281,14 @@
 	}
 
 	&.active {
-		background-color: #fef2f2; // Bardzo jasne czerwone tło
-		color: $color-primary; // Czerwony tekst
-		font-weight: 700; // Pogrubienie
+		background-color: #fef2f2;
+		color: $color-primary;
+		font-weight: 700;
 
 		.icon {
-			color: $color-primary; // Czerwona ikona
+			color: $color-primary;
 		}
 
-		// Opcjonalnie: ukrywamy strzałkę, jeśli jest aktywny, lub też ją kolorujemy
 		.chevron {
 			color: #fca5a5;
 			opacity: 1;
@@ -262,7 +313,6 @@
 	}
 }
 
-// Info Box
 .infoBox {
 	border: 1px dashed $color-border;
 	background-color: #f9fafb;
@@ -313,24 +363,17 @@
 	}
 }
 
-// ... (WSZYSTKO CO BYŁO WCZEŚNIEJ ZOSTAJE) ...
-
-// --- MOBILE FILTER TRIGGER (Przycisk nad listą) ---
-// ... wewnątrz Sidebar.module.scss
-
 .mobileTriggerWrapper {
-	display: block; // Musi być widoczne
-	width: 100%; // Musi zajmować całą szerokość
+	display: block;
+	width: 100%;
 	margin-bottom: 24px;
-	padding: 0 16px; // Dodaj padding, żeby przycisk nie dotykał krawędzi ekranu
-	margin-top: 24px; // Opcjonalnie: odstęp od nagłówka
+	padding: 0 16px;
+	margin-top: 24px;
 
 	@include lg {
-		display: none; // Ukrywamy DOPIERO na desktopie
+		display: none;
 	}
 }
-
-// ... reszta stylów
 
 .mobileFilterBtn {
 	width: 100%;
@@ -342,6 +385,7 @@
 	background-color: white;
 	border: 1px solid $color-border;
 	border-radius: 12px;
+	font-size: 1rem;
 	font-weight: 600;
 	color: $color-text-main;
 	box-shadow: $shadow-sm;
@@ -356,7 +400,6 @@
 	}
 }
 
-// --- MOBILE DRAWER (Wysuwany panel) ---
 .mobileDrawerOverlay {
 	position: fixed;
 	inset: 0;
@@ -364,22 +407,22 @@
 	backdrop-filter: blur(2px);
 	z-index: 100;
 	display: flex;
-	justify-content: flex-end; // Panel wyjeżdża z prawej (lub bottom dla dołu)
+	justify-content: flex-end;
 	animation: fadeIn 0.2s ease-out;
 
 	@include lg {
 		display: none;
-	} // Na desktopie zabezpieczenie
+	}
 }
 
 .mobileDrawer {
 	width: 100%;
-	max-width: 360px; // Nie szerszy niż typowy telefon
+	max-width: 360px;
 	height: 100%;
 	background-color: white;
 	display: flex;
 	flex-direction: column;
-	animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1); // Płynna animacja iOS-style
+	animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 
 	.drawerHeader {
 		padding: 16px 20px;
@@ -407,13 +450,13 @@
 	.drawerBody {
 		flex: 1;
 		overflow-y: auto;
-		padding: 24px 20px;
+		padding: 0px 20px;
 	}
 
 	.drawerFooter {
 		padding: 16px 20px;
 		border-top: 1px solid $color-border;
-		background-color: white; // Sticky footer
+		background-color: white;
 
 		.applyBtn {
 			width: 100%;

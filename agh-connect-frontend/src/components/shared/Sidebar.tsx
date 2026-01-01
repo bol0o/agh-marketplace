@@ -19,6 +19,12 @@ import styles from '@/styles/Sidebar.module.scss';
 
 export type ListingType = 'all' | 'buy_now' | 'auction';
 
+interface CheckboxProps {
+	label: string;
+	checked: boolean;
+	onChange: () => void;
+}
+
 export function Sidebar() {
 	const pathname = usePathname();
 	const isMarketplacePage = pathname.startsWith('/marketplace');
@@ -26,12 +32,10 @@ export function Sidebar() {
 
 	return (
 		<>
-			{/* DESKTOP SIDEBAR */}
 			<aside className={styles.sidebar}>
 				<SidebarContent isMarketplacePage={isMarketplacePage} />
 			</aside>
 
-			{/* MOBILE TRIGGER (Tylko Marketplace) */}
 			{isMarketplacePage && (
 				<div className={styles.mobileTriggerWrapper}>
 					<button
@@ -43,29 +47,23 @@ export function Sidebar() {
 				</div>
 			)}
 
-			{/* MOBILE DRAWER */}
 			{isMobileOpen && (
 				<div className={styles.mobileDrawerOverlay} onClick={() => setIsMobileOpen(false)}>
 					<div className={styles.mobileDrawer} onClick={(e) => e.stopPropagation()}>
 						<div className={styles.drawerHeader}>
-							<h3>Filtrowanie</h3>
+							<h3>Kategorie i filtrowanie</h3>
 							<button onClick={() => setIsMobileOpen(false)}>
 								<X size={24} />
 							</button>
 						</div>
 						<div className={styles.drawerBody}>
-							{/* 1. DODANO KATEGORIE NA MOBILE */}
-							<CategoryNav onNavigate={() => setIsMobileOpen(false)} />
-
-							{/* Separator estetyczny */}
-							<div className="my-6 border-b border-gray-100" />
-
 							<h3 className={styles.sectionTitle} style={{ marginTop: '24px' }}>
-								<Filter size={14} /> Opcje filtrowania
+								<Filter size={14} /> Filtrowanie
 							</h3>
 
-							{/* 2. FILTRY */}
 							<FilterLogicContent closeDrawer={() => setIsMobileOpen(false)} />
+
+							<CategoryNav onNavigate={() => setIsMobileOpen(false)} />
 						</div>
 						<div className={styles.drawerFooter}>
 							<button
@@ -82,7 +80,6 @@ export function Sidebar() {
 	);
 }
 
-// --- DESKTOP CONTENT ---
 function SidebarContent({ isMarketplacePage }: { isMarketplacePage: boolean }) {
 	return (
 		<>
@@ -125,12 +122,10 @@ function FilterLogicContent({ closeDrawer }: { closeDrawer?: () => void }) {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 
-	// Pobieramy dane z URL
 	const currentType = (searchParams.get('type') as ListingType) || 'all';
 	const currentConditions = searchParams.get('condition')?.split(',').filter(Boolean) || [];
 	const currentStatus = searchParams.get('status')?.split(',').filter(Boolean) || [];
 
-	// Stan lokalny inputów ceny
 	const [price, setPrice] = useState({
 		min: searchParams.get('minPrice') || '',
 		max: searchParams.get('maxPrice') || '',
@@ -139,19 +134,18 @@ function FilterLogicContent({ closeDrawer }: { closeDrawer?: () => void }) {
 	const minPriceParam = searchParams.get('minPrice');
 	const maxPriceParam = searchParams.get('maxPrice');
 
-	// 2. Synchronizacja URL -> Inputy
 	useEffect(() => {
 		setPrice({
 			min: minPriceParam || '',
 			max: maxPriceParam || '',
 		});
-
-		// 3. Tablica zależności zawiera teraz stringi, a nie obiekt
 	}, [minPriceParam, maxPriceParam]);
+
 	const updateURL = (key: string, value: string | null) => {
 		const params = new URLSearchParams(searchParams.toString());
 		if (value) params.set(key, value);
 		else params.delete(key);
+
 		router.push(`/marketplace?${params.toString()}`, { scroll: false });
 	};
 
@@ -170,32 +164,26 @@ function FilterLogicContent({ closeDrawer }: { closeDrawer?: () => void }) {
 		updateURL(paramName, newValues.length > 0 ? newValues.join(',') : null);
 	};
 
-	// --- 1. ZABEZPIECZENIE PRZED UJEMNYMI (onChange) ---
 	const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target;
 
-		// Jeśli wartość jest ujemna, ignorujemy zmianę (nie pozwalamy wpisać minusa)
 		if (value !== '' && Number(value) < 0) return;
 
 		setPrice((prev) => ({ ...prev, [name === 'minPrice' ? 'min' : 'max']: value }));
 	};
 
-	// --- 2. INTELIGENTNA WALIDACJA (onBlur / Enter) ---
 	const commitPriceFilter = () => {
 		let finalMin = price.min;
 		let finalMax = price.max;
 
-		// Konwersja na liczby do porównania
 		const numMin = finalMin ? Number(finalMin) : -1;
 		const numMax = finalMax ? Number(finalMax) : -1;
 
-		// LOGIKA: Jeśli oba pola są wypełnione i Min > Max -> Zamień je miejscami
-		// Np. Użytkownik wpisał Od: 100, Do: 50 -> My robimy Od: 50, Do: 100
 		if (finalMin && finalMax && numMin > numMax) {
 			const temp = finalMin;
 			finalMin = finalMax;
 			finalMax = temp;
-			// Aktualizujemy też stan wizualny inputów od razu, żeby użytkownik widział zamianę
+
 			setPrice({ min: finalMin, max: finalMax });
 		}
 
@@ -253,7 +241,7 @@ function FilterLogicContent({ closeDrawer }: { closeDrawer?: () => void }) {
 							type="number"
 							name="minPrice"
 							placeholder="Od"
-							min="0" // HTML5 constraint
+							min="0"
 							value={price.min}
 							onChange={handlePriceChange}
 							onBlur={commitPriceFilter}
@@ -264,7 +252,7 @@ function FilterLogicContent({ closeDrawer }: { closeDrawer?: () => void }) {
 							type="number"
 							name="maxPrice"
 							placeholder="Do"
-							min="0" // HTML5 constraint
+							min="0"
 							value={price.max}
 							onChange={handlePriceChange}
 							onBlur={commitPriceFilter}
@@ -275,7 +263,7 @@ function FilterLogicContent({ closeDrawer }: { closeDrawer?: () => void }) {
 
 				<div className={styles.filterGroup}>
 					<label>Stan przedmiotu</label>
-					<div className="space-y-1">
+					<div className={styles.itemStateFilters}>
 						<Checkbox
 							label="Nowy"
 							checked={currentConditions.includes('new')}
@@ -303,7 +291,7 @@ function FilterLogicContent({ closeDrawer }: { closeDrawer?: () => void }) {
 				{(currentType === 'auction' || currentType === 'all') && (
 					<div className={styles.filterGroup}>
 						<label>Status aukcji</label>
-						<div className="space-y-1">
+						<div className={styles.auctionStatusFilters}>
 							<Checkbox
 								label="Kończące się (< 24h)"
 								checked={currentStatus.includes('ending_soon')}
@@ -330,7 +318,6 @@ function FilterLogicContent({ closeDrawer }: { closeDrawer?: () => void }) {
 	);
 }
 
-// --- HELPERY (InfoBox, SidebarLink, Checkbox) ---
 function InfoBox() {
 	return (
 		<div className={styles.infoBox}>
@@ -354,32 +341,24 @@ function SidebarLink({
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
 
-	// 1. Sprawdzamy czy to link kategorii (czy zawiera "?cat=")
 	const isCategoryLink = href.includes('?cat=');
 
-	// 2. Budujemy docelowy URL
 	let finalHref = href;
 
 	if (isCategoryLink) {
-		// Parsujemy parametry z linku (np. cat=elektronika)
 		const [targetPath, targetQuery] = href.split('?');
 		const targetParams = new URLSearchParams(targetQuery);
 		const targetCat = targetParams.get('cat');
 
-		// Kopiujemy OBECNE parametry z URL przeglądarki
 		const currentParams = new URLSearchParams(searchParams.toString());
 
-		// Ustawiamy nową kategorię (lub usuwamy jeśli kliknięto tę samą - opcjonalne)
 		if (targetCat) {
 			currentParams.set('cat', targetCat);
 		}
 
-		// Jeśli jesteśmy na innej stronie niż marketplace, musimy tam wrócić
-		// ale z zachowaniem parametrów
 		finalHref = `${targetPath}?${currentParams.toString()}`;
 	}
 
-	// 3. Logika aktywnego linku (Poprawiona z poprzedniej odpowiedzi)
 	let isActive = false;
 	if (href.includes('?')) {
 		const [targetPath, targetQuery] = href.split('?');
@@ -399,7 +378,6 @@ function SidebarLink({
 		<Link
 			href={finalHref}
 			className={`${styles.navLink} ${isActive ? styles.active : ''}`}
-			// Opcjonalnie: prevent scroll reset dla płynności
 			scroll={false}
 		>
 			<div className={styles.content}>
@@ -411,28 +389,23 @@ function SidebarLink({
 	);
 }
 
-function Checkbox({
-	label,
-	checked,
-	onChange,
-}: {
-	label: string;
-	checked: boolean;
-	onChange: () => void;
-}) {
+function Checkbox({ label, checked, onChange }: CheckboxProps) {
 	return (
 		<label className={styles.checkboxLabel}>
-			<input type="checkbox" checked={checked} onChange={onChange} />
+			<input
+				type="checkbox"
+				checked={checked}
+				onChange={onChange}
+				className={styles.hiddenInput}
+			/>
+
 			<div className={styles.checkmark}></div>
 			<span className={styles.labelText}>{label}</span>
 		</label>
 	);
 }
 
-// Nowy komponent pomocniczy (na dole pliku)
 function CategoryNav({ onNavigate }: { onNavigate?: () => void }) {
-	// Wrapper div onClick przechwytuje kliknięcia w linki (Event Bubbling)
-	// Dzięki temu nie musimy przerabiać skomplikowanego SidebarLinka
 	return (
 		<div className={styles.section}>
 			<h3 className={styles.sectionTitle}>

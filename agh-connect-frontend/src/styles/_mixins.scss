@@ -2,6 +2,7 @@ $breakpoint-sm: 640px;
 $breakpoint-md: 768px;
 $breakpoint-lg: 1024px;
 $breakpoint-xl: 1280px;
+$breakpoint-xl: 1920px;
 
 @mixin sm {
 	@media (min-width: $breakpoint-sm) {
@@ -16,6 +17,12 @@ $breakpoint-xl: 1280px;
 }
 
 @mixin lg {
+	@media (min-width: $breakpoint-lg) {
+		@content;
+	}
+}
+
+@mixin xl {
 	@media (min-width: $breakpoint-lg) {
 		@content;
 	}
