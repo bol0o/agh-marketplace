@@ -1,0 +1,113 @@
+@use '@/styles/variables' as *;
+
+.item {
+	padding: 20px;
+	border-bottom: 1px solid #f3f4f6;
+	display: flex;
+	gap: 16px;
+	transition: background-color 0.2s;
+	position: relative;
+
+	&:last-child {
+		border-bottom: none;
+	}
+
+	&.unread {
+		background-color: rgba($color-primary, 0.03);
+		&::before {
+			content: '';
+			position: absolute;
+			left: 0;
+			top: 0;
+			bottom: 0;
+			width: 3px;
+			background-color: $color-primary;
+		}
+	}
+
+	&:hover {
+		background-color: #f9fafb;
+		.deleteBtn {
+			opacity: 1;
+		}
+	}
+}
+
+.iconWrapper {
+	width: 48px;
+	height: 48px;
+	border-radius: 12px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+
+	&.offer {
+		background-color: #eff6ff;
+		color: #3b82f6;
+	}
+	&.payment {
+		background-color: #ecfdf5;
+		color: #10b981;
+	}
+	&.system {
+		background-color: #f3f4f6;
+		color: #6b7280;
+	}
+	&.message {
+		background-color: #fff1f2;
+		color: $color-primary;
+	}
+}
+
+.content {
+	flex: 1;
+	.headerRow {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		margin-bottom: 4px;
+		h3 {
+			font-size: 1rem;
+			font-weight: 600;
+			color: $color-text-main;
+		}
+		span {
+			font-size: 0.75rem;
+			color: #9ca3af;
+			white-space: nowrap;
+			margin-left: 8px;
+		}
+	}
+
+	p {
+		font-size: 0.9rem;
+		color: $color-text-secondary;
+		line-height: 1.4;
+		margin-bottom: 8px;
+	}
+	.link {
+		font-size: 0.85rem;
+		font-weight: 600;
+		color: $color-primary;
+		text-decoration: none;
+		&:hover {
+			text-decoration: underline;
+		}
+	}
+}
+
+.deleteBtn {
+	opacity: 0;
+	color: #9ca3af;
+	padding: 4px;
+	transition: all 0.2s;
+	&:hover {
+		color: #ef4444;
+		background-color: #fef2f2;
+		border-radius: 4px;
+	}
+	@media (max-width: 640px) {
+		opacity: 1;
+	}
+}
