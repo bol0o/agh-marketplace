@@ -83,34 +83,62 @@ export const getProduct = async (req: Request, res: Response) => {
   }
 };
 
-// Create new product
+//Create new product
 export const createProduct = async (req: AuthRequest, res: Response) => {
   try {
-    //Extract text data from request body
-    //When using FormData, all fields come as strings initially
-    const { title, description, price, category } = req.body;
+    //Extract data from request
+    //FormData sends everything as strings
+    const { title, description, price, category, isAuction, auctionEnd } =
+      req.body;
 
-    //Extract image URL from Cloudinary response
-    //The middleware automatically uploads to Cloudinary and puts the result in req.file
+    //Extract image URL
     const imageUrl = req.file ? req.file.path : null;
 
     const sellerId = req.user?.userId;
 
-    //Check authentication
+    //Auth check
     if (!sellerId) {
       return res.status(401).json({ error: "Musisz być zalogowany" });
     }
 
-    //Save product to db
+    //Data parsing & validation
+    const priceNumber = Number(price);
+
+    //Parse boolean from string (FormData sends "true" or "false" as text)
+    const isAuctionBoolean = isAuction === "true";
+
+    //Parse Date if exists
+    let auctionEndDate: Date | null = null;
+    if (isAuctionBoolean && auctionEnd) {
+      auctionEndDate = new Date(auctionEnd);
+
+      //Basic validation for date
+      if (isNaN(auctionEndDate.getTime())) {
+        return res
+          .status(400)
+          .json({ error: "Nieprawidłowy format daty zakończenia aukcji" });
+      }
+    }
+
+    //Require end date for auctions
+    if (isAuctionBoolean && !auctionEndDate) {
+      return res
+        .status(400)
+        .json({ error: "Aukcja musi mieć datę zakończenia" });
+    }
+
+    //Save to DB
     const product = await prisma.product.create({
       data: {
         title,
         description,
-        //Convert string to number (FormData sends numbers as strings)
-        price: Number(price),
+        price: priceNumber,
         category,
-        imageUrl: imageUrl, //store the Cloudinary URL
+        imageUrl,
         sellerId,
+
+        isAuction: isAuctionBoolean,
+        auctionEnd: auctionEndDate,
       },
     });
 
