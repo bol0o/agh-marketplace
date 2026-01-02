@@ -74,6 +74,14 @@ export const login = async (req: Request, res: Response) => {
       return res.status(400).json({ error: "Nieprawidłowy email lub hasło" });
     }
 
+    //check if user is banned
+    if (!user.isActive) {
+      return res.status(403).json({
+        error:
+          "Twoje konto zostało zablokowane. Skontaktuj się z administratorem.",
+      });
+    }
+
     //Check password
     const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
     if (!isPasswordValid) {
