@@ -1,6 +1,7 @@
 import { Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import { AuthRequest } from "../middleware/auth.middleware";
+import { getIO } from "../socket";
 
 const prisma = new PrismaClient();
 
@@ -49,11 +50,9 @@ export const placeBid = async (req: AuthRequest, res: Response) => {
     const currentHighest = product.bids[0]?.amount || product.price;
 
     if (amount <= currentHighest) {
-      return res
-        .status(400)
-        .json({
-          message: `Twoja oferta musi być wyższa niż aktualna najwyższa oferta: ${currentHighest} PLN`,
-        });
+      return res.status(400).json({
+        message: `Twoja oferta musi być wyższa niż aktualna najwyższa oferta: ${currentHighest} PLN`,
+      });
     }
 
     //2. create bid
@@ -64,6 +63,17 @@ export const placeBid = async (req: AuthRequest, res: Response) => {
         amount,
       },
     });
+
+    //Socket
+    try {
+      const io = getIO();
+      // send event to all in auction room about new bid
+      io.to(`auction_${productId}`).emit("bid_update", {
+        amount: bid.amount,
+      });
+    } catch (socketError) {
+      console.error("Socket.io error:", socketError);
+    }
 
     res.status(201).json({ message: "Oferta została złożona pomyślnie", bid });
   } catch (error) {

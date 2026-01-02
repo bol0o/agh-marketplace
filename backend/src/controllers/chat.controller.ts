@@ -1,6 +1,7 @@
 import { Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import { AuthRequest } from "../middleware/auth.middleware";
+import { getIO } from "../socket";
 
 const prisma = new PrismaClient();
 
@@ -61,7 +62,9 @@ export const sendMessage = async (req: AuthRequest, res: Response) => {
       },
     });
 
-    // TODO : Emit socket event to recipient for real-time update
+    //send socket event to recipient
+    const io = getIO();
+    io.to(recipientId).emit("new_message", message);
 
     res.status(201).json(message);
   } catch (error) {

@@ -1,4 +1,5 @@
 import express from "express";
+import http from "http";
 import cors from "cors";
 import dotenv from "dotenv";
 
@@ -19,6 +20,9 @@ import adminRoutes from "./routes/admin.routes";
 
 // Jobs
 import { startAuctionJob } from "./jobs/auctionCloser";
+
+//Socket
+import { initSocket } from "./socket";
 
 dotenv.config();
 
@@ -44,6 +48,12 @@ console.log("All required environment variables are set.");
 // App Setup
 const app = express();
 const port = process.env.PORT || 3001;
+
+// Create HTTP server
+const server = http.createServer(app);
+
+// Initialize Socket.io
+initSocket(server);
 
 app.use(cors());
 app.use(express.json());
