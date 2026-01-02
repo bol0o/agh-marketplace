@@ -1,0 +1,521 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.pageHeader {
+	margin-bottom: 24px;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	padding: 0 4px;
+
+	@include md {
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.titleGroup {
+		h1 {
+			font-size: 1.5rem;
+			font-weight: 800;
+			color: $color-text-main;
+			margin-bottom: 4px;
+		}
+		p {
+			color: $color-text-secondary;
+			font-size: 0.9rem;
+		}
+	}
+}
+
+// --- GŁÓWNY KONTENER ---
+.layoutWrapper {
+	// Kontener na całą stronę czatów, żeby zarządzać wysokością
+	height: calc(100vh - 100px); // Odejmujemy wysokość Navbara i paddingów
+	display: flex;
+	flex-direction: column;
+}
+
+.container {
+	flex: 1; // Zajmij resztę miejsca pod Headerem
+	min-height: 0; // KLUCZOWE DLA SCROLLA WEWNĄTRZ FLEXA!
+
+	display: grid;
+	grid-template-columns: 1fr;
+	background-color: white;
+	border: 1px solid $color-border;
+	border-radius: 16px;
+	overflow: hidden; // Żeby rogi były zaokrąglone
+
+	@include md {
+		grid-template-columns: 320px 1fr;
+	}
+}
+
+// --- LEWA KOLUMNA (LISTA) ---
+.sidebar {
+	border-right: 1px solid $color-border;
+	display: flex;
+	flex-direction: column;
+	background-color: white;
+	height: 100%; // Musi mieć wysokość
+	overflow: hidden; // Żeby scrollowała się tylko lista w środku
+
+	&.hiddenOnMobile {
+		display: none;
+		@include md {
+			display: flex;
+		}
+	}
+}
+
+// Poprawiony Search Bar (Styl Navbara)
+.searchBar {
+	padding: 16px;
+	border-bottom: 1px solid $color-border;
+
+	.inputWrapper {
+		position: relative;
+		display: flex;
+		align-items: center;
+		background-color: #f3f4f6; // Szare tło jak w navbarze
+		border-radius: 99px;
+		padding: 0 16px;
+		transition: box-shadow 0.2s;
+
+		&:focus-within {
+			box-shadow: 0 0 0 2px rgba($color-primary, 0.2);
+			background-color: white;
+			border: 1px solid $color-primary;
+		}
+
+		// Ikonka lupy
+		svg {
+			color: #9ca3af;
+			flex-shrink: 0;
+		}
+
+		input {
+			width: 100%;
+			padding: 12px 0 12px 10px;
+			background: transparent;
+			border: none;
+			outline: none;
+			font-size: 0.9rem;
+			color: $color-text-main;
+
+			&::placeholder {
+				color: #9ca3af;
+			}
+		}
+	}
+}
+
+.chatList {
+	flex: 1; // Rozciągnij się
+	overflow-y: auto; // Scrolluj TYLKO ten element
+
+	// Stylowanie paska przewijania
+	&::-webkit-scrollbar {
+		width: 6px;
+	}
+	&::-webkit-scrollbar-track {
+		background: transparent;
+	}
+	&::-webkit-scrollbar-thumb {
+		background-color: #e5e7eb;
+		border-radius: 10px;
+	}
+	&:hover::-webkit-scrollbar-thumb {
+		background-color: #d1d5db;
+	}
+}
+
+.chatItem {
+	padding: 16px;
+	display: flex;
+	gap: 12px;
+	cursor: pointer;
+	transition: background 0.2s;
+	border-bottom: 1px solid #f9fafb;
+
+	&:hover {
+		background-color: #f9fafb;
+	}
+	&.active {
+		background-color: rgba($color-primary, 0.04);
+		border-right: 3px solid $color-primary;
+	}
+}
+
+.avatar {
+	width: 48px;
+	height: 48px;
+	border-radius: 50%;
+	background-color: #e5e7eb;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-weight: 700;
+	color: #6b7280;
+	position: relative;
+	flex-shrink: 0;
+	font-size: 0.9rem;
+
+	// Zdjęcie (jeśli jest URL)
+	img {
+		width: 100%;
+		height: 100%;
+		border-radius: 50%;
+		object-fit: cover;
+	}
+
+	&.online::after {
+		content: '';
+		position: absolute;
+		bottom: 2px;
+		right: 2px;
+		width: 10px;
+		height: 10px;
+		background-color: #22c55e;
+		border: 2px solid white;
+		border-radius: 50%;
+	}
+}
+
+.chatInfo {
+	flex: 1;
+	min-width: 0;
+
+	.topRow {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 4px;
+
+		h4 {
+			font-size: 0.95rem;
+			font-weight: 600;
+			color: $color-text-main;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+		span {
+			font-size: 0.75rem;
+			color: #9ca3af;
+			flex-shrink: 0;
+			margin-left: 8px;
+		}
+	}
+
+	.msgRow {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+
+		p {
+			font-size: 0.85rem;
+			color: $color-text-secondary;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			max-width: 180px;
+		}
+	}
+
+	.topicRow {
+		margin-bottom: 2px;
+		font-size: 0.75rem;
+		color: #6b7280;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+
+		strong {
+			font-weight: 500;
+		}
+	}
+
+	.msgRow {
+		p {
+			color: $color-text-main;
+			font-weight: 500;
+		}
+		&.unread p {
+			font-weight: 700;
+			color: black;
+		}
+	}
+}
+
+.unreadBadge {
+	background-color: $color-primary;
+	color: white;
+	font-size: 0.7rem;
+	padding: 2px 8px; // Trochę szerszy
+	border-radius: 99px;
+	font-weight: 600;
+	flex-shrink: 0;
+	margin-left: 8px;
+}
+
+// --- PRAWA KOLUMNA (CZAT) ---
+.main {
+	display: flex;
+	flex-direction: column;
+	background-color: white;
+	height: 100%;
+	overflow: hidden;
+
+	&.hiddenOnMobile {
+		display: none;
+		@include md {
+			display: flex;
+		}
+	}
+}
+
+.chatHeader {
+	padding: 12px 16px;
+	border-bottom: 1px solid $color-border;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	background: white;
+	position: relative;
+
+	.backBtn {
+		@include md {
+			display: none;
+		}
+		padding: 8px;
+		margin-left: -8px;
+		color: $color-text-secondary;
+	}
+
+	.headerInfo {
+		h3 {
+			font-size: 1rem;
+			font-weight: 600;
+		}
+		p {
+			font-size: 0.8rem;
+			color: #22c55e;
+			&.offline {
+				color: #9ca3af;
+			}
+		}
+	}
+
+	.actions {
+		margin-left: auto;
+		display: flex;
+		gap: 8px;
+		position: relative;
+	}
+
+	.menuBtn {
+		width: 36px;
+		height: 36px;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: #6b7280;
+		transition: background 0.2s;
+		&:hover {
+			background-color: #f3f4f6;
+			color: black;
+		}
+	}
+}
+
+.messagesArea {
+	flex: 1;
+	padding: 20px;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	background-color: #f9fafb;
+}
+
+.inputArea {
+	padding: 16px;
+	border-top: 1px solid $color-border;
+	display: flex;
+	gap: 12px;
+	background: white;
+
+	input {
+		flex: 1;
+		padding: 12px 20px;
+		border-radius: 24px;
+		border: 1px solid $color-border;
+		outline: none;
+		background-color: #f9fafb;
+		&:focus {
+			border-color: $color-primary;
+			background-color: white;
+		}
+	}
+
+	button {
+		width: 44px;
+		height: 44px;
+		border-radius: 50%;
+		background-color: $color-primary;
+		color: white;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		&:hover {
+			background-color: darken($color-primary, 5%);
+		}
+	}
+}
+
+.messageBubble {
+	max-width: 75%;
+	padding: 10px 16px;
+	border-radius: 18px;
+	font-size: 0.95rem;
+	line-height: 1.4;
+	position: relative;
+
+	&.me {
+		align-self: flex-end;
+		background-color: $color-primary;
+		color: white;
+		border-bottom-right-radius: 4px;
+	}
+
+	&.them {
+		align-self: flex-start;
+		background-color: white;
+		border: 1px solid #e5e7eb;
+		color: $color-text-main;
+		border-bottom-left-radius: 4px;
+	}
+
+	.time {
+		font-size: 0.65rem;
+		opacity: 0.7;
+		margin-top: 4px;
+		display: block;
+		text-align: right;
+	}
+}
+
+.emptyState {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+	color: #9ca3af;
+	text-align: center;
+	padding: 20px;
+}
+
+.productContextBar {
+	padding: 12px 16px;
+	background-color: #f9fafb;
+	border-bottom: 1px solid $color-border;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+
+	.productThumb {
+		width: 40px;
+		height: 40px;
+		border-radius: 8px;
+		background-color: #e5e7eb;
+		overflow: hidden;
+		flex-shrink: 0;
+		img {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
+	}
+
+	.productInfo {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+
+		.statusLabel {
+			font-size: 0.7rem;
+			text-transform: uppercase;
+			font-weight: 700;
+			color: #6b7280;
+			margin-bottom: 2px;
+		}
+
+		h4 {
+			font-size: 0.9rem;
+			font-weight: 600;
+			color: $color-text-main;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+	}
+
+	.productPrice {
+		font-weight: 700;
+		color: $color-text-main;
+		font-size: 1rem;
+	}
+}
+
+.dropdownMenu {
+	position: absolute;
+	top: 100%;
+	right: 0;
+	margin-top: 8px;
+	background: white;
+	border-radius: 12px;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+	border: 1px solid $color-border;
+	min-width: 180px;
+	z-index: 50;
+	overflow: hidden;
+	animation: fadeIn 0.1s ease-out;
+
+	button {
+		width: 100%;
+		text-align: left;
+		padding: 12px 16px;
+		font-size: 0.9rem;
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		color: $color-text-main;
+		transition: background 0.2s;
+
+		&:hover {
+			background-color: #f9fafb;
+		}
+
+		&.danger {
+			color: #ef4444; // Czerwony dla usuwania/zgłaszania
+			&:hover {
+				background-color: #fef2f2;
+			}
+		}
+	}
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(-5px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
