@@ -62,7 +62,8 @@ model Product {
   // aukcje
   isAuction   Boolean  @default(false)
   auctionEnd  DateTime? // Data zakończenia aukcji
-  
+  isAuctionClosed Boolean @default(false)
+
   seller   User   @relation("SellerProducts", fields: [sellerId], references: [id])
   sellerId String
 

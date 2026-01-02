@@ -1,6 +1,11 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+
+// Middleware
+import { apiLimiter } from "./middleware/rateLimit.middleware";
+
+// Routes
 import authRoutes from "./routes/auth.routes";
 import productRoutes from "./routes/product.routes";
 import cartRoutes from "./routes/cart.routes";
@@ -8,11 +13,15 @@ import orderRoutes from "./routes/order.routes";
 import reviewRoutes from "./routes/review.routes";
 import bidRoutes from "./routes/bid.routes";
 import socialRoutes from "./routes/social.routes";
-import { apiLimiter } from "./middleware/rateLimit.middleware";
+import chatRoutes from "./routes/chat.routes";
+import notificationRoutes from "./routes/notification.routes";
+
+// Jobs
+import { startAuctionJob } from "./jobs/auctionCloser";
 
 dotenv.config();
 
-//Security
+// Security Checks
 const requiredEnv = [
   "DATABASE_URL",
   "JWT_SECRET",
@@ -24,19 +33,21 @@ const requiredEnv = [
 
 const missingEnv = requiredEnv.filter((key) => !process.env[key]);
 if (missingEnv.length > 0) {
-  console.error(`Missing environment variables: ${missingEnv.join(", ")}`);
+  console.error(
+    `ERROR: Missing environment variables: ${missingEnv.join(", ")}`
+  );
   process.exit(1);
 }
 console.log("All required environment variables are set.");
 
-//Setup
+// App Setup
 const app = express();
 const port = process.env.PORT || 3001;
 
 app.use(cors());
 app.use(express.json());
 
-//Limit
+// Global Rate Limit
 app.use("/api/", apiLimiter);
 
 // Routes
@@ -47,6 +58,11 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/bids", bidRoutes);
 app.use("/api/social", socialRoutes);
+app.use("/api/chat", chatRoutes);
+app.use("/api/notifications", notificationRoutes);
+
+// Background Jobs
+startAuctionJob();
 
 app.get("/", (req, res) => {
   res.send("Backend is running");
