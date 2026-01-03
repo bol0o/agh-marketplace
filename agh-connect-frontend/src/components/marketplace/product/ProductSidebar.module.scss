@@ -135,3 +135,39 @@
 		border-color: #d1d5db;
 	}
 }
+
+.editBtn {
+	width: 100%;
+	padding: 12px;
+	border-radius: 8px;
+	background: white;
+	border: 1px solid $color-border;
+	font-weight: 600;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	cursor: pointer;
+	&:hover {
+		background: #f9fafb;
+		border-color: $color-text-main;
+	}
+}
+
+.deleteBtn {
+	width: 100%;
+	padding: 12px;
+	border-radius: 8px;
+	background: #fef2f2;
+	color: #ef4444;
+	border: none;
+	font-weight: 600;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	cursor: pointer;
+	&:hover {
+		background: #fee2e2;
+	}
+}

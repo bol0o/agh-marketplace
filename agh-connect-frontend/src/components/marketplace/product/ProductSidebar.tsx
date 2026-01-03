@@ -1,26 +1,17 @@
 'use client';
 
-import { ShoppingBag, MessageSquare, ShieldCheck, Heart } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { ShoppingBag, MessageSquare, Edit, Heart, Trash2 } from 'lucide-react';
 // import { useCartStore } from '@/store/cartStore';
-// import { useUIStore } from '@/store/uiStore';
+import { useUIStore } from '@/store/uiStore';
 import styles from './ProductSidebar.module.scss';
-// import { Product } from '@/components/marketplace/ProductCard';
-import { MOCK_PRODUCTS } from '@/data/mockData';
 import { Product } from '@/types/marketplace';
 import Link from 'next/link';
 
-// Mock sprzedawcy (normalnie z bazy przez 'authorId')
-// const MOCK_SELLER = {
-// 	name: 'Jan Kowalski',
-// 	avatar: 'https://ui-avatars.com/api/?name=Jan+Kowalski&background=random',
-// 	rating: 4.8,
-// 	joined: '2 lata temu',
-// };
-
 export function ProductSidebar({ product }: { product: Product }) {
-	const seller = product.seller;
+	const router = useRouter();
 	// const addItem = useCartStore((state) => state.addItem);
-	// const addToast = useUIStore((state) => state.addToast);
+	const addToast = useUIStore((state) => state.addToast);
 
 	const handleAddToCart = () => {
 		// addItem({
@@ -30,7 +21,20 @@ export function ProductSidebar({ product }: { product: Product }) {
 		// 	image: product.image,
 		// 	type: product.type,
 		// });
-		// addToast('Dodano produkt do koszyka!', 'success');
+		addToast('Dodano produkt do koszyka!', 'success');
+	};
+
+	const seller = product.seller;
+	const CURRENT_USER_ID = 'u2';
+	const isOwner = product.seller.id === CURRENT_USER_ID;
+
+	const handleDelete = async () => {
+		if (!confirm('Czy na pewno chcesz usunąć to ogłoszenie? Tej operacji nie można cofnąć.'))
+			return;
+
+		// MOCK DELETE
+		addToast('Ogłoszenie zostało usunięte', 'info');
+		router.push('/marketplace');
 	};
 
 	return (
@@ -45,7 +49,20 @@ export function ProductSidebar({ product }: { product: Product }) {
 				</div>
 
 				<div className={styles.actions}>
-					{product.type === 'buy_now' ? (
+					{isOwner ? (
+						// WIDOK WŁAŚCICIELA
+						<>
+							<button
+								className={styles.editBtn}
+								onClick={() => router.push(`/marketplace/${product.id}/edit`)}
+							>
+								<Edit size={18} /> Edytuj ofertę
+							</button>
+							<button className={styles.deleteBtn} onClick={handleDelete}>
+								<Trash2 size={18} /> Usuń
+							</button>
+						</>
+					) : product.type === 'buy_now' ? (
 						<>
 							<button className={styles.buyBtn} onClick={handleAddToCart}>
 								Kup Teraz
@@ -56,7 +73,6 @@ export function ProductSidebar({ product }: { product: Product }) {
 							</button>
 						</>
 					) : (
-						// Widok dla Licytacji
 						<div className={styles.auctionBox}>
 							<p>Aktualna oferta:</p>
 							<div className={styles.bidPrice}>{product.price} zł</div>

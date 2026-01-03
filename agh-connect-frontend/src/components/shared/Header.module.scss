@@ -647,3 +647,44 @@
 		transform: translateY(0);
 	}
 }
+
+.addOfferBtn {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	background-color: #e1251b;
+	color: white;
+	padding: 8px 16px;
+	border-radius: 99px;
+	font-weight: 600;
+	font-size: 0.9rem;
+	text-decoration: none;
+	transition: all 0.2s;
+	white-space: nowrap;
+	margin-right: 8px;
+
+	&:hover {
+		background-color: darken(#e1251b, 10%);
+		transform: translateY(-1px);
+		box-shadow: 0 4px 12px rgba(225, 37, 27, 0.2);
+	}
+}
+
+.mobileCreateBtn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	width: 100%;
+	background-color: #e1251b;
+	color: white;
+	padding: 12px;
+	border-radius: 8px;
+	font-weight: 600;
+	text-decoration: none;
+	margin-bottom: 16px;
+
+	&:hover {
+		background-color: darken(#e1251b, 5%);
+	}
+}

@@ -16,6 +16,7 @@ import {
 	Home,
 	Gavel,
 	LayoutGrid,
+	PlusCircle,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
@@ -92,6 +93,11 @@ export function Header() {
 							</nav>
 
 							<div className={styles.desktopIcons}>
+								<Link href="/marketplace/create" className={styles.addOfferBtn}>
+									<PlusCircle size={20} />
+									<span>Dodaj</span>
+								</Link>
+
 								<Link
 									href="/chats"
 									className={`${styles.iconBtn} ${isActive('/chats') ? styles.active : ''}`}
@@ -212,6 +218,17 @@ function MobileHeaderMenu({
 					</div>
 
 					<div className={styles.drawerBody}>
+						<div className={styles.section} style={{ marginBottom: 0 }}>
+							<Link
+								href="/marketplace/create"
+								className={styles.mobileCreateBtn}
+								onClick={() => setIsMobileMenuOpen(false)}
+							>
+								<PlusCircle size={20} />
+								Dodaj ogłoszenie
+							</Link>
+						</div>
+
 						<div className={styles.section}>
 							<p>Przeglądaj</p>
 							<nav>
