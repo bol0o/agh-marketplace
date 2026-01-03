@@ -20,9 +20,43 @@ if (!process.env.JWT_REFRESH_SECRET) {
 const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
 
+//HELPER
+const generateAuthResponse = (
+  user: any,
+  accessToken: string,
+  refreshToken: string
+) => {
+  return {
+    token: accessToken, // Frontend expects 'token'
+    refreshToken,
+    user: {
+      id: user.id,
+      email: user.email,
+      //Map: Combine first and last name into 'name'
+      name: `${user.firstName} ${user.lastName}`,
+      //Map: avatarUrl -> avatar
+      avatar: user.avatarUrl,
+      //Map: STUDENT -> student (lowercase)
+      role: user.role.toLowerCase(),
+
+      // Mocks for fields required by Frontend but not in DB yet
+      studentInfo: {
+        faculty: user.faculty || null,
+        year: 1, // Placeholder
+      },
+      rating: 0,
+      ratingCount: 0,
+      joinedAt: user.createdAt,
+      listedProductsCount: 0,
+      soldItemsCount: 0,
+    },
+  };
+};
+
 //REGISTER
 export const register = async (req: Request, res: Response) => {
   try {
+    //acceptTerms is already validated by Zod schema
     const { email, password, firstName, lastName, studentId } = req.body;
 
     //AGH Validation
@@ -54,7 +88,26 @@ export const register = async (req: Request, res: Response) => {
       },
     });
 
-    res.status(201).json({ message: "Użytkownik zarejestrowany pomyślnie" });
+    //Auto-login after register (generate tokens immediately)
+    const accessToken = jwt.sign(
+      { userId: user.id, role: user.role },
+      JWT_SECRET,
+      { expiresIn: "15m" }
+    );
+
+    const refreshToken = jwt.sign(
+      { userId: user.id, role: user.role },
+      JWT_REFRESH_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    //Save refresh token
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { refreshToken: refreshToken },
+    });
+
+    res.status(201).json(generateAuthResponse(user, accessToken, refreshToken));
   } catch (error) {
     console.error(error);
     res
@@ -108,17 +161,7 @@ export const login = async (req: Request, res: Response) => {
       data: { refreshToken: refreshToken },
     });
 
-    res.json({
-      message: "Zalogowano pomyślnie",
-      accessToken,
-      refreshToken,
-      user: {
-        id: user.id,
-        email: user.email,
-        firstName: user.firstName,
-        role: user.role,
-      },
-    });
+    res.json(generateAuthResponse(user, accessToken, refreshToken));
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Błąd serwera podczas logowania" });

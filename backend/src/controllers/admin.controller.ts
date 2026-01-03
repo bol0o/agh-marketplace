@@ -4,10 +4,74 @@ import { AuthRequest } from "../middleware/auth.middleware";
 
 const prisma = new PrismaClient();
 
-//get all users
+// GET /api/admin/stats (Dashboard)
+export const getDashboardStats = async (req: AuthRequest, res: Response) => {
+  try {
+    const totalUsers = await prisma.user.count();
+    const activeListings = await prisma.product.count();
+
+    // Calculate total revenue (sum of completed orders)
+    const revenueAgg = await prisma.order.aggregate({
+      _sum: { totalPrice: true },
+      where: { status: "COMPLETED" },
+    });
+    const totalRevenue = revenueAgg._sum.totalPrice || 0;
+
+    const pendingReports = await prisma.report.count({
+      where: { status: "open" },
+    });
+
+    res.json({
+      totalUsers,
+      activeListings,
+      totalRevenue,
+      pendingReports,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Błąd pobierania statystyk" });
+  }
+};
+
+// GET /api/admin/reports (List)
+export const getReports = async (req: AuthRequest, res: Response) => {
+  try {
+    const reports = await prisma.report.findMany({
+      orderBy: { createdAt: "desc" },
+      include: {
+        reporter: {
+          select: { id: true, firstName: true, lastName: true, email: true },
+        },
+      },
+    });
+    res.json(reports);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Błąd pobierania zgłoszeń" });
+  }
+};
+
+// PATCH /api/admin/reports/:id (Update Status)
+export const updateReportStatus = async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body; // 'resolved' | 'dismissed' | 'investigating'
+
+    const report = await prisma.report.update({
+      where: { id },
+      data: { status },
+    });
+
+    res.json(report);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Błąd aktualizacji zgłoszenia" });
+  }
+};
+
+// GET /api/admin/users
 export const getAllUsers = async (req: AuthRequest, res: Response) => {
   try {
-    //fetch users excluding sensitive data
     const users = await prisma.user.findMany({
       select: {
         id: true,
@@ -35,26 +99,23 @@ export const getAllUsers = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// toggle user block status (ban/unban)
+// PATCH /api/admin/users/:userId/status (Ban/Unban)
 export const toggleBlockUser = async (req: AuthRequest, res: Response) => {
   try {
     const { userId } = req.params;
     const currentAdminId = req.user?.userId;
 
-    // Prevent admin from banning themselves
     if (userId === currentAdminId) {
       return res
         .status(400)
         .json({ error: "Nie możesz zablokować własnego konta" });
     }
 
-    // check if target user exists
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) {
       return res.status(404).json({ error: "Użytkownik nie znaleziony" });
     }
 
-    //toggle the status
     const updatedUser = await prisma.user.update({
       where: { id: userId },
       data: { isActive: !user.isActive },
@@ -63,10 +124,7 @@ export const toggleBlockUser = async (req: AuthRequest, res: Response) => {
     const statusMessage = updatedUser.isActive ? "odblokowany" : "zablokowany";
     res.json({
       message: `Użytkownik został ${statusMessage}.`,
-      user: {
-        id: updatedUser.id,
-        isActive: updatedUser.isActive,
-      },
+      user: { id: updatedUser.id, isActive: updatedUser.isActive },
     });
   } catch (error) {
     console.error(error);
@@ -74,21 +132,19 @@ export const toggleBlockUser = async (req: AuthRequest, res: Response) => {
   }
 };
 
-//change user role
+// PATCH /api/admin/users/:userId/role
 export const changeUserRole = async (req: AuthRequest, res: Response) => {
   try {
     const { userId } = req.params;
     const { role } = req.body;
     const currentAdminId = req.user?.userId;
 
-    // Prevent admin from changing their own role
     if (userId === currentAdminId) {
       return res
         .status(400)
         .json({ error: "Nie możesz zmienić roli własnego konta" });
     }
 
-    //validate role enum
     if (!Object.values(Role).includes(role)) {
       return res.status(400).json({ error: "Nieprawidłowa rola użytkownika" });
     }

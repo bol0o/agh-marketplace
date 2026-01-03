@@ -14,6 +14,10 @@ export const registerSchema = z.object({
     firstName: z.string().min(2, { message: "Imię jest za krótkie" }),
     lastName: z.string().min(2, { message: "Nazwisko jest za krótkie" }),
     studentId: z.string().optional(),
+
+    acceptTerms: z.boolean().refine((val) => val === true, {
+      message: "Musisz zaakceptować regulamin",
+    }),
   }),
 });
 

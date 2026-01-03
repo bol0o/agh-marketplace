@@ -1,12 +1,36 @@
 import { Router } from "express";
-import { createOrder, getOrders } from "../controllers/order.controller";
+import {
+  createOrder,
+  getOrders,
+  getSales,
+  getOrderById,
+  payOrder,
+  updateOrderStatus,
+} from "../controllers/order.controller";
 import { authenticateToken } from "../middleware/auth.middleware";
+import { validate } from "../middleware/validate.middleware";
+import {
+  createOrderSchema,
+  updateOrderStatusSchema,
+} from "../schemas/order.schema";
 
 const router = Router();
 
-router.use(authenticateToken); //Authentication to all routes below
+router.use(authenticateToken);
 
-router.post("/", createOrder); // POST /api/orders
-router.get("/", getOrders); // GET /api/orders
+// Order Management
+router.get("/", getOrders); // My purchases
+router.get("/sales", getSales); // My sales
+router.get("/:id", getOrderById); // Details
+
+router.post("/", validate(createOrderSchema), createOrder); // Create order
+router.post("/:id/pay", payOrder); // Simulate payment
+
+// Status Update (e.g. for sellers/admin)
+router.patch(
+  "/:id/status",
+  validate(updateOrderStatusSchema),
+  updateOrderStatus
+);
 
 export default router;

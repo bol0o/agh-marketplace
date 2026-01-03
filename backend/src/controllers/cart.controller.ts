@@ -4,7 +4,23 @@ import { AuthRequest } from "../middleware/auth.middleware";
 
 const prisma = new PrismaClient();
 
-//Get cart
+// HELPER: Map DB Product to Frontend Interface
+const mapProduct = (p: any) => ({
+  id: p.id,
+  title: p.title,
+  price: p.price,
+  image: p.imageUrl, // Map imageUrl -> image
+  category: p.category,
+  condition: p.condition,
+  location: p.location,
+  seller: {
+    id: p.seller.id,
+    name: `${p.seller.firstName} ${p.seller.lastName}`,
+    avatar: p.seller.avatarUrl,
+  },
+});
+
+// GET /api/cart
 export const getCart = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
@@ -13,52 +29,61 @@ export const getCart = async (req: AuthRequest, res: Response) => {
       return res.status(401).json({ error: "Brak identyfikatora użytkownika" });
     }
 
-    //Find cart and include products
+    // Find cart and include products with seller info
     const cart = await prisma.cart.findUnique({
       where: { userId },
       include: {
         items: {
           include: {
-            product: true,
+            product: {
+              include: {
+                seller: true, // Needed for frontend product display
+              },
+            },
           },
+          orderBy: { createdAt: "asc" }, // Keep order consistent
         },
       },
     });
 
     if (!cart) {
-      return res.json({ items: [], totalPrice: 0 });
+      return res.json({ items: [] });
     }
 
-    //Calculate total price
-    const totalPrice = cart.items.reduce((sum, item) => {
-      return sum + item.quantity * item.product.price;
-    }, 0);
+    // Map to Frontend 'CartItemType' structure
+    const response = {
+      items: cart.items.map((item) => ({
+        id: item.id,
+        quantity: item.quantity,
+        product: mapProduct(item.product),
+      })),
+    };
 
-    res.json({ ...cart, totalPrice });
+    res.json(response);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Nie udało się pobrać koszyka" });
   }
 };
 
-//Add to cart
+// POST /api/cart
 export const addToCart = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
     const { productId, quantity = 1 } = req.body;
 
     if (!userId) {
-      return res.status(401).json({ error: "Brak identyfikatora użytkownika" });
+      return res.status(401).json({ error: "Brak autoryzacji" });
     }
 
-    //Find or create user cart
+    // Find or create user cart
     let cart = await prisma.cart.findUnique({ where: { userId } });
 
     if (!cart) {
       cart = await prisma.cart.create({ data: { userId } });
     }
 
-    //Check if product exists in cart
+    // Check if product exists in cart
     const existingItem = await prisma.cartItem.findUnique({
       where: {
         cartId_productId: {
@@ -69,13 +94,13 @@ export const addToCart = async (req: AuthRequest, res: Response) => {
     });
 
     if (existingItem) {
-      //Update quantity
+      // Update quantity
       await prisma.cartItem.update({
         where: { id: existingItem.id },
         data: { quantity: existingItem.quantity + quantity },
       });
     } else {
-      //Create new item
+      // Create new item
       await prisma.cartItem.create({
         data: {
           cartId: cart.id,
@@ -92,12 +117,56 @@ export const addToCart = async (req: AuthRequest, res: Response) => {
   }
 };
 
-//Remove from cart
+// PATCH /api/cart/:itemId
+export const updateCartItemQuantity = async (
+  req: AuthRequest,
+  res: Response
+) => {
+  try {
+    const { itemId } = req.params;
+    const { quantity } = req.body;
+    const userId = req.user?.userId;
+
+    // Verify if cart belongs to user (Security)
+    const cartItem = await prisma.cartItem.findUnique({
+      where: { id: itemId },
+      include: { cart: true },
+    });
+
+    if (!cartItem || cartItem.cart.userId !== userId) {
+      return res.status(404).json({ error: "Element koszyka nie znateziony" });
+    }
+
+    // Update
+    const updatedItem = await prisma.cartItem.update({
+      where: { id: itemId },
+      data: { quantity },
+    });
+
+    res.json({ message: "Zaktualizowano ilość", item: updatedItem });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Błąd aktualizacji koszyka" });
+  }
+};
+
+// DELETE /api/cart/:itemId
 export const removeFromCart = async (req: AuthRequest, res: Response) => {
   try {
     const { itemId } = req.params;
+    const userId = req.user?.userId;
 
-    //Delete item
+    // Verify ownership
+    const cartItem = await prisma.cartItem.findUnique({
+      where: { id: itemId },
+      include: { cart: true },
+    });
+
+    if (!cartItem || cartItem.cart.userId !== userId) {
+      return res.status(404).json({ error: "Element nie istnieje" });
+    }
+
+    // Delete item
     await prisma.cartItem.delete({
       where: { id: itemId },
     });
@@ -105,6 +174,6 @@ export const removeFromCart = async (req: AuthRequest, res: Response) => {
     res.json({ message: "Usunięto z koszyka" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Nie udało się usunąć" });
+    res.status(500).json({ error: "Nie udało się usunąć produktu" });
   }
 };

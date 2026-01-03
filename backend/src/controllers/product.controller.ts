@@ -1,181 +1,244 @@
 import { Request, Response } from "express";
-import { PrismaClient, Category } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { AuthRequest } from "../middleware/auth.middleware";
 
 const prisma = new PrismaClient();
 
-//Get all products with filtering
+// HELPER: Map DB Product to Frontend 'Product' Interface
+const mapProduct = (p: any) => ({
+  id: p.id,
+  title: p.title,
+  description: p.description,
+  price: p.price,
+  image: p.imageUrl, // Map imageUrl -> image
+
+  category: p.category,
+  condition: p.condition,
+  type: p.isAuction ? "auction" : "buy_now", // Map boolean -> string
+
+  location: p.location,
+  stock: 1,
+
+  seller: {
+    id: p.seller.id,
+    name: `${p.seller.firstName} ${p.seller.lastName}`,
+    avatar: p.seller.avatarUrl,
+    rating: 0, // Placeholder
+  },
+
+  views: p.views,
+  createdAt: p.createdAt,
+  endsAt: p.auctionEnd,
+});
+
+// GET /api/products (Filtering & Pagination)
 export const getProducts = async (req: Request, res: Response) => {
   try {
-    const { search, category, minPrice, maxPrice } = req.query;
+    const {
+      page = 1,
+      search,
+      cat,
+      minPrice,
+      maxPrice,
+      sort,
+      status, // 'auction' or 'buy_now'
+      location,
+    } = req.query;
 
     const where: any = {};
 
-    //Search by name or description
+    // 1. Build Filter Query
     if (search) {
       where.OR = [
         { title: { contains: String(search), mode: "insensitive" } },
         { description: { contains: String(search), mode: "insensitive" } },
       ];
     }
-
-    //Filter by category
-    if (category) {
-      where.category = category as Category;
+    if (cat) {
+      where.category = String(cat).toUpperCase();
     }
-
-    //Filter by price range
     if (minPrice || maxPrice) {
       where.price = {};
       if (minPrice) where.price.gte = Number(minPrice);
       if (maxPrice) where.price.lte = Number(maxPrice);
     }
+    if (status) {
+      if (status === "auction") where.isAuction = true;
+      if (status === "buy_now") where.isAuction = false;
+    }
+    if (location) {
+      where.location = { contains: String(location), mode: "insensitive" };
+    }
 
+    // 2. Sorting
+    let orderBy: any = { createdAt: "desc" };
+    if (sort === "price_asc") orderBy = { price: "asc" };
+    if (sort === "price_desc") orderBy = { price: "desc" };
+    if (sort === "views") orderBy = { views: "desc" };
+
+    // 3. Pagination
+    const take = 20;
+    const skip = (Number(page) - 1) * take;
+
+    // 4. Fetch
     const products = await prisma.product.findMany({
       where,
+      orderBy,
+      take,
+      skip,
       include: {
-        //Include seller's info
-        seller: {
-          select: {
-            firstName: true,
-            lastName: true,
-            email: true,
-          },
-        },
-      },
-    });
-
-    res.json(products);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Nie udało się pobrać produktów" });
-  }
-};
-
-//Get specific product
-export const getProduct = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-
-    const product = await prisma.product.findUnique({
-      where: { id },
-      include: {
-        //Include seller's info (needed to review them later)
         seller: {
           select: {
             id: true,
             firstName: true,
             lastName: true,
-            email: true,
+            avatarUrl: true,
           },
         },
       },
     });
 
-    if (!product) {
-      return res.status(404).json({ error: "Produkt nie znaleziony" });
-    }
-
-    res.json(product);
+    res.json(products.map(mapProduct));
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Nie udało się pobrać produktu" });
+    res.status(500).json({ error: "Błąd podczas pobierania produktów" });
   }
 };
 
-//Create new product
-export const createProduct = async (req: AuthRequest, res: Response) => {
+// GET /api/products/:id (Details)
+export const getProductById = async (req: Request, res: Response) => {
   try {
-    //Extract data from request
-    //FormData sends everything as strings
-    const { title, description, price, category, isAuction, auctionEnd } =
-      req.body;
+    const { id } = req.params;
 
-    //Extract image URL
-    const imageUrl = req.file ? req.file.path : null;
-
-    const sellerId = req.user?.userId;
-
-    //Auth check
-    if (!sellerId) {
-      return res.status(401).json({ error: "Musisz być zalogowany" });
-    }
-
-    //Data parsing & validation
-    const priceNumber = Number(price);
-
-    //Parse boolean from string (FormData sends "true" or "false" as text)
-    const isAuctionBoolean = isAuction === "true";
-
-    //Parse Date if exists
-    let auctionEndDate: Date | null = null;
-    if (isAuctionBoolean && auctionEnd) {
-      auctionEndDate = new Date(auctionEnd);
-
-      //Basic validation for date
-      if (isNaN(auctionEndDate.getTime())) {
-        return res
-          .status(400)
-          .json({ error: "Nieprawidłowy format daty zakończenia aukcji" });
-      }
-    }
-
-    //Require end date for auctions
-    if (isAuctionBoolean && !auctionEndDate) {
-      return res
-        .status(400)
-        .json({ error: "Aukcja musi mieć datę zakończenia" });
-    }
-
-    //Save to DB
-    const product = await prisma.product.create({
-      data: {
-        title,
-        description,
-        price: priceNumber,
-        category,
-        imageUrl,
-        sellerId,
-
-        isAuction: isAuctionBoolean,
-        auctionEnd: auctionEndDate,
+    // Increment view counter
+    const product = await prisma.product.update({
+      where: { id },
+      data: { views: { increment: 1 } },
+      include: {
+        seller: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            avatarUrl: true,
+          },
+        },
       },
     });
 
-    res.status(201).json(product);
+    res.json(mapProduct(product));
   } catch (error) {
-    console.error("Error creating product:", error);
-    res.status(500).json({ error: "Nie udało się dodać produktu" });
+    res.status(404).json({ error: "Produkt nie został znaleziony" });
   }
 };
 
-//Delete product
+// POST /api/products (Create)
+export const createProduct = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) return res.status(401).json({ error: "Brak autoryzacji" });
+
+    const {
+      title,
+      description,
+      price,
+      category,
+      condition,
+      location,
+      isAuction,
+      auctionEnd,
+      imageUrl,
+    } = req.body;
+
+    const product = await prisma.product.create({
+      data: {
+        sellerId: userId,
+        title,
+        description,
+        price: Number(price),
+        category,
+        imageUrl: imageUrl || null,
+        condition,
+        location,
+        isAuction: Boolean(isAuction),
+        auctionEnd: auctionEnd ? new Date(auctionEnd) : null,
+      },
+      include: {
+        seller: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            avatarUrl: true,
+          },
+        },
+      },
+    });
+
+    res.status(201).json(mapProduct(product));
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Nie udało się utworzyć produktu" });
+  }
+};
+
+// PATCH /api/products/:id (Edit)
+export const updateProduct = async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user?.userId;
+
+    // Check ownership
+    const existing = await prisma.product.findUnique({ where: { id } });
+    if (!existing || existing.sellerId !== userId) {
+      return res
+        .status(403)
+        .json({ error: "Możesz edytować tylko własne produkty" });
+    }
+
+    const updated = await prisma.product.update({
+      where: { id },
+      data: req.body,
+      include: {
+        seller: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            avatarUrl: true,
+          },
+        },
+      },
+    });
+
+    res.json(mapProduct(updated));
+  } catch (error) {
+    res.status(500).json({ error: "Nie udało się zaktualizować produktu" });
+  }
+};
+
+// DELETE /api/products/:id (Remove)
 export const deleteProduct = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
     const userId = req.user?.userId;
     const role = req.user?.role;
 
-    //Check if product exists
     const product = await prisma.product.findUnique({ where: { id } });
-
-    if (!product) {
+    if (!product)
       return res.status(404).json({ error: "Produkt nie istnieje" });
-    }
 
-    //Check permissions (Owner or Admin)
+    // Allow owner OR admin to delete
     if (product.sellerId !== userId && role !== "ADMIN") {
       return res
         .status(403)
         .json({ error: "Brak uprawnień do usunięcia tego produktu" });
     }
 
-    //Delete product
     await prisma.product.delete({ where: { id } });
 
-    res.json({ message: "Produkt usunięty" });
+    res.json({ message: "Produkt został usunięty" });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ error: "Nie udało się usunąć produktu" });
   }
 };

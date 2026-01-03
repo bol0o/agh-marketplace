@@ -1,32 +1,29 @@
 import { Router } from "express";
 import {
   getProducts,
-  getProduct,
+  getProductById,
   createProduct,
+  updateProduct,
   deleteProduct,
 } from "../controllers/product.controller";
 import { authenticateToken } from "../middleware/auth.middleware";
-import { upload } from "../middleware/upload.middleware";
 import { validate } from "../middleware/validate.middleware";
-import { createProductSchema } from "../schemas/product.schema";
+import {
+  createProductSchema,
+  updateProductSchema,
+} from "../schemas/product.schema";
 
 const router = Router();
 
+// Public Routes
 router.get("/", getProducts); // GET /api/products
-router.get("/:id", getProduct); // GET /api/products/123
+router.get("/:id", getProductById); // GET /api/products/:id
 
-// 1. Authenticate user
-// 2. Process image upload (field name must be "image")
-// 3. Validate parsed body (zod)
-// 4. Create product in DB
-router.post(
-  "/",
-  authenticateToken,
-  upload.single("image"),
-  validate(createProductSchema),
-  createProduct
-);
+// Protected Routes
+router.use(authenticateToken);
 
-router.delete("/:id", authenticateToken, deleteProduct);
+router.post("/", validate(createProductSchema), createProduct); // POST /api/products
+router.patch("/:id", validate(updateProductSchema), updateProduct); // PATCH /api/products/:id
+router.delete("/:id", deleteProduct); // DELETE /api/products/:id
 
 export default router;

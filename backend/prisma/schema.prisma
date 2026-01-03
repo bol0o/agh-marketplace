@@ -21,26 +21,43 @@ model User {
   isActive     Boolean @default(true) // false tzn ban
   refreshToken String?
 
+  // Address 
+  street          String?
+  city            String?
+  zipCode         String?
+  buildingNumber  String?
+  apartmentNumber String?
+  phone           String?
+
+  // Settings 
+  notifyEmail Boolean @default(true)
+  notifyPush  Boolean @default(true)
+  marketing   Boolean @default(false)
+
+  studentYear Int?
 
   // Profile info
   avatarUrl String?
   faculty   String? // Np. WIEiT, EAIiIB
 
   // Relations
-  products       Product[]     @relation("SellerProducts")
-  orders         Order[]
-  cart           Cart?
-  reviewsWritten Review[]      @relation("WrittenReviews")
-  reviewsReceived Review[]     @relation("ReceivedReviews")
+  products        Product[] @relation("SellerProducts")
+  orders          Order[]
+  cart            Cart?
+  reviewsWritten  Review[]  @relation("WrittenReviews")
+  reviewsReceived Review[]  @relation("ReceivedReviews")
 
-  bids          Bid[]          // Licytacje użytkownika
-  followedBy    Follow[]       @relation("FollowedBy") // Kto mnie obserwuje
-  following     Follow[]       @relation("Following")  // Kogo ja obserwuję
-  
-  // komunikacja
-  sentMessages     Message[]   @relation("SentMessages")
-  receivedMessages Message[]   @relation("ReceivedMessages")
-  notifications    Notification[]
+  bids       Bid[]    // Licytacje użytkownika
+  followedBy Follow[] @relation("FollowedBy") // Kto mnie obserwuje
+  following  Follow[] @relation("Following")  // Kogo ja obserwuję
+   
+  // Komunikacja 
+  chatsAsBuyer Chat[]    @relation("BuyerChats")
+  sentMessages Message[] @relation("SentMessages")
+
+  notifications Notification[]
+
+  reports Report[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -60,11 +77,15 @@ model Product {
   price       Float    // Cena Kup Teraz lub Cena Startowa
   category    Category
   imageUrl    String?
-  
-  // aukcje
-  isAuction   Boolean  @default(false)
-  auctionEnd  DateTime? // Data zakończenia aukcji
-  isAuctionClosed Boolean @default(false)
+
+  condition String @default("used") // 'new', 'used', 'damaged'
+  location  String @default("Kraków") // e.g. "Miasteczko Studenckie"
+  views     Int    @default(0)
+
+  // Aukcje
+  isAuction       Boolean   @default(false)
+  auctionEnd      DateTime? // Data zakończenia aukcji
+  isAuctionClosed Boolean   @default(false)
 
   seller   User   @relation("SellerProducts", fields: [sellerId], references: [id])
   sellerId String
@@ -72,6 +93,7 @@ model Product {
   cartItems  CartItem[]
   orderItems OrderItem[]
   bids       Bid[]      // Oferty licytacji
+  chats      Chat[]     // Czaty dotyczące tego produktu
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -95,25 +117,34 @@ model Cart {
 }
 
 model CartItem {
-  id        String  @id @default(uuid())
-  cart      Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  id        String   @id @default(uuid())
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
   cartId    String
-  product   Product @relation(fields: [productId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id])
   productId String
-  quantity  Int     @default(1)
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
 
   @@unique([cartId, productId])
 }
 
 // 4. Zamówienie
 model Order {
-  id         String      @id @default(uuid())
-  user       User        @relation(fields: [userId], references: [id])
-  userId     String
-  items      OrderItem[]
+  id     String @id @default(uuid())
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+  items  OrderItem[]
+
   totalPrice Float
   status     OrderStatus @default(PENDING)
-  createdAt  DateTime    @default(now())
+
+  shippingCost    Float  @default(0)
+  shippingStreet  String
+  shippingCity    String
+  shippingZipCode String
+  shippingPhone   String
+
+  createdAt DateTime @default(now())
 }
 
 model OrderItem {
@@ -124,6 +155,9 @@ model OrderItem {
   productId   String
   quantity    Int
   priceAtTime Float
+
+  snapshotTitle String
+  snapshotImage String?
 }
 
 enum OrderStatus {
@@ -148,13 +182,13 @@ model Review {
 
 // 6. Licytacje (Aukcje)
 model Bid {
-  id        String   @id @default(uuid())
-  amount    Float
-  
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String
-  
-  product   Product  @relation(fields: [productId], references: [id])
+  id     String @id @default(uuid())
+  amount Float
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  product   Product @relation(fields: [productId], references: [id])
   productId String
 
   createdAt DateTime @default(now())
@@ -162,43 +196,85 @@ model Bid {
 
 // 7. Obserwowanie
 model Follow {
-  id          String @id @default(uuid())
-  
-  follower    User   @relation("Following", fields: [followerId], references: [id])
-  followerId  String
-  
+  id String @id @default(uuid())
+
+  follower   User   @relation("Following", fields: [followerId], references: [id])
+  followerId String
+
   following   User   @relation("FollowedBy", fields: [followingId], references: [id])
   followingId String
 
-  createdAt   DateTime @default(now())
+  createdAt DateTime @default(now())
 
   @@unique([followerId, followingId]) // Zabezpieczenie przed dublowaniem
 }
 
-// 8. Wiadomości
-model Message {
-  id        String   @id @default(uuid())
-  content   String
-  
-  sender    User     @relation("SentMessages", fields: [senderId], references: [id])
-  senderId  String
-  
-  recipient User     @relation("ReceivedMessages", fields: [recipientId], references: [id])
-  recipientId String
+// 8. System Czatów (Social - Contextual Chat)
+model Chat {
+  id String @id @default(uuid())
 
-  isRead    Boolean  @default(false)
+  // Kontekst: Czat dotyczy konkretnego produktu
+  product   Product @relation(fields: [productId], references: [id])
+  productId String
+
+  // Kupujący (Sprzedawcą jest właściciel produktu)
+  buyer   User   @relation("BuyerChats", fields: [buyerId], references: [id])
+  buyerId String
+
+  messages Message[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt // Do sortowania listy czatów
+
+  @@unique([productId, buyerId]) // Jeden czat per produkt per kupujący
+}
+
+model Message {
+  id String @id @default(uuid())
+
+  chat   Chat   @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  chatId String
+
+  sender   User   @relation("SentMessages", fields: [senderId], references: [id])
+  senderId String
+
+  text   String // Treść wiadomości
+  isRead Boolean @default(false)
+
   createdAt DateTime @default(now())
 }
 
 // 9. Powiadomienia
 model Notification {
-  id        String   @id @default(uuid())
-  type      String   // np. 'BID', 'ORDER', 'FOLLOW'
-  message   String
-  isRead    Boolean  @default(false)
-  
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String
+  id   String @id @default(uuid())
+  type String // np. 'BID', 'ORDER', 'FOLLOW', 'MESSAGE'
+
+  title String  @default("Powiadomienie")
+  link  String?
+
+  message String
+  isRead  Boolean @default(false)
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
 
   createdAt DateTime @default(now())
+}
+
+
+// 10. Admin Raport
+model Report {
+  id          String   @id @default(uuid())
+  
+  reporter    User     @relation(fields: [reporterId], references: [id])
+  reporterId  String
+  
+  targetType  String   // 'product' | 'user' | 'chat'
+  targetId    String   // ID zgłaszanego obiektu
+  
+  reason      String   // 'spam', 'scam', etc.
+  description String?
+  status      String   @default("open") // 'open', 'resolved', 'dismissed'
+  
+  createdAt   DateTime @default(now())
 }
