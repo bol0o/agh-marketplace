@@ -4,17 +4,20 @@ import { ShoppingBag, MessageSquare, ShieldCheck, Heart } from 'lucide-react';
 // import { useCartStore } from '@/store/cartStore';
 // import { useUIStore } from '@/store/uiStore';
 import styles from './ProductSidebar.module.scss';
-import { Product } from '@/components/marketplace/ProductCard';
+// import { Product } from '@/components/marketplace/ProductCard';
+import { MOCK_PRODUCTS } from '@/data/mockData';
+import { Product } from '@/types/marketplace';
 
 // Mock sprzedawcy (normalnie z bazy przez 'authorId')
-const MOCK_SELLER = {
-	name: 'Jan Kowalski',
-	avatar: 'https://ui-avatars.com/api/?name=Jan+Kowalski&background=random',
-	rating: 4.8,
-	joined: '2 lata temu',
-};
+// const MOCK_SELLER = {
+// 	name: 'Jan Kowalski',
+// 	avatar: 'https://ui-avatars.com/api/?name=Jan+Kowalski&background=random',
+// 	rating: 4.8,
+// 	joined: '2 lata temu',
+// };
 
 export function ProductSidebar({ product }: { product: Product }) {
+	const seller = product.seller;
 	// const addItem = useCartStore((state) => state.addItem);
 	// const addToast = useUIStore((state) => state.addToast);
 
@@ -60,25 +63,16 @@ export function ProductSidebar({ product }: { product: Product }) {
 						</div>
 					)}
 				</div>
-
-				<div className={styles.safetyInfo}>
-					<ShieldCheck size={16} />
-					<span>Ochrona Kupującego AGH Protect</span>
-				</div>
 			</div>
 
 			{/* KARTA SPRZEDAWCY */}
 			<div className={styles.sellerCard}>
 				<h3>Sprzedawca</h3>
 				<div className={styles.sellerProfile}>
-					<img
-						src={MOCK_SELLER.avatar}
-						alt={MOCK_SELLER.name}
-						className={styles.avatar}
-					/>
+					<img src={seller.avatar} alt={seller.name} className={seller.avatar} />
 					<div className={styles.sellerInfo}>
-						<h4>{MOCK_SELLER.name}</h4>
-						<div className={styles.rating}>⭐ {MOCK_SELLER.rating} / 5</div>
+						<h4>{seller.name}</h4>
+						<div className={styles.rating}>⭐ {seller.rating} / 5</div>
 					</div>
 				</div>
 				<button className={styles.messageBtn}>

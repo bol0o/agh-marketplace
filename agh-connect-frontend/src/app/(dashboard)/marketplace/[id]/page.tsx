@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
-import { MOCK_CART } from '@/data/mockData';
+import { MOCK_PRODUCTS } from '@/data/mockData';
 import { ProductGallery } from '@/components/marketplace/product/ProductGallery';
 import { ProductInfo } from '@/components/marketplace/product/ProductInfo';
 import { ProductSidebar } from '@/components/marketplace/product/ProductSidebar';
@@ -16,7 +16,7 @@ export default async function ProductPage({ params }: PageProps) {
 	const { id } = await params;
 
 	// 1. Pobieramy produkt (symulacja bazy danych)
-	const product = MOCK_CART.find((p) => p.id === id)?.product;
+	const product = MOCK_PRODUCTS.find((p) => p.id === id);
 
 	if (!product) {
 		notFound(); // Wyświetli stronę 404

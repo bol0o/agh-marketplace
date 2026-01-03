@@ -51,3 +51,10 @@ export type PublicUserProfile = Pick<
 	| 'joinedAt'
 	| 'listedProductsCount'
 >;
+
+// Rzeczy które brakuje
+// User: address, settings, ratingCount
+// Orders: stan - 'pending' | 'paid' | 'shipped' | 'delivered' | 'cancelled' | 'returned'
+// Address: building number, apartment number
+// Chat: lastSeen, status productu 'archived', messages!!
+// Notifications: całe

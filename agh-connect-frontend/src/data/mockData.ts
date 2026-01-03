@@ -4,6 +4,7 @@ import { CartItemType } from '@/types/cart';
 import { Chat } from '@/types/social';
 import { NotificationItem } from '@/types/notifications';
 import { User } from '@/types/user';
+import { Order } from '@/types/orders';
 
 // --- HELPERY ---
 const now = new Date().toISOString();
@@ -268,3 +269,50 @@ export const MOCK_USER: User = {
 		},
 	},
 };
+
+// ==========================================
+// 6. MOCK ZAMÓWIEŃ (MOJE ZAKUPY)
+// ==========================================
+
+export const MOCK_ORDERS: Order[] = [
+	{
+		id: 'ord-1',
+		createdAt: '2023-12-10T14:30:00Z',
+		status: 'delivered',
+		buyerId: 'me',
+		totalAmount: 95.0,
+		shippingCost: 15.0,
+		shippingAddress: MOCK_USER.address!,
+		items: [
+			{
+				productId: 'p1',
+				quantity: 1,
+				snapshot: {
+					title: 'Podręcznik do Fizyki Halliday Resnick',
+					image: 'https://placehold.co/100',
+					price: 80.0,
+				},
+			},
+		],
+	},
+	{
+		id: 'ord-2',
+		createdAt: '2024-01-02T09:15:00Z',
+		status: 'shipped',
+		buyerId: 'me',
+		totalAmount: 45.0,
+		shippingCost: 0.0, // Odbiór osobisty
+		shippingAddress: MOCK_USER.address!,
+		items: [
+			{
+				productId: 'p2',
+				quantity: 3,
+				snapshot: {
+					title: 'Długopisy żelowe',
+					image: 'https://placehold.co/100',
+					price: 15.0,
+				},
+			},
+		],
+	},
+];
