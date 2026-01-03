@@ -88,7 +88,13 @@ export function ChatWindow({ chat, onBack, className }: ChatWindowProps) {
 					className={`${styles.avatar} ${chat.user.isOnline ? styles.online : ''}`}
 					style={{ width: 40, height: 40 }}
 				>
-					{chat.user.avatar}
+					<img
+						src={
+							chat.user.avatar ||
+							`https://ui-avatars.com/api/?name=${chat.user.name}&background=random`
+						}
+						alt={chat.user.name}
+					/>
 				</div>
 
 				<div className={styles.headerInfo}>

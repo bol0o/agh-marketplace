@@ -78,18 +78,20 @@
 }
 
 .avatar {
-	width: 48px;
-	height: 48px;
-	border-radius: 50%;
-	background-color: #e5e7eb;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	font-weight: 700;
-	color: #6b7280;
-	position: relative;
-	flex-shrink: 0;
-	font-size: 0.9rem;
+	width: 48px; // Przykładowy rozmiar
+	height: 48px; // Przykładowy rozmiar
+	border-radius: 50%; // Robi kółko
+	overflow: hidden; // Ukrywa to co wystaje poza kółko
+	flex-shrink: 0; // Zapobiega zgniataniu
+	position: relative; // Dla kropki statusu (isOnline)
+	background-color: #e5e7eb; // Tło na wypadek ładowania
+
+	img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover; // Kluczowe: zdjęcie wypełnia kółko bez deformacji
+		display: block;
+	}
 
 	&.online::after {
 		content: '';

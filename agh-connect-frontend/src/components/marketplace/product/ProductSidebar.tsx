@@ -7,6 +7,7 @@ import styles from './ProductSidebar.module.scss';
 // import { Product } from '@/components/marketplace/ProductCard';
 import { MOCK_PRODUCTS } from '@/data/mockData';
 import { Product } from '@/types/marketplace';
+import Link from 'next/link';
 
 // Mock sprzedawcy (normalnie z bazy przez 'authorId')
 // const MOCK_SELLER = {
@@ -68,13 +69,15 @@ export function ProductSidebar({ product }: { product: Product }) {
 			{/* KARTA SPRZEDAWCY */}
 			<div className={styles.sellerCard}>
 				<h3>Sprzedawca</h3>
-				<div className={styles.sellerProfile}>
-					<img src={seller.avatar} alt={seller.name} className={seller.avatar} />
-					<div className={styles.sellerInfo}>
-						<h4>{seller.name}</h4>
-						<div className={styles.rating}>⭐ {seller.rating} / 5</div>
+				<Link href={`/users/${product.seller.id}`}>
+					<div className={styles.sellerProfile}>
+						<img src={seller.avatar} alt={seller.name} className={seller.avatar} />
+						<div className={styles.sellerInfo}>
+							<h4>{seller.name}</h4>
+							<div className={styles.rating}>⭐ {seller.rating} / 5</div>
+						</div>
 					</div>
-				</div>
+				</Link>
 				<button className={styles.messageBtn}>
 					<MessageSquare size={18} />
 					Napisz wiadomość

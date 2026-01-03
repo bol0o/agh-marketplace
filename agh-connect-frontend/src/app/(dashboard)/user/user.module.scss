@@ -236,3 +236,53 @@
 		background: darken($color-primary, 5%);
 	}
 }
+
+// ... istniejące style ...
+
+.listingsSection {
+	margin-top: 40px;
+
+	.sectionHeader {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 20px;
+
+		h3 {
+			font-size: 1.2rem;
+			font-weight: 700;
+		}
+
+		.addBtn {
+			font-size: 0.9rem;
+			font-weight: 600;
+			color: $color-primary;
+			text-decoration: none;
+			&:hover {
+				text-decoration: underline;
+			}
+		}
+	}
+}
+
+.productsGrid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+	gap: 20px;
+}
+
+.emptyState {
+	background: white;
+	border: 1px dashed $color-border;
+	border-radius: 12px;
+	padding: 40px;
+	text-align: center;
+	p {
+		color: $color-text-secondary;
+		margin-bottom: 8px;
+	}
+	a {
+		color: $color-primary;
+		font-weight: 600;
+	}
+}

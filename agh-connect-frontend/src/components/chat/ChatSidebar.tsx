@@ -1,5 +1,5 @@
 import { Search } from 'lucide-react';
-import { Chat } from '@/data/chats';
+import { Chat } from '@/types/social';
 import styles from './ChatSidebar.module.scss';
 
 interface ChatSidebarProps {
@@ -43,7 +43,13 @@ export function ChatSidebar({
 						<div
 							className={`${styles.avatar} ${chat.user.isOnline ? styles.online : ''}`}
 						>
-							{chat.user.avatar}
+							<img
+								src={
+									chat.user.avatar ||
+									`https://ui-avatars.com/api/?name=${chat.user.name}&background=random`
+								}
+								alt={chat.user.name}
+							/>
 						</div>
 						<div className={styles.chatInfo}>
 							<div className={styles.topRow}>

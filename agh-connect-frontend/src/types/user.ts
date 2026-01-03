@@ -50,6 +50,7 @@ export type PublicUserProfile = Pick<
 	| 'ratingCount'
 	| 'joinedAt'
 	| 'listedProductsCount'
+	| 'role'
 >;
 
 // Rzeczy które brakuje

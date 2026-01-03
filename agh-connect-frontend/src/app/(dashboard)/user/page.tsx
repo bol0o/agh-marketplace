@@ -4,9 +4,12 @@ import Link from 'next/link';
 import { MOCK_USER } from '@/data/mockData';
 import { MapPin } from 'lucide-react';
 import styles from './user.module.scss';
+import { getUserProducts } from '@/data/mockData';
+import { ProductCard } from '@/components/marketplace/ProductCard';
 
 export default function ProfilePage() {
 	const user = MOCK_USER;
+	const myProducts = getUserProducts('u2');
 
 	return (
 		<div className={styles.wrapper}>
@@ -73,6 +76,28 @@ export default function ProfilePage() {
 						Edytuj adres &rarr;
 					</Link>
 				</div>
+			</div>
+
+			<div className={styles.listingsSection}>
+				<div className={styles.sectionHeader}>
+					<h3>Twoje aktywne ogłoszenia ({myProducts.length})</h3>
+					<Link href="/marketplace/create" className={styles.addBtn}>
+						+ Dodaj nowe
+					</Link>
+				</div>
+
+				{myProducts.length > 0 ? (
+					<div className={styles.productsGrid}>
+						{myProducts.map((product) => (
+							<ProductCard key={product.id} product={product} />
+						))}
+					</div>
+				) : (
+					<div className={styles.emptyState}>
+						<p>Nie masz jeszcze żadnych aktywnych ogłoszeń.</p>
+						<Link href="/marketplace/create">Wystaw pierwszy przedmiot</Link>
+					</div>
+				)}
 			</div>
 		</div>
 	);

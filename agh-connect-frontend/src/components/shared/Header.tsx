@@ -138,7 +138,7 @@ export function Header() {
 												<Package size={16} /> Zamówienia
 											</Link>
 
-											<Link href="/user/orders">
+											<Link href="/user/settings">
 												<Settings size={16} /> Ustawienia
 											</Link>
 										</div>

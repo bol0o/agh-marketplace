@@ -5,6 +5,7 @@ import { Chat } from '@/types/social';
 import { NotificationItem } from '@/types/notifications';
 import { User } from '@/types/user';
 import { Order } from '@/types/orders';
+import { PublicUserProfile } from '@/types/user';
 
 // --- HELPERY ---
 const now = new Date().toISOString();
@@ -316,3 +317,89 @@ export const MOCK_ORDERS: Order[] = [
 		],
 	},
 ];
+
+export const getUserById = (id: string): PublicUserProfile | undefined => {
+	// 1. Jeśli to "ja", mapujemy pełny profil na publiczny
+	if (id === 'me' || id === 'u1') {
+		// Zakładamy, że u1 to też ja dla testów
+		return {
+			id: MOCK_USER.id,
+			name: MOCK_USER.name,
+			avatar: MOCK_USER.avatar,
+			studentInfo: MOCK_USER.studentInfo,
+			rating: MOCK_USER.rating,
+			ratingCount: MOCK_USER.ratingCount,
+			joinedAt: MOCK_USER.joinedAt,
+			listedProductsCount: MOCK_USER.listedProductsCount,
+			role: MOCK_USER.role,
+		};
+	}
+
+	// 2. Szukamy w produktach, żeby znaleźć dane sprzedawcy (symulacja bazy)
+	const foundProduct = MOCK_PRODUCTS.find((p) => p.seller.id === id);
+
+	if (foundProduct) {
+		return {
+			id: foundProduct.seller.id,
+			name: foundProduct.seller.name,
+			avatar: foundProduct.seller.avatar,
+			studentInfo: { faculty: 'Inny', year: 2 }, // Mock, bo w produkcie tego nie ma
+			rating: foundProduct.seller.rating || 0,
+			ratingCount: 12, // Mock
+			joinedAt: '2023-10-01T00:00:00Z', // Mock
+			listedProductsCount: 3, // Mock
+			role: 'student', // Mock
+		};
+	}
+
+	return undefined;
+};
+
+export const getUserProducts = (userId: string) => {
+	const targetId = userId === 'me' ? 'me' : userId;
+
+	return MOCK_PRODUCTS.filter(
+		(p) => p.seller.id === targetId || (userId === 'me' && p.seller.id === 'u1')
+	);
+};
+
+const generateId = () => Math.random().toString(36).substr(2, 9);
+
+export const getOrCreateChat = (targetUserId: string, productId?: string) => {
+	const existingChat = MOCK_CHATS.find(
+		(chat) =>
+			chat.user.id === targetUserId && (productId ? chat.product.id === productId : true)
+	);
+
+	if (existingChat) {
+		return existingChat.id;
+	}
+
+	const targetUser = getUserById(targetUserId);
+	if (!targetUser) return null;
+
+	const newChat: Chat = {
+		id: `chat-${generateId()}`,
+		updatedAt: new Date().toISOString(),
+		lastMessage: '',
+		unreadCount: 0,
+		user: {
+			id: targetUser.id,
+			name: targetUser.name,
+			avatar: targetUser.avatar || '',
+			isOnline: true,
+		},
+		product: {
+			id: productId || 'general',
+			title: productId ? 'Rozmowa o ofercie' : 'Rozmowa prywatna',
+			price: 0,
+			image: '',
+			status: 'buying',
+		},
+		messages: [],
+	};
+
+	MOCK_CHATS.unshift(newChat);
+
+	return newChat.id;
+};
