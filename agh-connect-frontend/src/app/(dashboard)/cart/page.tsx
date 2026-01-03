@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { ShoppingBag } from 'lucide-react';
-import { MOCK_CART } from '@/data/cart';
+import { MOCK_CART } from '@/data/mockData';
 import { CartItem } from '@/components/cart/CartItem';
 import { CartSummary } from '@/components/cart/CartSummary';
 import styles from '@/styles/cart.module.scss';

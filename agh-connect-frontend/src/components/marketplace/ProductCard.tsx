@@ -2,16 +2,7 @@ import Link from 'next/link';
 import { Gavel, ShoppingBag, Clock } from 'lucide-react';
 import styles from './ProductCard.module.scss';
 import Image from 'next/image';
-
-// Typ, który pewnie później przeniesiesz do pliku types.ts
-export interface Product {
-	id: string;
-	title: string;
-	image: string;
-	price: number;
-	type: 'auction' | 'buy_now';
-	endsAt?: string; // Np. "2024-02-20T12:00:00"
-}
+import { Product } from '@/types/marketplace';
 
 export function ProductCard({ product }: { product: Product }) {
 	const isAuction = product.type === 'auction';

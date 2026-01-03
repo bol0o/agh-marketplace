@@ -1,0 +1,148 @@
+@use '@/styles/variables' as *;
+
+.sidebarWrapper {
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+	position: sticky;
+	top: 100px; // Sticky sidebar!
+}
+
+.card,
+.sellerCard {
+	background: white;
+	border: 1px solid $color-border;
+	border-radius: 16px;
+	padding: 24px;
+	box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+// --- PRICE & ACTIONS ---
+.priceRow {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 24px;
+
+	.price {
+		font-size: 2rem;
+		font-weight: 800;
+		color: $color-text-main;
+	}
+
+	.favBtn {
+		width: 40px;
+		height: 40px;
+		border-radius: 50%;
+		border: 1px solid $color-border;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: #6b7280;
+		cursor: pointer;
+		transition: all 0.2s;
+		&:hover {
+			background: #fee2e2;
+			color: #ef4444;
+			border-color: #ef4444;
+		}
+	}
+}
+
+.actions {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.buyBtn {
+	width: 100%;
+	padding: 14px;
+	border-radius: 10px;
+	font-weight: 600;
+	background-color: $color-primary;
+	color: white;
+	transition: background 0.2s;
+	&:hover {
+		background-color: darken($color-primary, 5%);
+	}
+}
+
+.cartBtn {
+	width: 100%;
+	padding: 14px;
+	border-radius: 10px;
+	font-weight: 600;
+	background-color: white;
+	border: 2px solid $color-primary;
+	color: $color-primary;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	&:hover {
+		background-color: rgba($color-primary, 0.05);
+	}
+}
+
+.safetyInfo {
+	margin-top: 16px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	font-size: 0.8rem;
+	color: #10b981;
+	font-weight: 500;
+}
+
+// --- SELLER CARD ---
+.sellerCard {
+	h3 {
+		font-size: 1rem;
+		font-weight: 700;
+		margin-bottom: 16px;
+	}
+}
+
+.sellerProfile {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin-bottom: 16px;
+
+	.avatar {
+		width: 48px;
+		height: 48px;
+		border-radius: 50%;
+	}
+	.sellerInfo {
+		h4 {
+			font-weight: 600;
+		}
+		.rating {
+			font-size: 0.85rem;
+			color: #f59e0b;
+			font-weight: 600;
+			margin-top: 2px;
+		}
+	}
+}
+
+.messageBtn {
+	width: 100%;
+	padding: 10px;
+	border-radius: 8px;
+	border: 1px solid $color-border;
+	background: white;
+	color: $color-text-main;
+	font-weight: 500;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	&:hover {
+		background-color: #f9fafb;
+		border-color: #d1d5db;
+	}
+}

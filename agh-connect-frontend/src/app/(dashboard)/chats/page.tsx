@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { MOCK_CHATS } from '@/data/chats';
+import { MOCK_CHATS } from '@/data/mockData';
 import { ChatSidebar } from '@/components/chat/ChatSidebar';
 import { ChatWindow } from '@/components/chat/ChatWindow';
 import styles from '@/styles/chats.module.scss';

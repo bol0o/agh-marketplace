@@ -1,7 +1,7 @@
 import Link from 'next/link';
 // Dodajemy MapPin do importów
 import { Trash2, Minus, Plus, MapPin } from 'lucide-react';
-import { CartItemType } from '@/data/cart';
+import { CartItemType } from '@/types/cart';
 import styles from './CartItem.module.scss';
 
 interface CartItemProps {
@@ -26,7 +26,7 @@ export function CartItem({ item, onRemove, onUpdateQuantity }: CartItemProps) {
 						{product.title}
 					</Link>
 
-					<p className={styles.seller}>Sprzedawca: {product.seller}</p>
+					<p className={styles.seller}>Sprzedawca: {product.seller.name}</p>
 
 					{/* NOWOŚĆ: Lokalizacja */}
 					<div className={styles.location}>

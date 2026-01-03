@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { ProductCard } from '@/components/marketplace/ProductCard';
 import { Pagination } from '@/components/ui/Pagination';
-import { ALL_PRODUCTS } from '@/data/products';
+import { MOCK_PRODUCTS } from '@/data/mockData';
 import { SearchX } from 'lucide-react';
 import styles from '@/styles/marketplace.module.scss';
 
@@ -24,7 +24,7 @@ export default async function MarketplacePage(props: MarketplacePageProps) {
 
 	const currentPage = Number(searchParams.page) || 1;
 
-	const filteredProducts = ALL_PRODUCTS.filter((product) => {
+	const filteredProducts = MOCK_PRODUCTS.filter((product) => {
 		if (category && product.category !== category) return false;
 		if (type && type !== 'all' && product.type !== type) return false;
 		if (minPrice !== null && product.price < minPrice) return false;

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { MOCK_NOTIFICATIONS } from '@/data/notifications';
+import { MOCK_NOTIFICATIONS } from '@/data/mockData';
 import { CheckCheck } from 'lucide-react';
 import { NotificationList } from '@/components/notifications/NotificationList';
 import styles from '@/styles/notifications.module.scss';
