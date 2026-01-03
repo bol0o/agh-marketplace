@@ -15,7 +15,7 @@ import {
 	ArrowRight,
 	SlidersHorizontal,
 } from 'lucide-react';
-import styles from '@/styles/Sidebar.module.scss';
+import styles from './Sidebar.module.scss';
 
 export type ListingType = 'all' | 'buy_now' | 'auction';
 

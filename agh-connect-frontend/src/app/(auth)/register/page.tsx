@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Mail, Lock, User, ArrowRight, Eye, EyeOff, Loader2 } from 'lucide-react';
-import styles from '@/styles/Auth.module.scss';
-import AuthBranding from '@/components/ui/auth/AuthBranding';
+import styles from '../Auth.module.scss';
+import AuthBranding from '@/components/auth/AuthBranding';
 import { RegisterFormData } from '@/types/userCredentialsTypes';
 
 export default function RegisterPage() {

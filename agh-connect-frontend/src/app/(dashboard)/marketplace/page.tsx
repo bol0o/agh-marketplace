@@ -1,9 +1,9 @@
 import Link from 'next/link';
 import { ProductCard } from '@/components/marketplace/ProductCard';
-import { Pagination } from '@/components/ui/Pagination';
+import { Pagination } from '@/components/shared/Pagination';
 import { MOCK_PRODUCTS } from '@/data/mockData';
 import { SearchX } from 'lucide-react';
-import styles from '@/styles/marketplace.module.scss';
+import styles from './marketplace.module.scss';
 
 const ITEMS_PER_PAGE = 12;
 

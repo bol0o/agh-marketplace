@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { ArrowRight, ShoppingBag, Gavel, ShieldCheck, Users, GraduationCap } from 'lucide-react';
-import styles from '../styles/LandingPage.module.scss';
+import styles from './LandingPage.module.scss';
 
 export default function Home() {
 	return (

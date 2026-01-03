@@ -1,6 +1,6 @@
 import { Header } from '@/components/shared/Header';
 import { Sidebar } from '@/components/shared/Sidebar';
-import styles from '@/styles/DashboardLayout.module.scss';
+import styles from './DashboardLayout.module.scss';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
 	return (

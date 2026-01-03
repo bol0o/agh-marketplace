@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import styles from '@/styles/Header.module.scss';
+import styles from './Header.module.scss';
 
 export function Header() {
 	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

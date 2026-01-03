@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { MOCK_CHATS } from '@/data/mockData';
 import { ChatSidebar } from '@/components/chat/ChatSidebar';
 import { ChatWindow } from '@/components/chat/ChatWindow';
-import styles from '@/styles/chats.module.scss';
+import styles from './chats.module.scss';
 
 export default function ChatsPage() {
 	const [selectedChatId, setSelectedChatId] = useState<string | null>(null);

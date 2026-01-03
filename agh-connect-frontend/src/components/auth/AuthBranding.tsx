@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import styles from '@/styles/AuthBranding.module.scss';
+import styles from './AuthBranding.module.scss';
 
 type Props = {
 	title: string;

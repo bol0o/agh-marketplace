@@ -2,7 +2,7 @@
 
 import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import styles from '@/styles/Pagination.module.scss';
+import styles from './Pagination.module.scss';
 
 interface PaginationProps {
 	totalPages: number;

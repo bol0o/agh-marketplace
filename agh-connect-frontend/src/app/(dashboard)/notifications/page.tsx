@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { MOCK_NOTIFICATIONS } from '@/data/mockData';
 import { CheckCheck } from 'lucide-react';
 import { NotificationList } from '@/components/notifications/NotificationList';
-import styles from '@/styles/notifications.module.scss';
+import styles from './notifications.module.scss';
 
 export default function NotificationsPage() {
 	const [notifications, setNotifications] = useState(MOCK_NOTIFICATIONS);

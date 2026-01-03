@@ -5,7 +5,7 @@ import { MOCK_CART } from '@/data/mockData';
 import { ProductGallery } from '@/components/marketplace/product/ProductGallery';
 import { ProductInfo } from '@/components/marketplace/product/ProductInfo';
 import { ProductSidebar } from '@/components/marketplace/product/ProductSidebar';
-import styles from '@/styles/productPage.module.scss';
+import styles from './productPage.module.scss';
 
 // Next.js 15: params jest Promise
 interface PageProps {

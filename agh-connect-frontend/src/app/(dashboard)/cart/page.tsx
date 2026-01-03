@@ -6,7 +6,7 @@ import { ShoppingBag } from 'lucide-react';
 import { MOCK_CART } from '@/data/mockData';
 import { CartItem } from '@/components/cart/CartItem';
 import { CartSummary } from '@/components/cart/CartSummary';
-import styles from '@/styles/cart.module.scss';
+import styles from './cart.module.scss';
 
 export default function CartPage() {
 	const [cartItems, setCartItems] = useState(MOCK_CART);
