@@ -1,0 +1,165 @@
+import { Response } from "express";
+import { PrismaClient, Role } from "@prisma/client";
+import { AuthRequest } from "../middleware/auth.middleware";
+
+const prisma = new PrismaClient();
+
+// GET /api/admin/stats (Dashboard)
+export const getDashboardStats = async (req: AuthRequest, res: Response) => {
+  try {
+    const totalUsers = await prisma.user.count();
+    const activeListings = await prisma.product.count();
+
+    // Calculate total revenue (sum of completed orders)
+    const revenueAgg = await prisma.order.aggregate({
+      _sum: { totalPrice: true },
+      where: { status: "COMPLETED" },
+    });
+    const totalRevenue = revenueAgg._sum.totalPrice || 0;
+
+    const pendingReports = await prisma.report.count({
+      where: { status: "open" },
+    });
+
+    res.json({
+      totalUsers,
+      activeListings,
+      totalRevenue,
+      pendingReports,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Błąd pobierania statystyk" });
+  }
+};
+
+// GET /api/admin/reports (List)
+export const getReports = async (req: AuthRequest, res: Response) => {
+  try {
+    const reports = await prisma.report.findMany({
+      orderBy: { createdAt: "desc" },
+      include: {
+        reporter: {
+          select: { id: true, firstName: true, lastName: true, email: true },
+        },
+      },
+    });
+    res.json(reports);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Błąd pobierania zgłoszeń" });
+  }
+};
+
+// PATCH /api/admin/reports/:id (Update Status)
+export const updateReportStatus = async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body; // 'resolved' | 'dismissed' | 'investigating'
+
+    const report = await prisma.report.update({
+      where: { id },
+      data: { status },
+    });
+
+    res.json(report);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Błąd aktualizacji zgłoszenia" });
+  }
+};
+
+// GET /api/admin/users
+export const getAllUsers = async (req: AuthRequest, res: Response) => {
+  try {
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        role: true,
+        isActive: true,
+        studentId: true,
+        createdAt: true,
+        _count: {
+          select: {
+            products: true,
+            orders: true,
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    res.json(users);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Błąd pobierania listy użytkowników" });
+  }
+};
+
+// PATCH /api/admin/users/:userId/status (Ban/Unban)
+export const toggleBlockUser = async (req: AuthRequest, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const currentAdminId = req.user?.userId;
+
+    if (userId === currentAdminId) {
+      return res
+        .status(400)
+        .json({ error: "Nie możesz zablokować własnego konta" });
+    }
+
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      return res.status(404).json({ error: "Użytkownik nie znaleziony" });
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { isActive: !user.isActive },
+    });
+
+    const statusMessage = updatedUser.isActive ? "odblokowany" : "zablokowany";
+    res.json({
+      message: `Użytkownik został ${statusMessage}.`,
+      user: { id: updatedUser.id, isActive: updatedUser.isActive },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Błąd zmiany statusu użytkownika" });
+  }
+};
+
+// PATCH /api/admin/users/:userId/role
+export const changeUserRole = async (req: AuthRequest, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const { role } = req.body;
+    const currentAdminId = req.user?.userId;
+
+    if (userId === currentAdminId) {
+      return res
+        .status(400)
+        .json({ error: "Nie możesz zmienić roli własnego konta" });
+    }
+
+    if (!Object.values(Role).includes(role)) {
+      return res.status(400).json({ error: "Nieprawidłowa rola użytkownika" });
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { role },
+    });
+
+    res.json({
+      message: "Rola użytkownika została zaktualizowana.",
+      role: updatedUser.role,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Błąd zmiany roli użytkownika" });
+  }
+};
