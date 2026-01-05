@@ -10,20 +10,22 @@ const mapProduct = (p: any) => ({
   title: p.title,
   description: p.description,
   price: p.price,
-  image: p.imageUrl, // Map imageUrl -> image
+  image: p.imageUrl,
 
   category: p.category,
   condition: p.condition,
-  type: p.isAuction ? "auction" : "buy_now", // Map boolean -> string
+  type: p.isAuction ? "auction" : "buy_now",
 
   location: p.location,
-  stock: 1,
+
+  stock: p.stock,
+  status: p.status,
 
   seller: {
     id: p.seller.id,
     name: `${p.seller.firstName} ${p.seller.lastName}`,
     avatar: p.seller.avatarUrl,
-    rating: 0, // Placeholder
+    rating: 0,
   },
 
   views: p.views,
@@ -41,7 +43,7 @@ export const getProducts = async (req: Request, res: Response) => {
       minPrice,
       maxPrice,
       sort,
-      status, // 'auction' or 'buy_now'
+      status,
       location,
     } = req.query;
 
@@ -62,10 +64,14 @@ export const getProducts = async (req: Request, res: Response) => {
       if (minPrice) where.price.gte = Number(minPrice);
       if (maxPrice) where.price.lte = Number(maxPrice);
     }
+
     if (status) {
       if (status === "auction") where.isAuction = true;
       if (status === "buy_now") where.isAuction = false;
     }
+
+    where.status = "active";
+
     if (location) {
       where.location = { contains: String(location), mode: "insensitive" };
     }
@@ -148,6 +154,7 @@ export const createProduct = async (req: AuthRequest, res: Response) => {
       isAuction,
       auctionEnd,
       imageUrl,
+      stock,
     } = req.body;
 
     const product = await prisma.product.create({
@@ -160,6 +167,10 @@ export const createProduct = async (req: AuthRequest, res: Response) => {
         imageUrl: imageUrl || null,
         condition,
         location,
+
+        stock: stock ? Number(stock) : 1,
+        status: "active",
+
         isAuction: Boolean(isAuction),
         auctionEnd: auctionEnd ? new Date(auctionEnd) : null,
       },

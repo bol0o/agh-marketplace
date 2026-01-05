@@ -9,7 +9,7 @@ const formatOrderResponse = (order: any) => {
   return {
     id: order.id,
     createdAt: order.createdAt,
-    status: order.status.toLowerCase(), // Frontend expects lowercase status
+    status: order.status.toLowerCase(),
     buyerId: order.userId,
 
     // Map DB 'totalPrice' to Frontend 'totalAmount'
@@ -43,7 +43,7 @@ const formatOrderResponse = (order: any) => {
 export const createOrder = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
-    const { address } = req.body; // Expecting address object
+    const { address } = req.body;
 
     if (!userId) return res.status(401).json({ error: "Brak autoryzacji" });
 
@@ -58,14 +58,37 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
     }
 
     // 2. Calculate Totals
-    const SHIPPING_COST = 15.0; // Hardcoded for MVP
+    const SHIPPING_COST = 15.0;
     const itemsTotal = cart.items.reduce((sum, item) => {
       return sum + item.quantity * item.product.price;
     }, 0);
     const totalAmount = itemsTotal + SHIPPING_COST;
 
-    // 3. Transaction (Order + Items + Clear Cart)
+    // 3. Transaction
     const order = await prisma.$transaction(async (tx) => {
+      //stock logic
+      for (const item of cart.items) {
+        const product = await tx.product.findUnique({
+          where: { id: item.productId },
+        });
+
+        if (!product) throw new Error(`Produkt nie istnieje.`);
+
+        if (product.stock < item.quantity) {
+          throw new Error(
+            `Produkt "${product.title}" jest niedostępny w wybranej ilości.`
+          );
+        }
+
+        await tx.product.update({
+          where: { id: item.productId },
+          data: {
+            stock: { decrement: item.quantity },
+            status: product.stock - item.quantity === 0 ? "SOLD" : "active",
+          },
+        });
+      }
+
       // Create Order
       const newOrder = await tx.order.create({
         data: {
@@ -73,21 +96,15 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
           totalPrice: totalAmount,
           shippingCost: SHIPPING_COST,
           status: "PENDING",
-
-          // Save Address Snapshot
           shippingStreet: address.street,
           shippingCity: address.city,
           shippingZipCode: address.zipCode,
           shippingPhone: address.phone,
-
-          // Create Items with Snapshots
           items: {
             create: cart.items.map((item) => ({
               productId: item.productId,
               quantity: item.quantity,
               priceAtTime: item.product.price,
-
-              // CRITICAL: Snapshot current title and image
               snapshotTitle: item.product.title,
               snapshotImage: item.product.imageUrl,
             })),
@@ -103,12 +120,18 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
     });
 
     res.status(201).json(formatOrderResponse(order));
-  } catch (error) {
+  } catch (error: any) {
     console.error("Order Error:", error);
+    if (
+      error.message &&
+      (error.message.includes("niedostępny") ||
+        error.message.includes("nie istnieje"))
+    ) {
+      return res.status(400).json({ error: error.message });
+    }
     res.status(500).json({ error: "Błąd podczas składania zamówienia" });
   }
 };
-
 // GET /api/orders (My Purchases)
 export const getOrders = async (req: AuthRequest, res: Response) => {
   try {
@@ -212,7 +235,6 @@ export const updateOrderStatus = async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     const { status } = req.body;
 
-    // For MVP, we assume permissions are handled (or admin only)
     const updatedOrder = await prisma.order.update({
       where: { id },
       data: { status },
