@@ -79,6 +79,10 @@ model Product {
   imageUrl    String?
 
   condition String @default("used") // 'new', 'used', 'damaged'
+
+  stock     Int    @default(1)     
+  status    String @default("active") 
+
   location  String @default("Kraków") // e.g. "Miasteczko Studenckie"
   views     Int    @default(0)
 

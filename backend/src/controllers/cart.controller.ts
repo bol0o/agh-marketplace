@@ -93,15 +93,17 @@ export const addToCart = async (req: AuthRequest, res: Response) => {
       },
     });
 
+    let resultItem;
+
     if (existingItem) {
       // Update quantity
-      await prisma.cartItem.update({
+      resultItem = await prisma.cartItem.update({
         where: { id: existingItem.id },
         data: { quantity: existingItem.quantity + quantity },
       });
     } else {
       // Create new item
-      await prisma.cartItem.create({
+      resultItem = await prisma.cartItem.create({
         data: {
           cartId: cart.id,
           productId,
@@ -110,7 +112,7 @@ export const addToCart = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    res.json({ message: "Produkt dodany do koszyka" });
+    res.json({ message: "Produkt dodany do koszyka", cartItem: resultItem });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Błąd dodawania do koszyka" });

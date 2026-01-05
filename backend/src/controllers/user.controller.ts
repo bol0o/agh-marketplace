@@ -110,7 +110,6 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
 export const updateAddress = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
-    //req.body matches the Address interface directly
     const { street, city, zipCode, buildingNumber, apartmentNumber, phone } =
       req.body;
 
@@ -140,7 +139,7 @@ export const updateAddress = async (req: AuthRequest, res: Response) => {
 export const updateSettings = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
-    const { email, push, marketing } = req.body; //Expecting flat structure or mapped in frontend
+    const { email, push, marketing } = req.body;
 
     const updatedUser = await prisma.user.update({
       where: { id: userId },

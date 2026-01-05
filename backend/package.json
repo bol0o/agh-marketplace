@@ -4,7 +4,20 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "ts-node src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "prisma:generate": "prisma generate",
+    "prisma:push": "prisma db push",
+    "seed": "ts-node prisma/seed.ts",
+    "lint": "eslint . --ext .ts",
+    "//SETUP": "",
+    "fix:prisma": "npm install prisma@5.22.0 @prisma/client@5.22.0 --save-exact && npx prisma generate",
+    "db:up": "docker-compose up -d",
+    "db:down": "docker-compose down",
+    "db:reset": "npx prisma migrate reset --force",
+    "setup:full": "npm run fix:prisma && npx prisma db push && npm run seed"
   },
   "keywords": [],
   "author": "",
