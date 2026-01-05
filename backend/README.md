@@ -109,13 +109,15 @@ npm run setup:full
 ```
 
 This command will:
--Generate Prisma Client
--Push the database schema
--Seed the database with:
--Admin accounts (prowadzacy, kaczmar, bolek)
--20 random student accounts
--50 sample products
--Test data for all features
+
+1. Generate Prisma Client
+2. Push the database schema
+3. Seed the database with:
+
+- Admin accounts (prowadzacy, kaczmar, bolek)
+- 20 random student accounts
+- 50 sample products
+- Test data for all features
 
 ### Step 5: Start the Server
 
@@ -137,95 +139,95 @@ The server should now be running at `http://localhost:3001`.
 
 ### Authentication
 
-POST /api/auth/register - Register new user
+1. POST /api/auth/register - Register new user
 
-POST /api/auth/login - Login
+2. POST /api/auth/login - Login
 
-POST /api/auth/refresh - Refresh access token
+3. POST /api/auth/refresh - Refresh access token
 
-POST /api/auth/logout - Logout
+4. POST /api/auth/logout - Logout
 
 ### Products
 
-GET /api/products - List products with filters
+1. GET /api/products - List products with filters
 
-GET /api/products/:id - Get product details
+2. GET /api/products/:id - Get product details
 
-POST /api/products - Create product (authenticated)
+3. POST /api/products - Create product (authenticated)
 
-PATCH /api/products/:id - Update product (owner/admin)
+4. PATCH /api/products/:id - Update product (owner/admin)
 
-DELETE /api/products/:id - Delete product (owner/admin)
+5. DELETE /api/products/:id - Delete product (owner/admin)
 
 ### Cart
 
-GET /api/cart - Get user's cart
+1. GET /api/cart - Get user's cart
 
-POST /api/cart - Add item to cart
+2. POST /api/cart - Add item to cart
 
-PATCH /api/cart/:itemId - Update quantity
+3. PATCH /api/cart/:itemId - Update quantity
 
-DELETE /api/cart/:itemId - Remove item
+4. DELETE /api/cart/:itemId - Remove item
 
 ### Orders
 
-GET /api/orders - Get user's orders
+1. GET /api/orders - Get user's orders
 
-GET /api/orders/sales - Get user's sales
+2. GET /api/orders/sales - Get user's sales
 
-POST /api/orders - Create order from cart
+3. POST /api/orders - Create order from cart
 
-GET /api/orders/:id - Get order details
+4. GET /api/orders/:id - Get order details
 
 ### Auctions & Bids
 
-GET /api/bids/product/:productId - Get bids for product
+1. GET /api/bids/product/:productId - Get bids for product
 
-POST /api/bids - Place a bid (authenticated)
+2. POST /api/bids - Place a bid (authenticated)
 
 ### Social Features
 
-GET /api/social/feed - Get feed from followed users
+1. GET /api/social/feed - Get feed from followed users
 
-POST /api/social/follow - Follow/unfollow user
+2. POST /api/social/follow - Follow/unfollow user
 
 ### Chat
 
-GET /api/chat - Get user's chats
+1. GET /api/chat - Get user's chats
 
-POST /api/chat - Start new chat
+2. POST /api/chat - Start new chat
 
-GET /api/chat/:chatId/messages - Get chat messages
+3. GET /api/chat/:chatId/messages - Get chat messages
 
-POST /api/chat/:chatId/messages - Send message
+4. POST /api/chat/:chatId/messages - Send message
 
 ### User Management
 
-GET /api/users/me - Get current user profile
+1. GET /api/users/me - Get current user profile
 
-PATCH /api/users/me - Update profile
+2. PATCH /api/users/me - Update profile
 
-GET /api/users/:id - Get public profile
+3. GET /api/users/:id - Get public profile
 
 ### Admin (Admin role required)
 
-GET /api/admin/stats - Dashboard statistics
+1. GET /api/admin/stats - Dashboard statistics
 
-GET /api/admin/users - List all users
+2. GET /api/admin/users - List all users
 
-PATCH /api/admin/users/:userId/status - Ban/unban user
+3. PATCH /api/admin/users/:userId/status - Ban/unban user
 
-GET /api/admin/reports - List reports
+4. GET /api/admin/reports - List reports
 
 ## 🔐 Authentication Flow
 
-Registration/Login → Returns accessToken (15min) and refreshToken (7 days)
+1. Registration/Login → Returns accessToken (15min) and refreshToken (7 days)
 
-API Requests → Include header: Authorization: Bearer <accessToken>
+2. API Requests → Include header: Authorization: Bearer <accessToken>
 
-Token Expiry → Call /api/auth/refresh with refreshToken to get new accessToken
+3. Token Expiry → Call /api/auth/refresh with refreshToken to get new accessToken
 
-Logout → Invalidates refreshToken
+4. Logout → Invalidates refreshToken
 
 ## 🎯 Features Implemented
 
@@ -281,61 +283,48 @@ Password for all: student123
 
 ### Development
 
-npm run dev - Start development server with hot reload using ts-node
-
-npm run build - Compile TypeScript to JavaScript
-
-npm start - Start production server from compiled code
-
-npm run lint - Run ESLint to check code quality
+1. npm run dev - Start development server with hot reload using ts-node
+2. npm run build - Compile TypeScript to JavaScript
+3. npm start - Start production server from compiled code
+4. npm run lint - Run ESLint to check code quality
 
 ### Database Management
 
-npm run db:up - Start PostgreSQL container using Docker Compose
-
-npm run db:down - Stop and remove PostgreSQL container
-
-npm run db:reset - Reset database (drop all tables and re-run migrations)
+1. npm run db:up - Start PostgreSQL container using Docker Compose
+2. npm run db:down - Stop and remove PostgreSQL container
+3. npm run db:reset - Reset database (drop all tables and re-run migrations)
 
 ### Prisma ORM
 
-npm run prisma:generate - Generate Prisma Client from schema
-
-npm run prisma:push - Push schema changes to database (no migrations)
-
-npm run seed - Seed database with test data
+1. npm run prisma:generate - Generate Prisma Client from schema
+2. npm run prisma:push - Push schema changes to database (no migrations)
+3. npm run seed - Seed database with test data
 
 ### Setup & Maintenance
 
 npm run fix:prisma - Fix Prisma version conflicts and regenerate client
 
-    Installs specific versions: prisma@5.22.0 and @prisma/client@5.22.0
-
-    Runs npx prisma generate to regenerate client
+1. Installs specific versions: prisma@5.22.0 and @prisma/client@5.22.0
+2. Runs npx prisma generate to regenerate client
 
 npm run setup:full - Complete setup for new development environment
 
-    Fix Prisma versions and generate client
-
-    Push schema to database
-
-    Seed with test data
+1. Fix Prisma versions and generate client
+2. Push schema to database
+3. Seed with test data
 
 ## ⚠️ Troubleshooting
 
 ### Database Connection Issues
 
-Ensure Docker Desktop is running
-
-Check if container is up: docker ps
-
-Verify DATABASE_URL in .env matches docker-compose.yml
+1. Ensure Docker Desktop is running
+2. Check if container is up: docker ps
+3. Verify DATABASE_URL in .env matches docker-compose.yml
 
 ### Prisma Errors
 
-Run npx prisma generate after schema changes
-
-Use npm run setup:full for fresh setup
+1. Run npx prisma generate after schema changes
+2. Use npm run setup:full for fresh setup
 
 ## 📝 Notes
 
