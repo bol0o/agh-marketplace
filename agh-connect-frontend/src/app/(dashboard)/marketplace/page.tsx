@@ -1,32 +1,62 @@
+'use client';
+
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { ProductCard } from '@/components/marketplace/ProductCard';
 import { Pagination } from '@/components/shared/Pagination';
-import { MOCK_PRODUCTS } from '@/data/mockData';
-import { SearchX } from 'lucide-react';
+import { SearchX, Loader2, AlertCircle } from 'lucide-react';
 import styles from './marketplace.module.scss';
+import { useProducts } from '@/hooks/useProducts';
+import { Product } from '@/types/marketplace';
 
 const ITEMS_PER_PAGE = 12;
 
-interface MarketplacePageProps {
-	searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}
+export default function MarketplacePage() {
+	const searchParams = useSearchParams();
 
-export default async function MarketplacePage(props: MarketplacePageProps) {
-	const searchParams = await props.searchParams;
+	const { data: allProducts = [], isLoading, isError } = useProducts();
 
-	const category = searchParams.cat as string | undefined;
-	const minPrice = searchParams.minPrice ? Number(searchParams.minPrice) : null;
-	const maxPrice = searchParams.maxPrice ? Number(searchParams.maxPrice) : null;
-	const type = searchParams.type as string | undefined;
-	const conditionParam = searchParams.condition as string | undefined;
+	const category = searchParams.get('cat');
+
+	const minPrice = searchParams.get('minPrice') ? Number(searchParams.get('minPrice')) : null;
+	const maxPrice = searchParams.get('maxPrice') ? Number(searchParams.get('maxPrice')) : null;
+
+	const type = searchParams.get('type');
+	const conditionParam = searchParams.get('condition');
 	const conditions = conditionParam ? conditionParam.split(',') : [];
-	const searchQuery = searchParams.search as string | undefined;
+	const searchQuery = searchParams.get('search');
 
-	const currentPage = Number(searchParams.page) || 1;
+	const currentPage = Number(searchParams.get('page')) || 1;
 
-	const filteredProducts = MOCK_PRODUCTS.filter((product) => {
-		if (category && product.category !== category) return false;
-		if (type && type !== 'all' && product.type !== type) return false;
+	if (isLoading) {
+		return (
+			<div
+				className={styles.wrapper}
+				style={{
+					height: '50vh',
+					display: 'flex',
+					alignItems: 'center',
+					justifyContent: 'center',
+				}}
+			>
+				<Loader2 className="animate-spin text-blue-600" size={48} />
+			</div>
+		);
+	}
+
+	if (isError) {
+		return (
+			<div className={styles.wrapper} style={{ textAlign: 'center', marginTop: '50px' }}>
+				<AlertCircle className="text-red-500 mx-auto mb-4" size={48} />
+				<h3 className="text-xl font-bold">Błąd pobierania ofert</h3>
+				<p>Nie udało się połączyć z serwerem.</p>
+			</div>
+		);
+	}
+
+	const filteredProducts = allProducts.filter((product) => {
+		if (category && product.category.toUpperCase() !== category.toUpperCase()) return false;
+		if (type && type !== 'all' && product.type !== type) return false; // Opcjonalne
 		if (minPrice !== null && product.price < minPrice) return false;
 		if (maxPrice !== null && product.price > maxPrice) return false;
 		if (conditions.length > 0 && !conditions.includes(product.condition)) return false;
@@ -38,15 +68,13 @@ export default async function MarketplacePage(props: MarketplacePageProps) {
 
 	const totalItems = filteredProducts.length;
 	const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
-
 	const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-	const endIndex = startIndex + ITEMS_PER_PAGE;
 
-	const currentProducts = filteredProducts.slice(startIndex, endIndex);
+	const currentProducts = filteredProducts.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
-	const pageTitle = category ? category : 'Wszystkie Oferty';
-	const currentItemsLower = ITEMS_PER_PAGE * (currentPage - 1) + 1;
-	const currentItemsUpper = Math.min(ITEMS_PER_PAGE * currentPage, totalItems);
+	const pageTitle = category || 'Wszystkie Oferty';
+	const currentItemsLower = totalItems > 0 ? startIndex + 1 : 0;
+	const currentItemsUpper = Math.min(startIndex + ITEMS_PER_PAGE, totalItems);
 
 	return (
 		<div className={styles.wrapper}>
@@ -62,12 +90,12 @@ export default async function MarketplacePage(props: MarketplacePageProps) {
 			{currentProducts.length > 0 ? (
 				<>
 					<div className={styles.grid}>
-						{currentProducts.map((product) => (
+						{currentProducts.map((product: Product) => (
 							<ProductCard key={product.id} product={product} />
 						))}
 					</div>
 
-					<Pagination totalPages={totalPages} />
+					{totalPages > 1 && <Pagination totalPages={totalPages} />}
 				</>
 			) : (
 				<div className={styles.emptyState}>

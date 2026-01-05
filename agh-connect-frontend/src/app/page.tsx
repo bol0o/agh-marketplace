@@ -14,18 +14,14 @@ export default function Home() {
 	const user = useAuthStore((state) => state.user);
 
 	useEffect(() => {
-		console.log('Stan Auth:', { isLoading, isAuthenticated, role: user?.role });
-
 		if (!isLoading) {
 			if (isAuthenticated) {
-				console.log('Przekierowuję...');
 				if (user?.role === 'ADMIN') {
 					router.push('/admin/dashboard');
 				} else {
 					router.push('/marketplace');
 				}
 			} else {
-				console.log('Użytkownik niezalogowany - zostaję na Landing Page');
 			}
 		}
 	}, [isLoading, isAuthenticated, user, router]);

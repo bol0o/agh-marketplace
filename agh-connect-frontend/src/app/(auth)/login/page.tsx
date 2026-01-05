@@ -35,26 +35,22 @@ export default function LoginPage() {
 
 	const handleLogin = async (e: React.FormEvent) => {
 		e.preventDefault();
+
 		setIsLoading(true);
-
 		try {
-			const data = await authService.login(formData);
+			const response = await authService.login(formData);
 
-			login(data.user, data.token);
+			login(response);
 
-			addToast(`Witaj ponownie, ${data.user.name}!`, 'success');
+			addToast('Zalogowano pomyślnie!', 'success');
 
-			if (data.user.role === 'ADMIN') {
-				router.push('/admin/dashboard');
+			if (response.user.role.toUpperCase() === 'ADMIN') {
+				router.push('/admin');
 			} else {
-				router.push('/home');
+				router.push('/marketplace');
 			}
-		} catch (error: any) {
-			console.error(error);
-			const msg =
-				error.response?.data?.error || error.response?.data?.message || 'Błąd logowania';
-
-			addToast(msg, 'error');
+		} catch (error) {
+			addToast('Błąd logowania', 'error');
 		} finally {
 			setIsLoading(false);
 		}

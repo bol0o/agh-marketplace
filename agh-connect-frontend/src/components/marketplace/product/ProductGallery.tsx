@@ -11,10 +11,9 @@ export function ProductGallery({ image, title }: { image: string; title: string 
 					fill
 					className={styles.image}
 					sizes="(max-width: 768px) 100vw, 50vw"
-					priority // Ładujemy to zdjęcie jako priorytetowe (LCP)
+					priority
 				/>
 			</div>
-			{/* Tutaj w przyszłości można dodać listę miniaturek */}
 		</div>
 	);
 }

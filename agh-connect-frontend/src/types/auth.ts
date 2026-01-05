@@ -5,7 +5,7 @@ export type UserRole = 'STUDENT' | 'ADMIN' | 'TEACHER';
 export interface AuthResponse {
 	user: User;
 	token: string;
-	refreshToken?: string; // Jeśli backend obsługuje refresh tokeny
+	refreshToken?: string;
 }
 
 export interface LoginCredentials {
