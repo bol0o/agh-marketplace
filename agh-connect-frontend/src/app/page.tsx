@@ -3,8 +3,33 @@
 import Link from 'next/link';
 import { ArrowRight, ShoppingBag, Gavel, ShieldCheck, Users, GraduationCap } from 'lucide-react';
 import styles from './LandingPage.module.scss';
+import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/store/authStore';
+import { useEffect } from 'react';
 
 export default function Home() {
+	const router = useRouter();
+	const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+	const isLoading = useAuthStore((state) => state.isLoading);
+	const user = useAuthStore((state) => state.user);
+
+	useEffect(() => {
+		console.log('Stan Auth:', { isLoading, isAuthenticated, role: user?.role });
+
+		if (!isLoading) {
+			if (isAuthenticated) {
+				console.log('Przekierowuję...');
+				if (user?.role === 'ADMIN') {
+					router.push('/admin/dashboard');
+				} else {
+					router.push('/marketplace');
+				}
+			} else {
+				console.log('Użytkownik niezalogowany - zostaję na Landing Page');
+			}
+		}
+	}, [isLoading, isAuthenticated, user, router]);
+
 	return (
 		<div className={styles.container}>
 			{/* 1. NAVBAR */}

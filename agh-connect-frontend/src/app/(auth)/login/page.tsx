@@ -1,13 +1,21 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Mail, Lock, Eye, EyeOff, ArrowRight, Loader2 } from 'lucide-react';
 import styles from '../Auth.module.scss';
 import AuthBranding from '@/components/auth/AuthBranding';
 import { LoginFormData } from '@/types/userCredentialsTypes';
+import { useAuthStore } from '@/store/authStore';
+import { authService } from '@/services/authService';
+import { useUIStore } from '@/store/uiStore';
 
 export default function LoginPage() {
+	const router = useRouter();
+	const login = useAuthStore((state) => state.login);
+	const addToast = useUIStore((state) => state.addToast);
+
 	const [formData, setFormData] = useState<LoginFormData>({
 		email: '',
 		password: '',
@@ -25,9 +33,31 @@ export default function LoginPage() {
 		}));
 	};
 
-	const handleLogin = (e: React.FormEvent) => {
+	const handleLogin = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setIsLoading(true);
+
+		try {
+			const data = await authService.login(formData);
+
+			login(data.user, data.token);
+
+			addToast(`Witaj ponownie, ${data.user.name}!`, 'success');
+
+			if (data.user.role === 'ADMIN') {
+				router.push('/admin/dashboard');
+			} else {
+				router.push('/home');
+			}
+		} catch (error: any) {
+			console.error(error);
+			const msg =
+				error.response?.data?.error || error.response?.data?.message || 'Błąd logowania';
+
+			addToast(msg, 'error');
+		} finally {
+			setIsLoading(false);
+		}
 	};
 
 	return (

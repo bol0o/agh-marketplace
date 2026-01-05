@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.scss';
+import { ToastContainer } from '@/components/shared/ToastContainer';
+import AuthProvider from '@/providers/AuthProvider';
 
 const inter = Inter({
 	subsets: ['latin'],
@@ -17,7 +19,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 	return (
 		<html lang="pl">
 			{/* 3. Dodanie klasy fontu do body */}
-			<body className={inter.variable}>{children}</body>
+
+			<body className={inter.variable}>
+				<AuthProvider>{children}</AuthProvider>
+
+				<ToastContainer />
+			</body>
 		</html>
 	);
 }

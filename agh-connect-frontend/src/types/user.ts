@@ -20,7 +20,7 @@ export interface User {
 	email: string;
 	name: string;
 	avatar?: string;
-	role: 'student' | 'admin';
+	role: 'STUDENT' | 'ADMIN' | 'TEACHER';
 
 	studentInfo?: {
 		faculty: string; // np. "WI", "EAIiIB"
