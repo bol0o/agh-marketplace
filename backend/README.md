@@ -333,3 +333,21 @@ npm run setup:full - Complete setup for new development environment
 3. All user emails must end with @student.agh.edu.pl (AGH students only)
 4. Background jobs automatically close expired auctions and send notifications
 5. Admin accounts can ban users and manage reports
+
+## 📚 API Documentation
+
+The project includes a comprehensive **Postman Collection** covering all endpoints, authentication flows, and real-time socket events.
+
+**Location:** `postman/AGH_marketplace.postman_collection.json`
+
+### How to use:
+
+1. Open **Postman**.
+2. Click **Import** (top left corner).
+3. Drag and drop the `.json` file from the `postman/` folder.
+4. The collection includes:
+   - Automated token management (scripts for login/refresh).
+   - Example request bodies and responses.
+   - Detailed descriptions of business logic.
+
+**Note:** Ensure your Postman environment variable `{{baseURL}}` is set to `http://localhost:3001` (or use the default configuration provided in the collection).
