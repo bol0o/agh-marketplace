@@ -2,7 +2,7 @@ $breakpoint-sm: 640px;
 $breakpoint-md: 768px;
 $breakpoint-lg: 1024px;
 $breakpoint-xl: 1280px;
-$breakpoint-xl: 1920px;
+$breakpoint-xxl: 1920px;
 
 @mixin sm {
 	@media (min-width: $breakpoint-sm) {
@@ -23,7 +23,13 @@ $breakpoint-xl: 1920px;
 }
 
 @mixin xl {
-	@media (min-width: $breakpoint-lg) {
+	@media (min-width: $breakpoint-xl) {
+		@content;
+	}
+}
+
+@mixin xxl {
+	@media (min-width: $breakpoint-xxl) {
 		@content;
 	}
 }
@@ -32,4 +38,53 @@ $breakpoint-xl: 1920px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
+}
+
+@mixin flex-between {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+@mixin button-primary {
+	background-color: $color-primary;
+	color: $color-white;
+	padding: $spacing-sm $spacing-xl;
+	border-radius: $radius-md;
+	font-weight: 700;
+	font-size: 1rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: $spacing-xs;
+	transition:
+		background-color,
+		transform 0.2s;
+	box-shadow: 0 4px 6px -1px rgba($color-primary, 0.3);
+
+	&:hover {
+		background-color: $color-primary-hover;
+		transform: translateY(-2px);
+	}
+
+	&:disabled {
+		opacity: 0.7;
+		cursor: not-allowed;
+	}
+}
+
+@mixin button-secondary {
+	background-color: $color-white;
+	color: $color-text;
+	border: 1px solid $color-border;
+	padding: $spacing-sm $spacing-xl;
+	border-radius: $radius-md;
+	font-weight: 700;
+	font-size: 1rem;
+	transition: all 0.2s;
+
+	&:hover {
+		background-color: $color-bg;
+		border-color: $color-text-light;
+	}
 }

@@ -1,7 +1,6 @@
-// src/store/authStore.ts
 import { create } from 'zustand';
-import { User } from '@/types/user'; // Importuj nowe typy
-import { authService } from '@/services/authService';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import { User } from '@/types/user';
 import { AuthResponse } from '@/types/auth';
 
 interface AuthState {
@@ -9,77 +8,77 @@ interface AuthState {
 	token: string | null;
 	refreshToken: string | null;
 	isAuthenticated: boolean;
-	isLoading: boolean;
 
-	// Zmieniamy to: przyjmujemy cały obiekt odpowiedzi z API
 	login: (data: AuthResponse) => void;
-
 	logout: () => void;
-	checkAuth: () => Promise<void>;
+	clear: () => void;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
-	user: null,
-	token: typeof window !== 'undefined' ? localStorage.getItem('token') : null,
-	refreshToken: typeof window !== 'undefined' ? localStorage.getItem('refreshToken') : null,
-	isAuthenticated: false,
-	isLoading: true,
+export const useAuthStore = create<AuthState>()(
+	persist(
+		(set) => ({
+			user: null,
+			token: null,
+			refreshToken: null,
+			isAuthenticated: false,
 
-	// --- ZAKTUALIZOWANA FUNKCJA LOGIN ---
-	login: (data: AuthResponse) => {
-		const { user, token, refreshToken } = data;
+			login: (data: AuthResponse) => {
+				const { user, token, refreshToken } = data;
 
-		if (typeof window !== 'undefined') {
-			localStorage.setItem('token', token);
-			if (refreshToken) {
-				localStorage.setItem('refreshToken', refreshToken);
-			}
+				if (typeof window !== 'undefined') {
+					document.cookie = `token=${token}; path=/; max-age=${7 * 24 * 60 * 60}`;
+					document.cookie = `userRole=${user.role}; path=/; max-age=${7 * 24 * 60 * 60}`;
+					document.cookie = `userId=${user.id}; path=/; max-age=${7 * 24 * 60 * 60}`;
+
+					localStorage.setItem('token', token);
+					if (refreshToken) {
+						localStorage.setItem('refreshToken', refreshToken);
+					}
+				}
+
+				set({
+					user,
+					token,
+					refreshToken,
+					isAuthenticated: true,
+				});
+			},
+
+			logout: () => {
+				if (typeof window !== 'undefined') {
+					document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+					document.cookie = 'userRole=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+					document.cookie = 'userId=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+
+					localStorage.removeItem('token');
+					localStorage.removeItem('refreshToken');
+				}
+
+				set({
+					user: null,
+					token: null,
+					refreshToken: null,
+					isAuthenticated: false,
+				});
+			},
+
+			clear: () => {
+				set({
+					user: null,
+					token: null,
+					refreshToken: null,
+					isAuthenticated: false,
+				});
+			},
+		}),
+		{
+			name: 'auth-storage',
+			storage: createJSONStorage(() => localStorage),
+			partialize: (state) => ({
+				user: state.user,
+				token: state.token,
+				refreshToken: state.refreshToken,
+			}),
 		}
-
-		set({
-			user,
-			token,
-			refreshToken,
-			isAuthenticated: true,
-		});
-	},
-
-	logout: () => {
-		if (typeof window !== 'undefined') {
-			localStorage.removeItem('token');
-			localStorage.removeItem('refreshToken');
-		}
-		set({ user: null, token: null, refreshToken: null, isAuthenticated: false });
-		if (typeof window !== 'undefined') {
-			window.location.href = '/login';
-		}
-	},
-
-	checkAuth: async () => {
-		const token = localStorage.getItem('token');
-		if (!token) {
-			set({ isLoading: false, isAuthenticated: false });
-			return;
-		}
-
-		try {
-			// Tutaj nadal pobieramy usera, jeśli odświeżamy stronę (F5)
-			const user = await authService.getMe();
-			set({
-				user,
-				isAuthenticated: true,
-				token: localStorage.getItem('token'),
-				refreshToken: localStorage.getItem('refreshToken'),
-			});
-		} catch (error) {
-			console.error('Błąd sesji:', error);
-			if (typeof window !== 'undefined') {
-				localStorage.removeItem('token');
-				localStorage.removeItem('refreshToken');
-			}
-			set({ user: null, token: null, refreshToken: null, isAuthenticated: false });
-		} finally {
-			set({ isLoading: false });
-		}
-	},
-}));
+	)
+);

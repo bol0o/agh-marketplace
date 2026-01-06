@@ -664,7 +664,7 @@
 	margin-right: 8px;
 
 	&:hover {
-		background-color: darken(#e1251b, 10%);
+		// background-color: darken(#e1251b, 10%);
 		transform: translateY(-1px);
 		box-shadow: 0 4px 12px rgba(225, 37, 27, 0.2);
 	}
@@ -685,6 +685,6 @@
 	margin-bottom: 16px;
 
 	&:hover {
-		background-color: darken(#e1251b, 5%);
+		// background-color: darken(#e1251b, 5%);
 	}
 }

@@ -3,17 +3,17 @@ import { AuthResponse, LoginCredentials, RegisterCredentials } from '@/types/aut
 import { User } from '@/types/user';
 
 export const authService = {
-	login: async (credentials: LoginCredentials) => {
+	login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
 		const response = await api.post<AuthResponse>('/auth/login', credentials);
 		return response.data;
 	},
 
-	register: async (credentials: RegisterCredentials) => {
+	register: async (credentials: RegisterCredentials): Promise<AuthResponse> => {
 		const response = await api.post<AuthResponse>('/auth/register', credentials);
 		return response.data;
 	},
 
-	getMe: async () => {
+	getMe: async (): Promise<User> => {
 		const response = await api.get<User>('/users/me');
 		return response.data;
 	},

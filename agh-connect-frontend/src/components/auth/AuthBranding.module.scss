@@ -2,7 +2,7 @@
 @use '@/styles/mixins' as *;
 
 .imageSection {
-	display: none; // Ukryte na mobile
+	display: none;
 	position: relative;
 	background-color: #111827;
 	color: white;
@@ -15,7 +15,6 @@
 		padding: 48px;
 	}
 
-	// Obraz tła
 	.bgImage {
 		position: absolute;
 		inset: 0;
@@ -27,7 +26,6 @@
 		z-index: 0;
 	}
 
-	// Gradient przyciemniający
 	.overlay {
 		position: absolute;
 		inset: 0;
@@ -35,7 +33,6 @@
 		z-index: 1;
 	}
 
-	// Treść na wierzchu
 	.content {
 		position: relative;
 		z-index: 10;
@@ -73,7 +70,7 @@
 
 	p {
 		font-size: 1.125rem;
-		color: #d1d5db; // gray-300
+		color: #d1d5db;
 		line-height: 1.6;
 	}
 }

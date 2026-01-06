@@ -15,11 +15,11 @@
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
-	padding: 24px;
-	background-color: white;
+	padding: $spacing-xl;
+	background-color: $color-white;
 
 	@include md {
-		padding: 48px;
+		padding: $spacing-2xl;
 	}
 
 	@include lg {
@@ -36,8 +36,8 @@
 .mobileLogo {
 	display: flex;
 	align-items: center;
-	gap: 12px;
-	margin-bottom: 32px;
+	gap: $spacing-md;
+	margin-bottom: $spacing-xl;
 	font-size: 1.25rem;
 	font-weight: 800;
 	color: $color-text;
@@ -48,10 +48,10 @@
 
 	.logoIcon {
 		background-color: $color-primary;
-		color: white;
+		color: $color-white;
 		width: 36px;
 		height: 36px;
-		border-radius: 8px;
+		border-radius: $radius-md;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -60,20 +60,14 @@
 	}
 }
 
-.formContainer {
-	width: 100%;
-	max-width: 400px;
-	margin: 0 auto;
-}
-
 .header {
-	margin-bottom: 32px;
+	margin-bottom: $spacing-xl;
 
 	h1 {
 		font-size: 2rem;
 		font-weight: 800;
 		color: $color-text;
-		margin-bottom: 8px;
+		margin-bottom: $spacing-xs;
 	}
 
 	p {
@@ -84,13 +78,13 @@
 .form {
 	display: flex;
 	flex-direction: column;
-	gap: 20px;
+	gap: $spacing-lg;
 }
 
 .inputGroup {
 	display: flex;
 	flex-direction: column;
-	gap: 6px;
+	gap: $spacing-xs;
 
 	label {
 		font-size: 0.875rem;
@@ -106,37 +100,44 @@
 			left: 12px;
 			top: 50%;
 			transform: translateY(-50%);
-			color: #9ca3af; // gray-400
+			color: $color-text-lighter;
 			pointer-events: none;
 		}
 
 		.togglePassword {
-			width: 20px;
-			height: 20px;
 			position: absolute;
-			right: 10px;
+			right: 16px; /* Zwiększone z 12px */
 			top: 50%;
 			transform: translateY(-50%);
-			color: #9ca3af;
+			color: $color-text-lighter;
 			cursor: pointer;
-			padding: 4px;
+			padding: $spacing-xs;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			background: none;
+			border: none;
+			width: 24px; /* Zwiększone z 20px */
+			height: 24px; /* Zwiększone z 20px */
 
 			&:hover {
 				color: $color-text;
 			}
-		}
 
-		.eye {
-			position: absolute;
-			top: 9;
-			left: -1;
+			/* Ikona wewnątrz przycisku */
+			svg {
+				position: static;
+				transform: none;
+				width: 20px;
+				height: 20px;
+			}
 		}
 
 		input {
 			width: 100%;
-			padding: 12px 40px;
+			padding: 12px 48px 12px 40px; /* Zwiększone prawe padding z 40px na 48px */
 			border: 1px solid $color-dark;
-			border-radius: 12px;
+			border-radius: $radius-md;
 			font-size: 0.95rem;
 			transition: all 0.2s;
 			outline: none;
@@ -147,22 +148,22 @@
 			}
 
 			&.hasRightIcon {
-				padding-right: 40px;
+				padding-right: 48px; /* Zwiększone z 40px */
 			}
 		}
 	}
 
 	.helperText {
 		font-size: 0.75rem;
-		color: $color-text;
+		color: $color-text-light;
 	}
 }
 
 .checkboxGroup {
 	display: flex;
-	gap: 12px;
+	gap: $spacing-md;
 	align-items: flex-start;
-	margin-top: 8px;
+	margin-top: $spacing-xs;
 
 	input[type='checkbox'] {
 		width: 18px;
@@ -190,16 +191,16 @@
 .btnPrimary {
 	width: 100%;
 	background-color: $color-primary;
-	color: white;
-	padding: 14px;
-	border-radius: 12px;
+	color: $color-white;
+	padding: $spacing-md;
+	border-radius: $radius-md;
 	font-weight: 700;
 	font-size: 0.95rem;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	gap: 8px;
-	margin-top: 8px;
+	gap: $spacing-xs;
+	margin-top: $spacing-xs;
 	transition:
 		background-color,
 		transform 0.2s;
@@ -217,7 +218,7 @@
 }
 
 .footer {
-	margin-top: 32px;
+	margin-top: $spacing-xl;
 	text-align: center;
 	font-size: 0.875rem;
 	color: $color-text;
@@ -228,5 +229,18 @@
 		&:hover {
 			text-decoration: underline;
 		}
+	}
+}
+
+.spinner {
+	animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
 	}
 }

@@ -66,9 +66,12 @@ api.interceptors.response.use(
 					throw new Error('Brak refresh tokena');
 				}
 
-				const response = await axios.post(`${process.env.BASE_URL}/auth/refresh`, {
-					refreshToken: refreshToken,
-				});
+				const response = await axios.post(
+					`${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`,
+					{
+						refreshToken: refreshToken,
+					}
+				);
 
 				const { accessToken, refreshToken: newRefreshToken } = response.data;
 

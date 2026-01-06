@@ -10,15 +10,13 @@
 
 .container {
 	display: flex;
-	// ZMIANA 1: Na mobile układamy elementy jeden pod drugim (przycisk nad treścią)
 	flex-direction: column;
-	align-items: stretch; // Rozciągnij na szerokość
+	align-items: stretch;
 
 	width: 100%;
 	max-width: 1440px;
 	margin: 0 auto;
 
-	// ZMIANA 2: Dopiero na dużych ekranach (lg) robimy układ "Sidebar obok Treści"
 	@include lg {
 		flex-direction: row;
 		align-items: flex-start;

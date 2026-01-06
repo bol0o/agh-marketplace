@@ -1,7 +1,6 @@
 @use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
-// --- NAVBAR ---
 .navbar {
 	position: fixed;
 	top: 0;
@@ -17,7 +16,7 @@
 	.navContainer {
 		max-width: 1200px;
 		margin: 0 auto;
-		padding: 0 24px;
+		padding: 0 $spacing-xl;
 		width: 100%;
 		display: flex;
 		justify-content: space-between;
@@ -27,18 +26,18 @@
 	.logo {
 		display: flex;
 		align-items: center;
-		gap: 10px;
+		gap: $spacing-sm;
 		font-weight: 800;
 		font-size: 1.2rem;
-		color: #000;
+		color: $color-dark;
 		letter-spacing: -0.02em;
 
 		.logoIcon {
 			background-color: $color-primary;
-			color: white;
+			color: $color-white;
 			height: 36px;
 			width: 36px;
-			border-radius: 8px;
+			border-radius: $radius-md;
 			display: flex;
 			align-items: center;
 			justify-content: center;
@@ -48,28 +47,28 @@
 
 	.navLinks {
 		display: flex;
-		gap: 24px;
+		gap: $spacing-xl;
 		align-items: center;
 
 		.linkLogin {
 			font-size: 0.9rem;
 			font-weight: 600;
-			color: #374151;
+			color: $color-text;
 			transition: color 0.2s;
 			text-align: center;
 
 			&:hover {
-				color: #000;
+				color: $color-dark;
 			}
 		}
 
 		.btnJoin {
-			background-color: #0f172a; // Bardzo ciemny granat/czarny (jak na screenie)
-			color: white;
+			background-color: $color-btn-dark;
+			color: $color-white;
 			font-size: 0.9rem;
 			font-weight: 700;
-			padding: 10px 24px;
-			border-radius: 99px; // Idealna pigułka
+			padding: $spacing-sm $spacing-xl;
+			border-radius: 99px;
 			transition: transform 0.2s;
 			text-align: center;
 
@@ -80,7 +79,6 @@
 	}
 }
 
-// --- HERO SECTION ---
 .heroSection {
 	padding-top: 160px;
 	padding-bottom: 100px;
@@ -91,7 +89,7 @@
 .content {
 	max-width: 800px;
 	margin: 0 auto;
-	padding: 0 20px;
+	padding: 0 $spacing-lg;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -101,8 +99,8 @@
 	font-size: 3.5rem;
 	font-weight: 900;
 	line-height: 1.1;
-	color: #0f172a;
-	margin-bottom: 24px;
+	color: $color-dark;
+	margin-bottom: $spacing-xl;
 	letter-spacing: -0.03em;
 
 	@include lg {
@@ -110,7 +108,7 @@
 	}
 
 	.gradientText {
-		display: block; // Na nowej linii
+		display: block;
 		background: linear-gradient(90deg, $color-primary 0%, $color-secondary 100%);
 		-webkit-background-clip: text;
 		background-clip: text;
@@ -121,28 +119,28 @@
 .subheadline {
 	font-size: 1.1rem;
 	font-weight: 600;
-	color: $color-text; // Szary tekst
+	color: $color-text;
 	max-width: 640px;
-	margin: 0 auto 48px auto;
+	margin: 0 auto $spacing-2xl auto;
 	line-height: 1.6;
 }
 
 .ctaGroup {
 	display: flex;
-	gap: 16px;
+	gap: $spacing-md;
 	align-items: center;
 	justify-content: center;
 
 	.btnPrimary {
 		background: linear-gradient(135deg, $color-primary 0%, $color-primary-hover 100%);
-		color: white;
-		padding: 14px 32px;
-		border-radius: 12px;
+		color: $color-white;
+		padding: $spacing-md $spacing-xl;
+		border-radius: $radius-md;
 		font-weight: 700;
 		font-size: 1rem;
 		display: flex;
 		align-items: center;
-		gap: 8px;
+		gap: $spacing-xs;
 		box-shadow: 0 4px 6px -1px rgba($color-primary, 0.3);
 		transition:
 			background-color,
@@ -154,18 +152,18 @@
 	}
 
 	.btnSecondary {
-		background-color: white;
-		color: #1f2937;
-		border: 1px solid #e5e7eb;
-		padding: 14px 32px;
-		border-radius: 12px;
+		background-color: $color-white;
+		color: $color-text;
+		border: 1px solid $color-border;
+		padding: $spacing-md $spacing-xl;
+		border-radius: $radius-md;
 		font-weight: 700;
 		font-size: 1rem;
 		transition: background-color 0.2s;
 
 		&:hover {
-			background-color: #f9fafb;
-			border-color: #d1d5db;
+			background-color: $color-bg;
+			border-color: $color-text-light;
 		}
 	}
 }
@@ -174,37 +172,36 @@
 	margin-top: 80px;
 	display: flex;
 	flex-wrap: wrap;
-	gap: 32px;
+	gap: $spacing-xl;
 	align-items: center;
 	justify-content: center;
 
 	.proofItem {
 		display: flex;
 		align-items: center;
-		gap: 10px;
+		gap: $spacing-sm;
 		font-size: 1rem;
-		font-weight: 800; // Bold uppercase
-		color: #9ca3af; // Jasny szary
+		font-weight: 800;
+		color: $color-text-lighter;
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
 
 		svg {
-			color: #d1d5db; // Ikony jeszcze jaśniejsze
+			color: $color-border;
 		}
 	}
 }
 
-// --- FEATURES GRID ---
 .featuresSection {
-	padding: 80px 24px;
-	background-color: #fafafa; // Prawie białe tło
+	padding: 80px $spacing-xl;
+	background-color: $color-bg;
 
 	.gridContainer {
 		max-width: 1200px;
 		margin: 0 auto;
 		display: grid;
 		grid-template-columns: 1fr;
-		gap: 32px;
+		gap: $spacing-xl;
 
 		@include md {
 			grid-template-columns: repeat(3, 1fr);
@@ -212,98 +209,52 @@
 	}
 
 	.featureCard {
-		background-color: white;
-		padding: 40px 32px; // Duży padding w środku
-		border-radius: 24px;
-		// Bardzo delikatny cień jak na screenie
-		box-shadow:
-			0 4px 6px -1px rgba(0, 0, 0, 0.02),
-			0 2px 4px -1px rgba(0, 0, 0, 0.02);
-		border: 1px solid rgba(0, 0, 0, 0.02);
+		background-color: $color-white;
+		padding: $spacing-2xl $spacing-xl;
+		border-radius: $radius-xl;
+		box-shadow: $shadow-sm;
+		border: 1px solid rgba($color-dark, 0.02);
 		transition: transform 0.2s;
 
 		&:hover {
 			transform: translateY(-4px);
-			box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+			box-shadow: $shadow-lg;
 		}
 
 		.iconWrapper {
 			width: 56px;
 			height: 56px;
-			border-radius: 16px;
+			border-radius: $radius-lg;
 			display: flex;
 			align-items: center;
 			justify-content: center;
-			margin-bottom: 24px;
+			margin-bottom: $spacing-xl;
 
-			// Kolory tła ikon dopasowane do screena
 			&.red {
-				background-color: #fef2f2;
-				color: #ef4444;
+				background-color: $color-status-red-bg;
+				color: $color-status-red;
 			}
 			&.purple {
-				background-color: #f3e8ff;
-				color: #a855f7;
+				background-color: $color-status-purple-bg;
+				color: $color-status-purple;
 			}
 			&.blue {
-				background-color: #eff6ff;
-				color: #3b82f6;
+				background-color: $color-status-blue-bg;
+				color: $color-status-blue;
 			}
 		}
 
 		h3 {
 			font-size: 1.25rem;
 			font-weight: 800;
-			color: #111827;
-			margin-bottom: 16px;
+			color: $color-dark;
+			margin-bottom: $spacing-md;
 		}
 
 		p {
-			color: #6b7280;
+			color: $color-text-light;
 			line-height: 1.6;
 			font-size: 0.95rem;
-		}
-	}
-}
-
-.footer {
-	padding: 40px 24px;
-	background-color: white;
-	border-top: 1px solid #f3f4f6;
-
-	.footerContainer {
-		max-width: 1200px;
-		margin: 0 auto;
-		display: flex;
-		flex-direction: column-reverse;
-		align-items: center;
-		gap: 24px;
-
-		@include md {
-			flex-direction: row;
-			justify-content: space-between;
-		}
-	}
-
-	.copy {
-		font-size: 0.875rem;
-		color: #6b7280;
-	}
-
-	.links {
-		display: flex;
-		gap: 32px;
-
-		a {
-			font-size: 0.875rem;
-			color: #4b5563;
-			font-weight: 500;
-			transition: color 0.2s;
-			text-decoration: none;
-
-			&:hover {
-				color: #111827;
-			}
 		}
 	}
 }

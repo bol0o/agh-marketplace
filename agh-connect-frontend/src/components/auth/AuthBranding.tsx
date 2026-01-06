@@ -1,10 +1,14 @@
 import Image from 'next/image';
 import styles from './AuthBranding.module.scss';
+import Link from 'next/link';
 
 type Props = {
 	title: string;
 	description: string;
 };
+
+const PLACEHOLDER_IMAGE =
+	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
 
 export default function AuthBranding(props: Props) {
 	return (
@@ -17,14 +21,16 @@ export default function AuthBranding(props: Props) {
 				priority
 				className={styles.bgImage}
 				sizes="(max-width: 1024px) 0vw, 50vw"
+				placeholder="blur"
+				blurDataURL={PLACEHOLDER_IMAGE}
 			/>
 			<div className={styles.overlay}></div>
 
 			<div className={styles.content}>
-				<div className={styles.brand}>
+				<Link href="/" className={styles.brand}>
 					<div className={styles.logoIcon}>A</div>
 					<span>AGH Connect</span>
-				</div>
+				</Link>
 				<div>
 					<h2>{props.title}</h2>
 					<p>{props.description}</p>
