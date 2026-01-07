@@ -8,7 +8,7 @@ import styles from '../Auth.module.scss';
 import AuthBranding from '@/components/auth/AuthBranding';
 import { RegisterCredentials } from '@/types/auth';
 import { useAuth } from '@/store/useAuth';
-// import { useUIStore } from '@/store/uiStore';
+import { useUIStore } from '@/store/uiStore';
 import { isAxiosError } from 'axios';
 import { ApiErrorResponse } from '@/types/api';
 import { isValidAghEmail, validatePassword } from '@/utils/validation';
@@ -16,7 +16,7 @@ import { isValidAghEmail, validatePassword } from '@/utils/validation';
 export default function RegisterForm() {
 	const router = useRouter();
 	const register = useAuth((state) => state.register);
-	// const addToast = useUIStore((state) => state.addToast);
+	const addToast = useUIStore((state) => state.addToast);
 
 	const [formData, setFormData] = useState<RegisterCredentials>({
 		email: '',
@@ -41,18 +41,18 @@ export default function RegisterForm() {
 		e.preventDefault();
 
 		if (!isValidAghEmail(formData.email)) {
-			// addToast('Wymagany jest email w domenie @student.agh.edu.pl', 'error');
+			addToast('Wymagany jest email w domenie @student.agh.edu.pl', 'error');
 			return;
 		}
 
 		const passwordValidation = validatePassword(formData.password);
 		if (!passwordValidation.isValid) {
-			// addToast(passwordValidation.message || 'Hasło nie spełnia wymagań', 'error');
+			addToast(passwordValidation.message || 'Hasło nie spełnia wymagań', 'error');
 			return;
 		}
 
 		if (!formData.acceptTerms) {
-			// addToast('Musisz zaakceptować regulamin', 'error');
+			addToast('Musisz zaakceptować regulamin', 'error');
 			return;
 		}
 
@@ -60,7 +60,7 @@ export default function RegisterForm() {
 
 		try {
 			await register(formData);
-			// addToast('Konto zostało utworzone!', 'success');
+			addToast('Konto zostało utworzone!', 'success');
 			router.push('/marketplace');
 		} catch (error: unknown) {
 			if (isAxiosError<ApiErrorResponse>(error)) {
@@ -68,9 +68,9 @@ export default function RegisterForm() {
 				const errorMessage = Array.isArray(data?.message)
 					? data.message[0]
 					: data?.error || 'Wystąpił błąd rejestracji';
-				// addToast(errorMessage, 'error');
+				addToast(errorMessage, 'error');
 			} else {
-				// addToast('Wystąpił nieoczekiwany błąd', 'error');
+				addToast('Wystąpił nieoczekiwany błąd', 'error');
 			}
 		} finally {
 			setIsLoading(false);

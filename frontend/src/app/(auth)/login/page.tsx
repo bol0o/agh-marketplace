@@ -8,7 +8,7 @@ import styles from '../Auth.module.scss';
 import AuthBranding from '@/components/auth/AuthBranding';
 import { LoginCredentials } from '@/types/auth';
 import { useAuth } from '@/store/useAuth';
-// import { useUIStore } from '@/store/uiStore';
+import { useUIStore } from '@/store/uiStore';
 import { isAxiosError } from 'axios';
 import { ApiErrorResponse } from '@/types/api';
 import { isValidAghEmail } from '@/utils/validation';
@@ -17,7 +17,7 @@ export default function LoginPage() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const login = useAuth((state) => state.login);
-	// const addToast = useUIStore((state) => state.addToast);
+	const addToast = useUIStore((state) => state.addToast);
 
 	const [formData, setFormData] = useState<LoginCredentials>({
 		email: '',
@@ -39,7 +39,7 @@ export default function LoginPage() {
 		e.preventDefault();
 
 		if (!isValidAghEmail(formData.email)) {
-			// addToast('Wymagany jest email w domenie @student.agh.edu.pl', 'error');
+			addToast('Wymagany jest email w domenie @student.agh.edu.pl', 'error');
 			return;
 		}
 
@@ -51,9 +51,8 @@ export default function LoginPage() {
 			const currentUser = useAuth.getState().user;
 			const name = currentUser?.name?.split(' ')[0] || 'Studencie';
 
-			// addToast(`Witaj spowrotem, ${name}`, 'success');
+			addToast(`Witaj spowrotem, ${name}`, 'success');
 
-			// Sprawdź redirect URL z middleware
 			const redirectTo = searchParams.get('redirect');
 			if (redirectTo) {
 				router.push(redirectTo);
@@ -70,9 +69,9 @@ export default function LoginPage() {
 				const errorMessage = Array.isArray(data?.message)
 					? data.message[0]
 					: data?.error || 'Wystąpił błąd logowania';
-				// addToast(errorMessage, 'error');
+				addToast(errorMessage, 'error');
 			} else {
-				// addToast('Wystąpił nieoczekiwany błąd', 'error');
+				addToast('Wystąpił nieoczekiwany błąd', 'error');
 			}
 		} finally {
 			setIsLoading(false);
