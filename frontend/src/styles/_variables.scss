@@ -1,0 +1,61 @@
+// Breakpoints
+$breakpoint-sm: 640px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 1024px;
+$breakpoint-xl: 1280px;
+$breakpoint-xxl: 1920px;
+
+// Main colors (AGH)
+$color-primary: #dc2626; // red-600
+$color-primary-hover: #b91c1c; // red-700
+$color-secondary: #9333ea; // purple-600
+
+// Text colors
+$color-dark: #111827; // gray-900
+$color-text: #374151; // gray-700
+$color-text-light: #6b7280; // gray-500
+$color-text-lighter: #9ca3af; // gray-400
+
+// Background colors
+$color-bg: #f9fafb; // gray-50
+$color-white: #ffffff;
+$color-border: #e5e7eb; // gray-200
+
+// Status colors (dla ikon feature cards)
+$color-status-red-bg: #fef2f2;
+$color-status-red: #ef4444;
+$color-status-purple-bg: #f3e8ff;
+$color-status-purple: #a855f7;
+$color-status-blue-bg: #eff6ff;
+$color-status-blue: #3b82f6;
+$color-status-green: green;
+$color-status-pink: pink;
+$color-warning: orange;
+
+// Button specific (dla LandingPage)
+$color-btn-dark: #0f172a; // slate-900
+
+// Spacing
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 16px;
+$spacing-lg: 24px;
+$spacing-xl: 32px;
+$spacing-2xl: 48px;
+
+// Radius
+$radius-sm: 6px;
+$radius-md: 12px;
+$radius-lg: 16px;
+$radius-xl: 24px;
+$radius-circle: 50%;
+
+// Shadows
+$shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+$shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+$shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+
+// Do zmienienia
+$color-text-main: black;
+$color-text-secondary: black;
+$color-bg-alt: black;

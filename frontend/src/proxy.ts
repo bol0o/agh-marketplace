@@ -11,8 +11,6 @@ export function proxy(request: NextRequest) {
 		if (accessToken) {
 			const target = userRole === 'admin' ? '/admin' : '/home';
 			return NextResponse.redirect(new URL(target, request.url));
-		} else {
-			return NextResponse.redirect(new URL('/login', request.url));
 		}
 	}
 
