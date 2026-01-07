@@ -12,7 +12,7 @@ export default function Home() {
 				<div className={styles.navContainer}>
 					<div className={styles.logo}>
 						<div className={styles.logoIcon}>A</div>
-						<span>AGH Connect</span>
+						<span className={styles.logoText}>AGH Connect</span>
 					</div>
 					<div className={styles.navLinks}>
 						<Link href="/login" className={styles.linkLogin}>
