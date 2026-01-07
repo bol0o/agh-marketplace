@@ -1,5 +1,3 @@
-'use client';
-
 import Link from 'next/link';
 import { ArrowRight, ShoppingBag, Gavel, ShieldCheck, Users, GraduationCap } from 'lucide-react';
 import styles from './Home.module.scss';
