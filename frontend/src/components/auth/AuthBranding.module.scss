@@ -1,0 +1,76 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.imageSection {
+	display: none;
+	position: relative;
+	background-color: #111827;
+	color: white;
+	overflow: hidden;
+
+	@include lg {
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		padding: 48px;
+	}
+
+	.bgImage {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		opacity: 0.4;
+		mix-blend-mode: overlay;
+		z-index: 0;
+	}
+
+	.overlay {
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(to top, #111827, rgba(#111827, 0.4), transparent);
+		z-index: 1;
+	}
+
+	.content {
+		position: relative;
+		z-index: 10;
+		height: 100%;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+	}
+
+	.brand {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		font-size: 1.25rem;
+		font-weight: 700;
+
+		.logoIcon {
+			background-color: $color-primary;
+			width: 32px;
+			height: 32px;
+			border-radius: 8px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-weight: 800;
+		}
+	}
+
+	h2 {
+		font-size: 2.5rem;
+		font-weight: 800;
+		line-height: 1.1;
+		margin-bottom: 16px;
+	}
+
+	p {
+		font-size: 1.125rem;
+		color: #d1d5db;
+		line-height: 1.6;
+	}
+}

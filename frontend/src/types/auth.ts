@@ -35,6 +35,5 @@ export interface RegisterCredentials {
 	password: string;
 	firstName: string;
 	lastName: string;
-	studentId: string;
 	acceptTerms: boolean;
 }
