@@ -1,0 +1,68 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.desktopNav {
+	display: none;
+	align-items: center;
+	gap: $spacing-xl;
+
+	@include lg {
+		display: flex;
+	}
+}
+
+.navLinks {
+	display: flex;
+	align-items: center;
+	gap: $spacing-xl;
+	font-size: 0.875rem;
+	font-weight: 500;
+
+	a {
+		color: $color-text-secondary;
+		transition: all 0.2s;
+		text-decoration: none;
+		padding: $spacing-xs 0;
+		border-bottom: 2px solid transparent;
+		position: relative;
+
+		&:hover {
+			color: $color-primary;
+		}
+
+		&.active {
+			color: $color-primary;
+			font-weight: 600;
+			border-bottom-color: $color-primary;
+		}
+	}
+}
+
+.desktopIcons {
+	display: flex;
+	align-items: center;
+	gap: $spacing-sm;
+	border-left: 1px solid $color-border;
+	padding-left: $spacing-xl;
+}
+
+.addOfferBtn {
+	display: flex;
+	align-items: center;
+	gap: $spacing-sm;
+	background-color: $color-primary;
+	color: $color-white;
+	padding: $spacing-sm $spacing-lg;
+	border-radius: 9999px;
+	font-weight: 600;
+	font-size: 0.9rem;
+	text-decoration: none;
+	transition: all 0.2s;
+	white-space: nowrap;
+
+	&:hover {
+		background-color: $color-primary-hover;
+		transform: translateY(-1px);
+		box-shadow: 0 4px 12px rgba($color-primary, 0.2);
+	}
+}

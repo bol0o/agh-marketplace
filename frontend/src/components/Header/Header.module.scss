@@ -1,0 +1,158 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.header {
+	position: sticky;
+	top: 0;
+	z-index: 40;
+	width: 100%;
+	background-color: $color-white;
+	border-bottom: 1px solid $color-border;
+	box-shadow: $shadow-sm;
+	backdrop-filter: blur(8px);
+	background-color: rgba($color-white, 0.95);
+}
+
+.container {
+	@include flex-center;
+	height: 64px;
+	justify-content: space-between;
+	padding: 0 $spacing-md;
+	width: 100%;
+	margin: 0 auto;
+
+	@include sm {
+		padding: 0 $spacing-xl;
+	}
+
+	@include lg {
+		padding: 0 $spacing-2xl;
+	}
+}
+
+.leftSection {
+	@include flex-center;
+	gap: $spacing-sm;
+	flex-shrink: 0;
+}
+
+.hamburgerBtn {
+	padding: $spacing-sm;
+	margin-left: -$spacing-sm;
+	color: $color-text-main;
+	border-radius: $radius-sm;
+	transition: background-color 0.2s;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: none;
+	border: none;
+	cursor: pointer;
+
+	&:hover {
+		background-color: $color-bg-alt;
+	}
+
+	@include lg {
+		display: none;
+	}
+}
+
+.logoLink {
+	text-decoration: none;
+	color: inherit;
+
+	&:hover {
+		opacity: 0.9;
+	}
+}
+
+.logo {
+	display: flex;
+	align-items: center;
+	gap: $spacing-sm;
+	font-weight: 800;
+	font-size: 1.2rem;
+	color: $color-dark;
+	letter-spacing: -0.02em;
+
+	.logoIcon {
+		background-color: $color-primary;
+		color: $color-white;
+		height: 36px;
+		width: 36px;
+		border-radius: $radius-md;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-weight: 900;
+		font-size: 1.25rem;
+	}
+}
+
+.rightSection {
+	display: flex;
+	align-items: center;
+	gap: $spacing-xs;
+
+	@include sm {
+		gap: $spacing-lg;
+	}
+}
+
+.mobileActions {
+	display: flex;
+	align-items: center;
+	gap: $spacing-xs;
+
+	@include lg {
+		display: none;
+	}
+
+	button,
+	.mobileIcon {
+		padding: $spacing-sm;
+		color: $color-text-secondary;
+		border-radius: $radius-circle;
+		transition: all 0.2s;
+		background: none;
+		border: none;
+		cursor: pointer;
+
+		&:hover {
+			background-color: $color-bg-alt;
+		}
+	}
+
+	.mobileIcon {
+		text-decoration: none;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+
+		&.active {
+			color: $color-primary;
+		}
+	}
+
+	.mobileAvatar {
+		margin-left: $spacing-xs;
+		padding: $spacing-xs;
+		text-decoration: none;
+
+		div {
+			height: 32px;
+			width: 32px;
+			border-radius: $radius-circle;
+			background-color: $color-bg-alt;
+			border: 1px solid $color-border;
+			@include flex-center;
+			color: $color-text-secondary;
+			transition: transform 0.1s;
+
+			&:active {
+				transform: scale(0.95);
+			}
+		}
+	}
+}
