@@ -73,3 +73,28 @@ export const authenticateToken = (
     next();
   });
 };
+
+export const optionalAuth = (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+
+  if (!token) {
+    // No token provided, continue as guest
+    return next();
+  }
+
+  jwt.verify(token, process.env.JWT_SECRET as string, (err: any, user: any) => {
+    if (err) {
+      // Invalid token, continue as guest (or log warning)
+      console.warn("Optional Auth: Invalid token ignored");
+      return next();
+    }
+    // Valid token, attach user to request
+    req.user = user;
+    next();
+  });
+};

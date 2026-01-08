@@ -69,36 +69,50 @@ export const updateReportStatus = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// GET /api/admin/users
+// GET /api/admin/users (With Pagination)
 export const getAllUsers = async (req: AuthRequest, res: Response) => {
   try {
-    const users = await prisma.user.findMany({
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-        role: true,
-        isActive: true,
-        studentId: true,
-        createdAt: true,
-        _count: {
-          select: {
-            products: true,
-            orders: true,
+    // 1. Pagination Params
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 20; // Admin sees more rows
+    const skip = (page - 1) * limit;
+
+    // 2. Database Transaction: Fetch Users + Count Total
+    const [users, total] = await prisma.$transaction([
+      prisma.user.findMany({
+        skip,
+        take: limit,
+        orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          email: true,
+          firstName: true,
+          lastName: true,
+          role: true,
+          isActive: true,
+          _count: {
+            select: { products: true, orders: true },
           },
         },
-      },
-      orderBy: { createdAt: "desc" },
-    });
+      }),
+      prisma.user.count(),
+    ]);
 
-    res.json(users);
+    // 3. Return Data with Pagination Metadata
+    res.json({
+      data: users,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Błąd pobierania listy użytkowników" });
+    res.status(500).json({ error: "Błąd pobierania użytkowników" });
   }
 };
-
 // PATCH /api/admin/users/:userId/status (Ban/Unban)
 export const toggleBlockUser = async (req: AuthRequest, res: Response) => {
   try {
