@@ -1,0 +1,101 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.mobileTrigger {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 12px;
+	width: calc(100% - 32px);
+	max-width: 380px;
+	margin: 20px auto 24px;
+	padding: 15px 22px;
+	background: linear-gradient(135deg, $color-primary, $color-primary-hover);
+	border: none;
+	border-radius: 12px;
+	font-size: 0.95rem;
+	font-weight: 700;
+	color: $color-white;
+	cursor: pointer;
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+	box-shadow: 0 4px 15px rgba($color-primary, 0.3);
+
+	&:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 8px 25px rgba($color-primary, 0.4);
+	}
+
+	&:active {
+		transform: translateY(0);
+	}
+
+	svg {
+		color: $color-white;
+	}
+
+	@include lg {
+		display: none;
+	}
+}
+
+.sidebar {
+	display: none;
+	width: 260px;
+	flex-shrink: 0;
+	padding: 0;
+	position: sticky;
+	top: 84px;
+	height: calc(100vh - 84px);
+	overflow-y: auto;
+	background-color: $color-white;
+	border-right: 1px solid $color-border;
+
+	@include lg {
+		display: block;
+	}
+}
+
+.sidebarContent {
+	padding: 20px 16px;
+}
+
+.sidebar::-webkit-scrollbar {
+	width: 4px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+	background-color: #e5e7eb;
+	border-radius: 2px;
+
+	&:hover {
+		background-color: #d1d5db;
+	}
+}
+
+@include sm {
+	.mobileTrigger {
+		margin: 16px auto 20px;
+		padding: 14px 20px;
+		font-size: 0.9rem;
+	}
+}
+
+@include md {
+	.sidebar {
+		width: 280px;
+	}
+
+	.sidebarContent {
+		padding: 24px 20px;
+	}
+}
+
+@include xl {
+	.sidebar {
+		width: 300px;
+	}
+}

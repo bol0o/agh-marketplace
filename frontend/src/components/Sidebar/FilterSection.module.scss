@@ -1,0 +1,269 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.filterSection {
+	margin-bottom: 32px;
+}
+
+.sectionTitle {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 0.75rem;
+	font-weight: 700;
+	color: $color-text-lighter;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	padding-bottom: 12px;
+	margin-bottom: 20px;
+	border-bottom: 1px solid $color-border;
+
+	svg {
+		color: $color-text-lighter;
+	}
+}
+
+.filterContent {
+	animation: fadeIn 0.3s ease-out;
+}
+
+.typeToggle {
+	display: flex;
+	background-color: $color-bg;
+	padding: 4px;
+	border-radius: 10px;
+	margin-bottom: 24px;
+	border: 1px solid $color-border;
+}
+
+.toggleBtn {
+	flex: 1;
+	padding: 10px 12px;
+	font-size: 0.85rem;
+	font-weight: 500;
+	border-radius: 8px;
+	color: $color-text;
+	background: transparent;
+	border: none;
+	cursor: pointer;
+	transition: all 0.2s;
+
+	&:hover {
+		background-color: rgba($color-white, 0.5);
+		color: $color-dark;
+	}
+
+	&.active {
+		background-color: $color-white;
+		color: $color-primary;
+		font-weight: 600;
+		box-shadow: $shadow-sm;
+	}
+}
+
+.filterGroups {
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+}
+
+.filterGroup {
+	label {
+		display: block;
+		font-size: 0.875rem;
+		font-weight: 600;
+		color: $color-dark;
+		margin-bottom: 8px;
+	}
+}
+
+.filterLabel {
+	display: block;
+	font-size: 0.875rem;
+	font-weight: 600;
+	color: $color-dark;
+	margin-bottom: 12px;
+}
+
+.priceInputs {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+
+	input {
+		width: calc(100% / 2 - 14px);
+		border: 1px solid $color-border;
+		background-color: $color-white;
+		border-radius: 8px;
+		padding: 9px 10px;
+		font-size: 0.85rem;
+		color: $color-dark;
+		outline: none;
+		transition: all 0.2s;
+		flex-shrink: 0;
+
+		&::-webkit-outer-spin-button,
+		&::-webkit-inner-spin-button {
+			-webkit-appearance: none;
+			margin: 0;
+		}
+
+		&[type='number'] {
+			-moz-appearance: textfield;
+		}
+
+		&:focus {
+			border-color: $color-primary;
+			box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
+		}
+
+		&::placeholder {
+			color: $color-text-lighter;
+			font-size: 0.85rem;
+		}
+	}
+}
+
+.priceInput {
+	text-align: center;
+
+	&::placeholder {
+		text-align: center;
+	}
+}
+
+.priceSeparator {
+	color: $color-text-lighter;
+	font-weight: 400;
+	min-width: 12px;
+	text-align: center;
+	flex-shrink: 0;
+}
+
+.checkboxGroup {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.checkboxLabel {
+	display: flex;
+	align-items: center;
+	cursor: pointer;
+	user-select: none;
+	transition: all 0.2s;
+	width: 100%;
+}
+
+.customCheckboxWrapper {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	width: 100%;
+}
+
+.checkboxInput {
+	display: none;
+}
+
+.customCheckbox {
+	width: 18px;
+	height: 18px;
+	border: 2px solid $color-border;
+	border-radius: 4px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: all 0.2s;
+	flex-shrink: 0;
+	background-color: $color-white;
+	position: relative;
+
+	&.checked {
+		background-color: $color-primary;
+		border-color: $color-primary;
+	}
+}
+
+.checkmark {
+	width: 10px;
+	height: 6px;
+	border-left: 2px solid $color-white;
+	border-bottom: 2px solid $color-white;
+	transform: rotate(-45deg) translate(1px, -1px);
+	position: relative;
+	z-index: 1;
+}
+
+.checkboxText {
+	font-size: 0.875rem;
+	color: $color-text;
+	font-weight: 500;
+	transition: color 0.2s;
+	line-height: 1;
+	flex: 1;
+}
+
+.clearBtn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	padding: 12px 16px;
+	border-radius: 8px;
+	border: 1px solid $color-border;
+	background-color: $color-white;
+	color: $color-text;
+	font-size: 0.875rem;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s;
+	margin-top: 16px;
+	width: 100%;
+
+	&:hover {
+		background-color: $color-bg;
+		border-color: $color-primary;
+		color: $color-primary;
+	}
+
+	&:active {
+		transform: scale(0.98);
+	}
+}
+
+.applyBtn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 12px 16px;
+	border-radius: 8px;
+	border: none;
+	background-color: $color-primary;
+	color: $color-white;
+	font-size: 0.875rem;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s;
+	margin-top: 16px;
+	width: 100%;
+
+	&:hover {
+		background-color: $color-primary-hover;
+	}
+
+	&:active {
+		transform: scale(0.98);
+	}
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(5px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}

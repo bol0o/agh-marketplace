@@ -1,0 +1,59 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.marketplaceInfo {
+	background: linear-gradient(135deg, rgba($color-primary, 0.05), rgba($color-primary, 0.02));
+	border: 1px dashed rgba($color-primary, 0.3);
+	border-radius: 12px;
+	padding: 24px;
+	text-align: center;
+	margin-top: 16px;
+}
+
+.infoIcon {
+	width: 48px;
+	height: 48px;
+	margin: 0 auto 16px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: rgba($color-primary, 0.1);
+	border-radius: 50%;
+	color: $color-primary;
+}
+
+.infoTitle {
+	font-size: 1rem;
+	font-weight: 700;
+	color: $color-dark;
+	margin-bottom: 8px;
+}
+
+.infoText {
+	font-size: 0.875rem;
+	color: $color-text;
+	line-height: 1.5;
+	margin-bottom: 20px;
+}
+
+.marketplaceButton {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	width: 100%;
+	padding: 12px 20px;
+	background-color: $color-primary;
+	color: $color-white;
+	border-radius: 8px;
+	font-size: 0.875rem;
+	font-weight: 600;
+	text-decoration: none;
+	transition: all 0.2s;
+
+	&:hover {
+		background-color: $color-primary-hover;
+		transform: translateY(-2px);
+		box-shadow: $shadow-md;
+	}
+}

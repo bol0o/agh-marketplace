@@ -1,0 +1,237 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.drawerOverlay {
+	position: fixed;
+	inset: 0;
+	background-color: rgba(0, 0, 0, 0);
+	backdrop-filter: blur(8px);
+	-webkit-backdrop-filter: blur(8px);
+	z-index: 100;
+	display: flex;
+	justify-content: flex-end;
+	pointer-events: none;
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+	&:not(.closing) {
+		pointer-events: auto;
+
+		&::before {
+			content: '';
+			position: absolute;
+			inset: 0;
+			background-color: rgba(0, 0, 0, 0.3);
+			backdrop-filter: blur(8px);
+			-webkit-backdrop-filter: blur(8px);
+			animation: overlayFadeIn 0.3s ease-out forwards;
+		}
+	}
+
+	&.closing {
+		&::before {
+			animation: overlayFadeOut 0.3s ease-out forwards;
+		}
+	}
+}
+
+.drawer {
+	width: 100%;
+	max-width: 320px;
+	height: 100%;
+	background-color: $color-white;
+	display: flex;
+	flex-direction: column;
+	transform: translateX(100%);
+	pointer-events: auto;
+	position: relative;
+	box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+
+	&.open {
+		animation: drawerSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+	}
+
+	&.closing {
+		animation: drawerSlideOut 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+	}
+}
+
+.drawerHeader {
+	padding: 20px 24px;
+	border-bottom: 1px solid $color-border;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	background-color: $color-white;
+	position: sticky;
+	top: 0;
+	z-index: 10;
+	flex-shrink: 0;
+}
+
+.drawerTitleWrapper {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.drawerIcon {
+	color: $color-primary;
+}
+
+.drawerTitle {
+	font-size: 1.1rem;
+	font-weight: 700;
+	color: $color-dark;
+	margin: 0;
+}
+
+.closeButton {
+	width: 40px;
+	height: 40px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: transparent;
+	border: none;
+	border-radius: 50%;
+	color: $color-text-lighter;
+	cursor: pointer;
+	transition: all 0.2s;
+
+	&:hover {
+		background-color: $color-bg;
+		color: $color-dark;
+	}
+
+	&:active {
+		transform: scale(0.95);
+	}
+}
+
+.drawerContent {
+	flex: 1;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+	position: relative;
+	padding: 20px 24px;
+
+	opacity: 0;
+	animation: contentFadeIn 0.3s ease-out 0.15s forwards;
+}
+
+.drawerFooter {
+	padding: 16px 24px;
+	border-top: 1px solid $color-border;
+	background-color: $color-white;
+	position: sticky;
+	bottom: 0;
+	flex-shrink: 0;
+}
+
+.applyButton {
+	width: 100%;
+	padding: 16px;
+	background: linear-gradient(135deg, $color-primary, $color-primary-hover);
+	color: $color-white;
+	font-size: 1rem;
+	font-weight: 700;
+	border: none;
+	border-radius: 12px;
+	cursor: pointer;
+	transition: all 0.2s;
+	box-shadow: 0 4px 12px rgba($color-primary, 0.3);
+
+	&:hover {
+		background: linear-gradient(135deg, $color-primary-hover, rgba($color-primary-hover, 0.95));
+		transform: translateY(-1px);
+		box-shadow: 0 6px 16px rgba($color-primary, 0.4);
+	}
+
+	&:active {
+		transform: translateY(0);
+		box-shadow: 0 4px 12px rgba($color-primary, 0.3);
+	}
+}
+
+@keyframes drawerSlideIn {
+	from {
+		transform: translateX(100%);
+	}
+	to {
+		transform: translateX(0);
+	}
+}
+
+@keyframes drawerSlideOut {
+	from {
+		transform: translateX(0);
+	}
+	to {
+		transform: translateX(100%);
+	}
+}
+
+@keyframes overlayFadeIn {
+	from {
+		opacity: 0;
+		backdrop-filter: blur(0px);
+		-webkit-backdrop-filter: blur(0px);
+	}
+	to {
+		opacity: 1;
+		backdrop-filter: blur(8px);
+		-webkit-backdrop-filter: blur(8px);
+	}
+}
+
+@keyframes overlayFadeOut {
+	from {
+		opacity: 1;
+		backdrop-filter: blur(8px);
+		-webkit-backdrop-filter: blur(8px);
+	}
+	to {
+		opacity: 0;
+		backdrop-filter: blur(0px);
+		-webkit-backdrop-filter: blur(0px);
+	}
+}
+
+@keyframes contentFadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(10px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.drawerContent::-webkit-scrollbar {
+	width: 4px;
+}
+
+.drawerContent::-webkit-scrollbar-track {
+	background: $color-bg;
+}
+
+.drawerContent::-webkit-scrollbar-thumb {
+	background-color: $color-border;
+	border-radius: 2px;
+
+	&:hover {
+		background-color: $color-text-lighter;
+	}
+}
+
+@include sm {
+	.drawer {
+		max-width: 320px;
+	}
+
+	.drawerContent {
+		padding: 16px 20px;
+	}
+}
