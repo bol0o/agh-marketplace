@@ -47,15 +47,12 @@
 									}
 								],
 								"url": {
-									"raw": "{{baseURL}}/api/bids/product/{{productId}}",
-									"host": [
-										"{{baseURL}}"
-									],
+									"raw": "/api/bids/product/",
 									"path": [
 										"api",
 										"bids",
 										"product",
-										"{{productId}}"
+										""
 									]
 								}
 							},
@@ -179,7 +176,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n  \"productId\": \"{{productId}}\",\r\n  \"amount\": 20.00\r\n}",
+									"raw": "{\r\n  \"productId\": \"\",\r\n  \"amount\": 20.00\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -187,10 +184,7 @@
 									}
 								},
 								"url": {
-									"raw": "{{baseURL}}/api/bids",
-									"host": [
-										"{{baseURL}}"
-									],
+									"raw": "/api/bids",
 									"path": [
 										"api",
 										"bids"
@@ -305,10 +299,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{baseURL}}/api/chat",
-									"host": [
-										"{{baseURL}}"
-									],
+									"raw": "/api/chat",
 									"path": [
 										"api",
 										"chat"
@@ -435,7 +426,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n  \"productId\": \"{{productId}}\",\r\n  \"message\": \"Cześć! Czy cena 20 zł to Twoja ostateczna oferta?\"\r\n}",
+									"raw": "{\r\n  \"productId\": \"\",\r\n  \"message\": \"Cześć! Czy cena 20 zł to Twoja ostateczna oferta?\"\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -443,10 +434,7 @@
 									}
 								},
 								"url": {
-									"raw": "{{baseURL}}/api/chat",
-									"host": [
-										"{{baseURL}}"
-									],
+									"raw": "/api/chat",
 									"path": [
 										"api",
 										"chat"
@@ -563,10 +551,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{baseURL}}/api/chat/:chatId/messages",
-									"host": [
-										"{{baseURL}}"
-									],
+									"raw": "/api/chat/:chatId/messages",
 									"path": [
 										"api",
 										"chat",
@@ -717,10 +702,7 @@
 									}
 								},
 								"url": {
-									"raw": "{{baseURL}}/api/chat/:chatId/messages",
-									"host": [
-										"{{baseURL}}"
-									],
+									"raw": "/api/chat/:chatId/messages",
 									"path": [
 										"api",
 										"chat",
@@ -870,10 +852,7 @@
 									}
 								},
 								"url": {
-									"raw": "{{baseURL}}/api/social/follow",
-									"host": [
-										"{{baseURL}}"
-									],
+									"raw": "/api/social/follow",
 									"path": [
 										"api",
 										"social",
@@ -1437,7 +1416,10 @@
 									}
 								},
 								"url": {
-									"raw": "/api/auth/login",
+									"raw": "{{baseURL}}/api/auth/login",
+									"host": [
+										"{{baseURL}}"
+									],
 									"path": [
 										"api",
 										"auth",
@@ -1651,7 +1633,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"title\": \"Monitor Dell 24 cale\",\n  \"description\": \"Używany, stan idealny. Sprzedaję bo kończę studia.\",\n  \"price\": 350.00,\n  \"category\": \"ELECTRONICS\",\n  \"imageUrl\": \"https://placehold.co/600x400\",\n  \"condition\": \"used\",\n  \"location\": \"Miasteczko AGH\"\n}",
+							"raw": "{\n  \"title\": \"Legendarny Laptop Gamingowy\",\n  \"description\": \"Aukcja BCM (bez ceny minimalnej), start od 1zł!\",\n  \"price\": 1.00,\n  \"category\": \"ELECTRONICS\",\n  \"condition\": \"used\",\n  \"stock\": 1,\n  \"location\": \"Kraków\",\n  \"isAuction\": true,\n  \"auctionEnd\": \"2026-02-01T20:00:00.000Z\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2139,7 +2121,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJhOTVlZGU1Mi1hOWE4LTQwMjUtOTQzYy05MmU1ODdhMGU5YzYiLCJyb2xlIjoiU1RVREVOVCIsImlhdCI6MTc2NzIxNjkyOSwiZXhwIjoxNzY3MjI0MTI5fQ.tlkUR7GLAtdbJL4suUNV4EOu8LWkp-EYK6JmFfyUWeE",
+									"value": "{{token}}",
 									"type": "string"
 								}
 							]
@@ -2148,7 +2130,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"revieweeId\": \"uuid\",\n  \"rating\": 5,\n  \"comment\": \"string\"\n}",
+							"raw": "{\n  \"revieweeId\": \"866bc549-4533-4a9e-9c6a-7261802f3138\",\n  \"rating\": 5,\n  \"comment\": \"Super sprzedawca, monitor w świetnym stanie!\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2286,6 +2268,175 @@
 				}
 			],
 			"description": "## ⭐ Moduł Reviews\n\nModuł ten umożliwia budowanie systemu zaufania na platformie poprzez wystawianie i przeglądanie ocen użytkowników po zakończonych transakcjach.\n\n### 📜 Funkcjonalności\n\n- **Ocenianie**: Użytkownicy mogą wystawiać recenzje innym studentom (zarówno sprzedającym, jak i kupującym).\n    \n- **Transparentność**: Oceny są publiczne i wpływają na ogólny ranking użytkownika widoczny w jego profilu.\n    \n\n### ⚙️ Logika biznesowa\n\n- **Zakres ocen**: Skala ocen wynosi od 1 do 5 gwiazdek.\n    \n- **Ograniczenia**: System blokuje możliwość wystawienia oceny samemu sobie."
+		},
+		{
+			"name": "Notifications",
+			"item": [
+				{
+					"name": "Get notifications list",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/notifications",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"notifications"
+							]
+						},
+						"description": "Pobiera pełną listę powiadomień przypisanych do zalogowanego użytkownika.\n\n### 📋 Zwracane dane (200 OK)\n\nZwraca tablicę obiektów, zawierającą:\n\n- **`id`**: UUID powiadomienia.\n    \n- **`type`**: Typ zdarzenia (np. `BID_OUTBID`), służący do dobrania ikony.\n    \n- **`title`** / **`message`**: Treść powiadomienia.\n    \n- **`isRead`**: Flaga określająca, czy użytkownik już widział to powiadomienie.\n    \n- **`link`**: Opcjonalny URL (np. do strony licytowanego produktu).\n    \n\n### ⚙️ Logika działania\n\n- Lista jest posortowana malejąco po dacie utworzenia."
+					},
+					"response": []
+				},
+				{
+					"name": "Get unread count",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/notifications/unread-count",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"notifications",
+								"unread-count"
+							]
+						},
+						"description": "Lekki endpoint zwracający liczbę nieprzeczytanych powiadomień.\n\n### 📋 Zwracane dane (200 OK)\n\nObiekt JSON:\n\n- **`count`**: Liczba całkowita (integer).\n    \n\n### 💡 Zastosowanie (Frontend)\n\n- Ten endpoint powinien być odpytywany przy starcie aplikacji lub cyklicznie, aby wyświetlić \"badge\" (licznik) przy ikonie dzwonka w nawigacji.\n    \n\nResponse:\n\n``` json\n{ \"count\": 5 }\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Mark ALL read",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/notifications/mark-all-read",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"notifications",
+								"mark-all-read"
+							]
+						},
+						"description": "Oznacza wszystkie powiadomienia zalogowanego użytkownika jako przeczytane."
+					},
+					"response": []
+				},
+				{
+					"name": "Mark single read",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/notifications/:id/read",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"notifications",
+								":id",
+								"read"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "uuid-powiadomienia",
+									"description": "UUID powiadomienia"
+								}
+							]
+						},
+						"description": "Oznacza wszystkie powiadomienia zalogowanego użytkownika jako przeczytane (`isRead: true`).\n\n### ⚙️ Logika działania\n\n- Przydatne dla przycisku \"Oznacz wszystkie jako przeczytane\" na liście powiadomień.\n    \n- Operacja dotyczy tylko powiadomień, które miały status `isRead: false`."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete notification",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/notifications/:id",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"notifications",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "uuid-powiadomienia"
+								}
+							]
+						},
+						"description": "Zmienia status pojedynczego powiadomienia na przeczytane.\n\n### 📍 Parametry ścieżki (Path Variables)\n\n- **`id`**: UUID powiadomienia.\n    \n\n### ⚙️ Logika działania\n\n- Wywoływane zazwyczaj w momencie kliknięcia w konkretne powiadomienie lub jego rozwinięcia.\n    \n- Jeśli powiadomienie nie należy do użytkownika, zwraca błąd `404 Not Found` (ze względów bezpieczeństwa)."
+					},
+					"response": []
+				}
+			],
+			"description": "## 🔔 Moduł Notifications\n\nModuł ten odpowiada za system powiadomień wewnątrz aplikacji, informując użytkownika o ważnych zdarzeniach, takich jak przebicie oferty w licytacji, zakończenie aukcji czy wiadomości systemowe.\n\n### 📜 Funkcjonalności\n\n- **Centrum powiadomień**: Pobieranie listy historycznych zdarzeń.\n    \n- **Status przeczytania**: Zarządzanie flagą `isRead` (pojedynczo lub grupowo).\n    \n- **Licznik (Badge)**: Szybki endpoint do pobierania liczby nieprzeczytanych wiadomości (dla \"czerwonej kropki\" na dzwoneczku).\n    \n\n### ⚙️ Logika biznesowa\n\n- **Sortowanie**: Powiadomienia są zawsze zwracane chronologicznie od najnowszych (`createdAt: desc`).\n    \n- **Typy powiadomień**: Frontend powinien obsługiwać różne typy (pole `type`), np. `BID_OUTBID`, `AUCTION_WON`, `SYSTEM`, aby wyświetlić odpowiednie ikony."
 		}
 	],
 	"event": [

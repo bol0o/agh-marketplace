@@ -108,3 +108,25 @@ export const deleteNotification = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ error: "Błąd podczas usuwania powiadomienia" });
   }
 };
+
+// GET /api/notifications/unread-count
+export const getUnreadCount = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) return res.status(401).json({ error: "Brak autoryzacji" });
+
+    const count = await prisma.notification.count({
+      where: {
+        userId,
+        isRead: false,
+      },
+    });
+
+    res.json({ count });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: "Błąd podczas pobierania liczby powiadomień" });
+  }
+};
