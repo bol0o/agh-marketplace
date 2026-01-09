@@ -38,7 +38,7 @@ export const getProducts = async (req: AuthRequest, res: Response) => {
   try {
     // 1. Pagination Params
     const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 10;
+    const limit = parseInt(req.query.limit as string) || 24;
     const skip = (page - 1) * limit;
 
     const {
@@ -84,11 +84,9 @@ export const getProducts = async (req: AuthRequest, res: Response) => {
       const userId = req.user?.userId;
 
       if (!userId) {
-        return res
-          .status(401)
-          .json({
-            error: "Musisz być zalogowany, aby filtrować po obserwowanych",
-          });
+        return res.status(401).json({
+          error: "Musisz być zalogowany, aby filtrować po obserwowanych",
+        });
       }
 
       // Get list of followed user IDs
@@ -103,9 +101,26 @@ export const getProducts = async (req: AuthRequest, res: Response) => {
 
     // 4. Sorting Logic
     let orderBy: any = { createdAt: "desc" };
-    if (sort === "price_asc") orderBy = { price: "asc" };
-    if (sort === "price_desc") orderBy = { price: "desc" };
-    if (sort === "views") orderBy = { views: "desc" };
+
+    switch (sort) {
+      case "price_asc":
+        orderBy = { price: "asc" };
+        break;
+      case "price_desc":
+        orderBy = { price: "desc" };
+        break;
+      case "views_desc":
+        orderBy = { views: "desc" };
+        break;
+      case "name_asc":
+        orderBy = { title: "asc" };
+        break;
+      case "name_desc":
+        orderBy = { title: "desc" };
+        break;
+      default:
+        orderBy = { createdAt: "desc" };
+    }
 
     // 5. Database Transaction: Fetch Data + Count Total
     const [products, total] = await prisma.$transaction([
@@ -130,13 +145,13 @@ export const getProducts = async (req: AuthRequest, res: Response) => {
 
     // 6. Return Data with Pagination Metadata
     res.json({
-      data: products.map(mapProduct),
       pagination: {
-        total,
-        page,
-        limit,
+        totalItems: total,
         totalPages: Math.ceil(total / limit),
+        currentPage: page,
+        itemsPerPage: limit,
       },
+      products: products.map(mapProduct),
     });
   } catch (error) {
     console.error(error);
