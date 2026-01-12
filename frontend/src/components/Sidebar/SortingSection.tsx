@@ -5,7 +5,14 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowUpDown } from 'lucide-react';
 import styles from './SortingSection.module.scss';
 
-type SortOption = 'price_asc' | 'price_desc' | 'name_asc' | 'name_desc' | 'newest' | 'date_desc';
+type SortOption =
+	| 'price_asc'
+	| 'price_desc'
+	| 'name_asc'
+	| 'name_desc'
+	| 'newest'
+	| 'date_desc'
+	| 'views_desc';
 
 interface SortingSectionProps {
 	isMobile?: boolean;
@@ -36,6 +43,7 @@ export default function SortingSection({
 		{ value: 'price_desc', label: 'Cena: malejąco' },
 		{ value: 'name_asc', label: 'Nazwa: A-Z' },
 		{ value: 'name_desc', label: 'Nazwa: Z-A' },
+		{ value: 'views_desc', label: 'Wyświetlenia: malejąco' },
 	];
 
 	const handleSortChange = (value: SortOption) => {

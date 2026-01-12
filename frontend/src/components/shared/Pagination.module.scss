@@ -1,0 +1,115 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.pagination {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 16px;
+	flex-wrap: wrap;
+
+	@include sm {
+		gap: 24px;
+	}
+}
+
+.navButton {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 10px 16px;
+	background-color: $color-white;
+	border: 1px solid $color-border;
+	border-radius: 8px;
+	font-size: 0.875rem;
+	font-weight: 600;
+	color: $color-text;
+	cursor: pointer;
+	transition: all 0.2s;
+
+	&:hover:not(:disabled) {
+		border-color: $color-primary;
+		color: $color-primary;
+		transform: translateY(-1px);
+	}
+
+	&:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+
+	&.prevButton {
+		order: 1;
+
+		@include sm {
+			order: 1;
+		}
+	}
+
+	&.nextButton {
+		order: 3;
+
+		@include sm {
+			order: 3;
+		}
+	}
+}
+
+.navText {
+	display: none;
+
+	@include sm {
+		display: inline;
+	}
+}
+
+.pageNumbers {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	order: 2;
+
+	@include sm {
+		gap: 12px;
+	}
+}
+
+.pageButton {
+	width: 40px;
+	height: 40px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: $color-white;
+	border: 1px solid $color-border;
+	border-radius: 8px;
+	font-size: 0.875rem;
+	font-weight: 600;
+	color: $color-text;
+	cursor: pointer;
+	transition: all 0.2s;
+
+	&:hover:not(.active) {
+		border-color: $color-primary;
+		color: $color-primary;
+		transform: translateY(-1px);
+	}
+
+	&.active {
+		background-color: $color-primary;
+		border-color: $color-primary;
+		color: $color-white;
+		font-weight: 700;
+		box-shadow: 0 4px 12px rgba($color-primary, 0.2);
+	}
+}
+
+.dots {
+	width: 40px;
+	height: 40px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: $color-text-lighter;
+	font-weight: 600;
+}

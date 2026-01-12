@@ -1,17 +1,15 @@
 import { Header } from '@/components/Header/index';
 import { Sidebar } from '@/components/Sidebar';
-// import { Sidebar } from '@/components/Sidebar/index';
-// import styles from './DashboardLayout.module.scss';
+import styles from './DashboardLayout.module.scss';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
 	return (
-		<div>
+		<>
 			<Header />
-
-			<div>
+			<div className={styles.container}>
 				<Sidebar />
-				<main>{children}</main>
+				<main className={styles.mainContent}>{children}</main>
 			</div>
-		</div>
+		</>
 	);
 }
