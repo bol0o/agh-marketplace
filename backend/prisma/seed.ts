@@ -19,12 +19,23 @@ async function main() {
     );
   }
 
-  //CLEAR DATABASE
+  /// CLEAR DATABASE
+  console.log("Cleaning database...");
+
+  await prisma.report.deleteMany();
+  await prisma.notification.deleteMany();
+  await prisma.message.deleteMany();
+  await prisma.bid.deleteMany();
   await prisma.review.deleteMany();
+  await prisma.follow.deleteMany();
+
+  await prisma.chat.deleteMany();
   await prisma.cartItem.deleteMany();
-  await prisma.cart.deleteMany();
   await prisma.orderItem.deleteMany();
+
+  await prisma.cart.deleteMany();
   await prisma.order.deleteMany();
+
   await prisma.product.deleteMany();
   await prisma.user.deleteMany();
 

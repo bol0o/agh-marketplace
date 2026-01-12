@@ -33,11 +33,15 @@ const mapProduct = (p: any) => ({
   endsAt: p.auctionEnd,
 });
 
-// GET /api/products (Filtering & Pagination)
-export const getProducts = async (req: Request, res: Response) => {
+// GET /api/products (With Pagination, Filtering & Social Feed logic)
+export const getProducts = async (req: AuthRequest, res: Response) => {
   try {
+    // 1. Pagination Params
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 24;
+    const skip = (page - 1) * limit;
+
     const {
-      page = 1,
       search,
       cat,
       minPrice,
@@ -45,11 +49,14 @@ export const getProducts = async (req: Request, res: Response) => {
       sort,
       status,
       location,
+      onlyFollowed, //social feed
     } = req.query;
 
-    const where: any = {};
+    const where: any = {
+      status: "active", // Default: show only active products
+    };
 
-    // 1. Build Filter Query
+    // 2. Build Search Filters
     if (search) {
       where.OR = [
         { title: { contains: String(search), mode: "insensitive" } },
@@ -64,47 +71,88 @@ export const getProducts = async (req: Request, res: Response) => {
       if (minPrice) where.price.gte = Number(minPrice);
       if (maxPrice) where.price.lte = Number(maxPrice);
     }
-
     if (status) {
       if (status === "auction") where.isAuction = true;
       if (status === "buy_now") where.isAuction = false;
     }
-
-    where.status = "active";
-
     if (location) {
       where.location = { contains: String(location), mode: "insensitive" };
     }
 
-    // 2. Sorting
+    // 3. Social Feed Logic (Filter by followed users)
+    if (onlyFollowed === "true") {
+      const userId = req.user?.userId;
+
+      if (!userId) {
+        return res.status(401).json({
+          error: "Musisz być zalogowany, aby filtrować po obserwowanych",
+        });
+      }
+
+      // Get list of followed user IDs
+      const following = await prisma.follow.findMany({
+        where: { followerId: userId },
+        select: { followingId: true },
+      });
+      const followingIds = following.map((f) => f.followingId);
+
+      where.sellerId = { in: followingIds };
+    }
+
+    // 4. Sorting Logic
     let orderBy: any = { createdAt: "desc" };
-    if (sort === "price_asc") orderBy = { price: "asc" };
-    if (sort === "price_desc") orderBy = { price: "desc" };
-    if (sort === "views") orderBy = { views: "desc" };
 
-    // 3. Pagination
-    const take = 20;
-    const skip = (Number(page) - 1) * take;
+    switch (sort) {
+      case "price_asc":
+        orderBy = { price: "asc" };
+        break;
+      case "price_desc":
+        orderBy = { price: "desc" };
+        break;
+      case "views_desc":
+        orderBy = { views: "desc" };
+        break;
+      case "name_asc":
+        orderBy = { title: "asc" };
+        break;
+      case "name_desc":
+        orderBy = { title: "desc" };
+        break;
+      default:
+        orderBy = { createdAt: "desc" };
+    }
 
-    // 4. Fetch
-    const products = await prisma.product.findMany({
-      where,
-      orderBy,
-      take,
-      skip,
-      include: {
-        seller: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            avatarUrl: true,
+    // 5. Database Transaction: Fetch Data + Count Total
+    const [products, total] = await prisma.$transaction([
+      prisma.product.findMany({
+        where,
+        orderBy,
+        take: limit,
+        skip,
+        include: {
+          seller: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              avatarUrl: true,
+            },
           },
         },
-      },
-    });
+      }),
+      prisma.product.count({ where }),
+    ]);
 
-    res.json(products.map(mapProduct));
+    // 6. Return Data with Pagination Metadata
+    res.json({
+      pagination: {
+        totalItems: total,
+        totalPages: Math.ceil(total / limit),
+        currentPage: page,
+        itemsPerPage: limit,
+      },
+      products: products.map(mapProduct),
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Błąd podczas pobierania produktów" });

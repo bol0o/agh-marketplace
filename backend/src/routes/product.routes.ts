@@ -6,7 +6,7 @@ import {
   updateProduct,
   deleteProduct,
 } from "../controllers/product.controller";
-import { authenticateToken } from "../middleware/auth.middleware";
+import { authenticateToken, optionalAuth } from "../middleware/auth.middleware";
 import { validate } from "../middleware/validate.middleware";
 import {
   createProductSchema,
@@ -16,7 +16,7 @@ import {
 const router = Router();
 
 // Public Routes
-router.get("/", getProducts); // GET /api/products
+router.get("/", optionalAuth, getProducts); // GET /api/products
 router.get("/:id", getProductById); // GET /api/products/:id
 
 // Protected Routes

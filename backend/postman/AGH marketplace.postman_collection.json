@@ -919,31 +919,6 @@
 					]
 				},
 				{
-					"name": "Get social feed",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer <access_token>"
-							}
-						],
-						"url": {
-							"raw": "{{baseURL}}/api/social/feed",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"social",
-								"feed"
-							]
-						},
-						"description": "Pobiera listę produktów wystawionych przez użytkowników, których aktualnie śledzi zalogowany student.\n\n### 📋 Zwracane dane (200 OK)\n\n- Zwraca tablicę obiektów produktów (analogiczną do głównej listy `/products`), ale ograniczoną do śledzonych sprzedawców.\n    \n\n### ⚙️ Logika działania\n\n- **Personalizacja**: Pozwala na szybki dostęp do ofert od zaufanych sprzedawców.\n    \n- **Sortowanie**: Produkty domyślnie wyświetlane są od najnowszych do najstarszych."
-					},
-					"response": []
-				},
-				{
 					"name": "Get user profile",
 					"request": {
 						"auth": {
@@ -1191,41 +1166,6 @@
 			"name": "Admin",
 			"item": [
 				{
-					"name": "Get all users",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer <access_token>"
-							}
-						],
-						"url": {
-							"raw": "{{baseURL}}/api/admin/users",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"api",
-								"admin",
-								"users"
-							]
-						},
-						"description": "Pobiera kompletną listę wszystkich zarejestrowanych użytkowników marketplace.\n\n### 📋 Zwracane dane (200 OK)\n\nZwraca tablicę obiektów użytkowników zawierającą:\n\n- Pełne dane profilowe (email, studentId, rola).\n    \n- Status aktywności konta (`isActive`).\n    \n- Liczniki powiązanych rekordów (liczba wystawionych produktów, zamówień).\n    \n\n### ⚙️ Logika działania\n\n- Pozwala administratorom na szybki przegląd bazy studentów i wyszukiwanie kont wymagających moderacji."
-					},
-					"response": []
-				},
-				{
 					"name": "Update user status",
 					"request": {
 						"method": "PATCH",
@@ -1292,6 +1232,51 @@
 							]
 						},
 						"description": "Zwraca globalne statystyki dotyczące wydajności i aktywności na platformie.\n\n### 📋 Zwracane dane (200 OK)\n\nZestawienie liczbowe obejmujące:\n\n- **Użytkownicy**: Całkowita liczba kont, liczba aktywnych licytantów.\n    \n- **Produkty**: Suma aktywnych ogłoszeń i licytacji.\n    \n- **Finanse**: Całkowity obrót (revenue) wygenerowany na platformie.\n    \n\n### ⚙️ Logika działania\n\n- Dane te służą do zasilania dashboardu administratora, prezentując aktualny stan ekosystemu AGH Marketplace."
+					},
+					"response": []
+				},
+				{
+					"name": "Get all users",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer <access_token>"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/api/admin/users?page=1&limit=10",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"users"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Pobiera listę wszystkich zarejestrowanych użytkowników (paginowana).\n\n### 🔍 Parametry Query\n\n- **`page`**: Numer strony (domyślnie 1).\n    \n- **`limit`**: Ilość wyników na stronę (domyślnie 20).\n    \n\n### 📋 Zwracane dane (200 OK)\n\nZwraca listę studentów wraz z metadanymi paginacji.\n\n``` json\n{\n  \"data\": [\n    {\n      \"id\": \"uuid...\",\n      \"email\": \"student@agh.edu.pl\",\n      \"role\": \"STUDENT\",\n      \"_count\": { \"products\": 5, \"orders\": 1 }\n    }\n  ],\n  \"pagination\": {\n    \"total\": 150,\n    \"page\": 1,\n    \"limit\": 20,\n    \"totalPages\": 8\n  }\n}\n\n ```"
 					},
 					"response": []
 				}
@@ -1416,10 +1401,7 @@
 									}
 								},
 								"url": {
-									"raw": "{{baseURL}}/api/auth/login",
-									"host": [
-										"{{baseURL}}"
-									],
+									"raw": "/api/auth/login",
 									"path": [
 										"api",
 										"auth",
@@ -1575,7 +1557,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseURL}}/api/products?search=Gamingowy",
+							"raw": "{{baseURL}}/api/products?search=Gamingowy&page=1&limit=10&onlyFollowed=false",
 							"host": [
 								"{{baseURL}}"
 							],
@@ -1587,10 +1569,22 @@
 								{
 									"key": "search",
 									"value": "Gamingowy"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "onlyFollowed",
+									"value": "false"
 								}
 							]
 						},
-						"description": "Pobiera listę dostępnych produktów z możliwością filtrowania i wyszukiwania.\n\n### 🔍 Parametry Query\n\n- **`search`**: Słowo kluczowe wyszukiwane w tytule lub opisie (np. \"Gamingowy\").\n    \n- **`cat`**: Filtrowanie po kategorii (BOOKS, ELECTRONICS, ACCESSORIES, CLOTHING, OTHER).\n    \n- **`minPrice`** **/ **`maxPrice`**: Zakres cenowy.\n    \n- **`status`**: Filtrowanie po typie oferty (`auction` lub `buy_now`).\n    \n\n### 📋 Zwracane dane (200 OK)\n\nZwraca tablicę obiektów produktów zawierającą podstawowe informacje, dane sprzedawcy oraz statystyki wyświetleń."
+						"description": "Pobiera listę produktów z pełną obsługą filtrów, paginacji oraz feedu społecznościowego.\n\n### 🔍 Parametry Query\n\n- **`page`**: Numer strony (domyślnie 1).\n    \n- **`limit`**: Ilość wyników na stronę (domyślnie 10).\n    \n- **`search`**: Wyszukiwanie w nazwie/opisie.\n    \n- **`cat`**: Kategoria.\n    \n- **`minPrice`** **/** **`maxPrice`**: Zakres cen.\n    \n- **`onlyFollowed`**: `true`/`false`. Jeśli `true`, zwraca tylko oferty od obserwowanych użytkowników (wymaga tokena!).\n    \n\n### 📋 Zwracane dane (200 OK)\n\nStruktura odpowiedzi (obiekt z `data` i `pagination`).\n\n``` json\n{\n  \"data\": [\n    {\n      \"id\": \"uuid...\",\n      \"title\": \"Laptop\",\n      \"price\": 2500,\n      \"seller\": { \"name\": \"Jan\", \"avatar\": \"...\" }\n    }\n  ],\n  \"pagination\": {\n    \"total\": 50,\n    \"page\": 1,\n    \"limit\": 10,\n    \"totalPages\": 5\n  }\n}\n\n ```"
 					},
 					"response": []
 				},
