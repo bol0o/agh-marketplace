@@ -42,9 +42,7 @@ async function main() {
   console.log("Database cleared.");
 
   //HASH PASSWORDS FROM ENV
-  //Password for regular students
   const studentPassword = await bcrypt.hash(rawStudentPass, 10);
-  //Password for Admins/Team
   const adminPassword = await bcrypt.hash(rawAdminPass, 10);
 
   //Create Lecturer Account (Admin)
@@ -143,6 +141,46 @@ async function main() {
         imageUrl: `https://placehold.co/600x400/png?text=${imageText}+${i}`,
         sellerId: randomUser.id,
         createdAt: faker.date.past(),
+        views: faker.number.int({ min: 0, max: 500 }),
+      },
+    });
+  }
+
+  //notifications
+  console.log("Seeding notifications...");
+
+  for (const user of users) {
+    await prisma.notification.create({
+      data: {
+        userId: user.id,
+        type: "SYSTEM",
+        title: "Witaj w AGH Marketplace!",
+        message:
+          "Cieszymy się, że dołączyłeś do naszej społeczności. Uzupełnij profil, aby zacząć sprzedawać.",
+        isRead: true,
+        createdAt: faker.date.past({ years: 1 }),
+      },
+    });
+
+    await prisma.notification.create({
+      data: {
+        userId: user.id,
+        type: "FOLLOW",
+        title: "Ktoś Cię obserwuje!",
+        message: "Użytkownik z Twojego wydziału zaczął obserwować Twój profil.",
+        isRead: false,
+        createdAt: faker.date.recent({ days: 2 }),
+      },
+    });
+
+    await prisma.notification.create({
+      data: {
+        userId: user.id,
+        type: "OFFER",
+        title: "Nowa oferta w kategorii Elektronika",
+        message: "Sprawdź nowe laptopy dodane przez studentów WIEiT.",
+        isRead: Math.random() > 0.5,
+        createdAt: faker.date.recent({ days: 5 }),
       },
     });
   }
