@@ -259,6 +259,19 @@ export const updateProduct = async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     const userId = req.user?.userId;
 
+    const {
+      title,
+      description,
+      price,
+      category,
+      condition,
+      location,
+      imageUrl,
+      stock,
+      isAuction,
+      auctionEnd,
+    } = req.body;
+
     // Check ownership
     const existing = await prisma.product.findUnique({ where: { id } });
     if (!existing || existing.sellerId !== userId) {
@@ -269,7 +282,20 @@ export const updateProduct = async (req: AuthRequest, res: Response) => {
 
     const updated = await prisma.product.update({
       where: { id },
-      data: req.body,
+      data: {
+        title,
+        description,
+        category,
+        condition,
+        location,
+        imageUrl,
+
+        price: price ? Number(price) : undefined,
+        stock: stock ? Number(stock) : undefined,
+
+        isAuction: isAuction !== undefined ? Boolean(isAuction) : undefined,
+        auctionEnd: auctionEnd ? new Date(auctionEnd) : undefined,
+      },
       include: {
         seller: {
           select: {
@@ -284,6 +310,7 @@ export const updateProduct = async (req: AuthRequest, res: Response) => {
 
     res.json(mapProduct(updated));
   } catch (error) {
+    console.error("Update error:", error);
     res.status(500).json({ error: "Failed to update product" });
   }
 };
