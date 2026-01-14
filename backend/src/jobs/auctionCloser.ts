@@ -1,5 +1,5 @@
 import cron from "node-cron";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, NotificationType } from "@prisma/client"; // <--- Import Enum
 
 const prisma = new PrismaClient();
 
@@ -11,12 +11,12 @@ export const startAuctionJob = () => {
     try {
       const now = new Date();
 
-      //Find all auctions that have ended and are still open
+      // Find all auctions that have ended and are still open
       const expiredAuctions = await prisma.product.findMany({
         where: {
           isAuction: true,
           auctionEnd: {
-            lte: now, //date of end is in the past
+            lte: now, // date of end is in the past
           },
           isAuctionClosed: false,
         },
@@ -37,9 +37,9 @@ export const startAuctionJob = () => {
 
       console.log(`Found ${expiredAuctions.length} expired auctions.`);
 
-      //Process each expired auction
+      // Process each expired auction
       for (const product of expiredAuctions) {
-        //use transaction to ensure notification and auction closing happen together or neither od them happen
+        // Use transaction to ensure notification and auction closing happen together or neither of them happen
         await prisma.$transaction(async (tx) => {
           const winnerBid = product.bids[0];
 
@@ -52,8 +52,10 @@ export const startAuctionJob = () => {
             await tx.notification.create({
               data: {
                 userId: winnerBid.userId,
-                type: "AUCTION_WON",
-                message: `Congratulations! You have won the auction for product "${product.title}" with a bid of ${winnerBid.amount}.`,
+                type: NotificationType.BID,
+                title: "Wygrałeś aukcję!",
+                message: `Gratulacje! Wygrałeś aukcję produktu "${product.title}" z ofertą ${winnerBid.amount} PLN.`,
+                isRead: false,
               },
             });
 
@@ -61,8 +63,10 @@ export const startAuctionJob = () => {
             await tx.notification.create({
               data: {
                 userId: product.sellerId,
-                type: "AUCTION_ENDED",
-                message: `Your auction for product "${product.title}" has ended. The winning bid is ${winnerBid.amount}.`,
+                type: NotificationType.BID,
+                title: "Aukcja zakończona sukcesem",
+                message: `Twoja aukcja produktu "${product.title}" zakończyła się. Wygrywająca oferta: ${winnerBid.amount} PLN.`,
+                isRead: false,
               },
             });
           } else {
@@ -74,13 +78,15 @@ export const startAuctionJob = () => {
             await tx.notification.create({
               data: {
                 userId: product.sellerId,
-                type: "AUCTION_FAILED",
-                message: `Your auction for product "${product.title}" has ended with no bids.`,
+                type: NotificationType.BID,
+                title: "Aukcja zakończona bez ofert",
+                message: `Twoja aukcja produktu "${product.title}" zakończyła się bez złożonych ofert.`,
+                isRead: false,
               },
             });
           }
 
-          // D. Mark the auction as closed (ACHTUNG)
+          // D. Mark the auction as closed
           await tx.product.update({
             where: { id: product.id },
             data: { isAuctionClosed: true },
