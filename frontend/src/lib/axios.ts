@@ -48,18 +48,20 @@ api.interceptors.response.use(
 	async (error: AxiosError) => {
 		const originalRequest = error.config as CustomAxiosRequestConfig;
 
-		if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
-			if (originalRequest.url?.includes('/auth/login')) {
+		const status = error.response?.status;
+		if ((status === 401 || status === 403) && originalRequest && !originalRequest._retry) {
+			if (
+				originalRequest.url?.includes('/auth/login') ||
+				originalRequest.url?.includes('/auth/refresh')
+			) {
 				return Promise.reject(error);
 			}
 
 			if (isRefreshing) {
-				return new Promise<AxiosResponse>((resolve, reject) => {
+				return new Promise((resolve, reject) => {
 					failedQueue.push({
 						resolve: (token: string) => {
-							if (originalRequest.headers) {
-								originalRequest.headers.Authorization = 'Bearer ' + token;
-							}
+							originalRequest.headers.Authorization = `Bearer ${token}`;
 							resolve(api(originalRequest));
 						},
 						reject: (err: unknown) => reject(err),
@@ -72,27 +74,25 @@ api.interceptors.response.use(
 
 			try {
 				const refreshToken = Cookies.get('refreshToken');
-				if (!refreshToken) throw new Error('Brak refresh tokena');
+				if (!refreshToken) throw new Error('No refresh token');
 
 				const { data } = await axios.post<RefreshResponse>(`${BASE_URL}/auth/refresh`, {
 					token: refreshToken,
 				});
 
 				const newAccessToken = data.accessToken;
-
 				const isProduction = process.env.NODE_ENV === 'production';
+
 				Cookies.set('accessToken', newAccessToken, {
 					secure: isProduction,
 					sameSite: 'strict',
 				});
 
-				api.defaults.headers.common['Authorization'] = 'Bearer ' + newAccessToken;
+				api.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`;
 
 				processQueue(null, newAccessToken);
 
-				if (originalRequest.headers) {
-					originalRequest.headers.Authorization = 'Bearer ' + newAccessToken;
-				}
+				originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
 
 				return api(originalRequest);
 			} catch (refreshError: unknown) {
@@ -100,12 +100,10 @@ api.interceptors.response.use(
 
 				Cookies.remove('accessToken');
 				Cookies.remove('refreshToken');
-				Cookies.remove('userRole');
 
 				if (typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
 					window.location.href = '/login';
 				}
-
 				return Promise.reject(refreshError);
 			} finally {
 				isRefreshing = false;
@@ -115,5 +113,4 @@ api.interceptors.response.use(
 		return Promise.reject(error);
 	}
 );
-
 export default api;
