@@ -1,11 +1,11 @@
 import { Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, NotificationType } from "@prisma/client";
 import { AuthRequest } from "../middleware/auth.middleware";
 import { getIO } from "../socket";
 
 const prisma = new PrismaClient();
 
-//place a bid on product
+// place a bid on product
 export const placeBid = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
@@ -15,7 +15,7 @@ export const placeBid = async (req: AuthRequest, res: Response) => {
       return res.status(401).json({ message: "Nieautoryzowany dostęp" });
     }
 
-    //1. fetch product to check rules
+    // 1. fetch product to check rules
     const product = await prisma.product.findUnique({
       where: { id: productId },
       include: { bids: { orderBy: { amount: "desc" }, take: 1 } },
@@ -25,37 +25,38 @@ export const placeBid = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ message: "Produkt nie istnieje" });
     }
 
-    //check if it's an auction
+    // check if it's an auction
     if (!product.isAuction) {
       return res
         .status(400)
         .json({ message: "Ten produkt nie jest na aukcji" });
     }
 
-    //check if auction ended
+    // check if auction ended
     if (product.auctionEnd && new Date() > product.auctionEnd) {
       return res
         .status(400)
         .json({ message: "Aukcja dla tego produktu już się zakończyła" });
     }
 
-    //prevent self bidding
+    // prevent self bidding
     if (product.sellerId === userId) {
       return res
         .status(400)
         .json({ message: "Nie możesz licytować własnego produktu" });
     }
 
-    //check bid amount logic
-    const currentHighest = product.bids[0]?.amount || product.price;
+    // check bid amount logic
+    const currentHighestBid = product.bids[0];
+    const currentHighestAmount = currentHighestBid?.amount || product.price;
 
-    if (amount <= currentHighest) {
+    if (amount <= currentHighestAmount) {
       return res.status(400).json({
-        message: `Twoja oferta musi być wyższa niż aktualna najwyższa oferta: ${currentHighest} PLN`,
+        message: `Twoja oferta musi być wyższa niż aktualna najwyższa oferta: ${currentHighestAmount} PLN`,
       });
     }
 
-    //2. create bid
+    // 2. create bid
     const bid = await prisma.bid.create({
       data: {
         userId,
@@ -64,7 +65,31 @@ export const placeBid = async (req: AuthRequest, res: Response) => {
       },
     });
 
-    //Socket
+    // Notify the Seller
+    await prisma.notification.create({
+      data: {
+        userId: product.sellerId,
+        type: NotificationType.BID,
+        title: "Nowa oferta licytacji",
+        message: `Ktoś zaoferował ${amount} PLN za Twój produkt "${product.title}".`,
+        isRead: false,
+      },
+    });
+
+    // Notify the previous highest bidder (You have been outbid)
+    if (currentHighestBid && currentHighestBid.userId !== userId) {
+      await prisma.notification.create({
+        data: {
+          userId: currentHighestBid.userId,
+          type: NotificationType.BID,
+          title: "Zostałeś przelicytowany!",
+          message: `Ktoś przebił Twoją ofertę w aukcji "${product.title}". Nowa kwota: ${amount} PLN.`,
+          isRead: false,
+        },
+      });
+    }
+
+    // Socket
     try {
       const io = getIO();
       // send event to all in auction room about new bid
@@ -82,7 +107,7 @@ export const placeBid = async (req: AuthRequest, res: Response) => {
   }
 };
 
-//get bids for a product
+// get bids for a product
 export const getBidsForProduct = async (req: AuthRequest, res: Response) => {
   try {
     const { productId } = req.params;

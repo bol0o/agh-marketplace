@@ -49,7 +49,8 @@ export const getProducts = async (req: AuthRequest, res: Response) => {
       sort,
       status,
       location,
-      onlyFollowed, //social feed
+      condition,
+      onlyFollowed,
     } = req.query;
 
     const where: any = {
@@ -66,6 +67,11 @@ export const getProducts = async (req: AuthRequest, res: Response) => {
     if (cat) {
       where.category = String(cat).toUpperCase();
     }
+    // Filter by Condition (e.g., 'new', 'used')
+    if (condition) {
+      where.condition = String(condition);
+    }
+
     if (minPrice || maxPrice) {
       where.price = {};
       if (minPrice) where.price.gte = Number(minPrice);
@@ -85,7 +91,7 @@ export const getProducts = async (req: AuthRequest, res: Response) => {
 
       if (!userId) {
         return res.status(401).json({
-          error: "Musisz być zalogowany, aby filtrować po obserwowanych",
+          error: "You must be logged in to filter by followed users",
         });
       }
 
@@ -117,6 +123,12 @@ export const getProducts = async (req: AuthRequest, res: Response) => {
         break;
       case "name_desc":
         orderBy = { title: "desc" };
+        break;
+      case "createdAt_asc":
+        orderBy = { createdAt: "asc" };
+        break;
+      case "createdAt_desc":
+        orderBy = { createdAt: "desc" };
         break;
       default:
         orderBy = { createdAt: "desc" };
@@ -155,7 +167,7 @@ export const getProducts = async (req: AuthRequest, res: Response) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Błąd podczas pobierania produktów" });
+    res.status(500).json({ error: "Error fetching products" });
   }
 };
 
@@ -182,7 +194,7 @@ export const getProductById = async (req: Request, res: Response) => {
 
     res.json(mapProduct(product));
   } catch (error) {
-    res.status(404).json({ error: "Produkt nie został znaleziony" });
+    res.status(404).json({ error: "Product not found" });
   }
 };
 
@@ -190,7 +202,7 @@ export const getProductById = async (req: Request, res: Response) => {
 export const createProduct = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
-    if (!userId) return res.status(401).json({ error: "Brak autoryzacji" });
+    if (!userId) return res.status(401).json({ error: "Unauthorized" });
 
     const {
       title,
@@ -237,7 +249,7 @@ export const createProduct = async (req: AuthRequest, res: Response) => {
     res.status(201).json(mapProduct(product));
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Nie udało się utworzyć produktu" });
+    res.status(500).json({ error: "Failed to create product" });
   }
 };
 
@@ -252,7 +264,7 @@ export const updateProduct = async (req: AuthRequest, res: Response) => {
     if (!existing || existing.sellerId !== userId) {
       return res
         .status(403)
-        .json({ error: "Możesz edytować tylko własne produkty" });
+        .json({ error: "You can only edit your own products" });
     }
 
     const updated = await prisma.product.update({
@@ -272,7 +284,7 @@ export const updateProduct = async (req: AuthRequest, res: Response) => {
 
     res.json(mapProduct(updated));
   } catch (error) {
-    res.status(500).json({ error: "Nie udało się zaktualizować produktu" });
+    res.status(500).json({ error: "Failed to update product" });
   }
 };
 
@@ -285,19 +297,19 @@ export const deleteProduct = async (req: AuthRequest, res: Response) => {
 
     const product = await prisma.product.findUnique({ where: { id } });
     if (!product)
-      return res.status(404).json({ error: "Produkt nie istnieje" });
+      return res.status(404).json({ error: "Product does not exist" });
 
     // Allow owner OR admin to delete
     if (product.sellerId !== userId && role !== "ADMIN") {
       return res
         .status(403)
-        .json({ error: "Brak uprawnień do usunięcia tego produktu" });
+        .json({ error: "Unauthorized to delete this product" });
     }
 
     await prisma.product.delete({ where: { id } });
 
-    res.json({ message: "Produkt został usunięty" });
+    res.json({ message: "Product deleted successfully" });
   } catch (error) {
-    res.status(500).json({ error: "Nie udało się usunąć produktu" });
+    res.status(500).json({ error: "Failed to delete product" });
   }
 };

@@ -1,5 +1,5 @@
 import "dotenv/config"; // 1. Load env vars first
-import { PrismaClient, Role, Category } from "@prisma/client";
+import { PrismaClient, Role, Category, NotificationType } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { fakerPL as faker } from "@faker-js/faker";
 
@@ -150,22 +150,23 @@ async function main() {
   console.log("Seeding notifications...");
 
   for (const user of users) {
+    // 1. SYSTEM
     await prisma.notification.create({
       data: {
         userId: user.id,
-        type: "SYSTEM",
+        type: NotificationType.SYSTEM,
         title: "Witaj w AGH Marketplace!",
-        message:
-          "Cieszymy się, że dołączyłeś do naszej społeczności. Uzupełnij profil, aby zacząć sprzedawać.",
+        message: "Cieszymy się, że dołączyłeś do naszej społeczności.",
         isRead: true,
         createdAt: faker.date.past({ years: 1 }),
       },
     });
 
+    // 2. FOLLOW
     await prisma.notification.create({
       data: {
         userId: user.id,
-        type: "FOLLOW",
+        type: NotificationType.FOLLOW,
         title: "Ktoś Cię obserwuje!",
         message: "Użytkownik z Twojego wydziału zaczął obserwować Twój profil.",
         isRead: false,
@@ -173,10 +174,11 @@ async function main() {
       },
     });
 
+    // 3. OFFER
     await prisma.notification.create({
       data: {
         userId: user.id,
-        type: "OFFER",
+        type: NotificationType.OFFER,
         title: "Nowa oferta w kategorii Elektronika",
         message: "Sprawdź nowe laptopy dodane przez studentów WIEiT.",
         isRead: Math.random() > 0.5,

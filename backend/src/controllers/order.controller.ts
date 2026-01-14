@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, NotificationType } from "@prisma/client"; // <--- Added NotificationType
 import { AuthRequest } from "../middleware/auth.middleware";
 
 const prisma = new PrismaClient();
@@ -35,7 +35,7 @@ const formatOrderResponse = (order: any) => {
       },
     })),
 
-    paymentId: "mock_payment_id", // Placeholder
+    paymentId: "mock_payment_id",
   };
 };
 
@@ -66,7 +66,7 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
 
     // 3. Transaction
     const order = await prisma.$transaction(async (tx) => {
-      //stock logic
+      // stock logic & notify sellers logic preparation
       for (const item of cart.items) {
         const product = await tx.product.findUnique({
           where: { id: item.productId },
@@ -87,6 +87,20 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
             status: product.stock - item.quantity === 0 ? "SOLD" : "active",
           },
         });
+
+        // Notify the seller that their product has been sold
+        if (product.sellerId !== userId) {
+          // Don't notify if buying own product
+          await tx.notification.create({
+            data: {
+              userId: product.sellerId,
+              type: NotificationType.ORDER,
+              title: "Twój produkt został sprzedany!",
+              message: `Użytkownik kupił Twój produkt: "${product.title}". Przygotuj paczkę.`,
+              isRead: false,
+            },
+          });
+        }
       }
 
       // Create Order
@@ -132,6 +146,7 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ error: "Błąd podczas składania zamówienia" });
   }
 };
+
 // GET /api/orders (My Purchases)
 export const getOrders = async (req: AuthRequest, res: Response) => {
   try {
@@ -239,6 +254,17 @@ export const updateOrderStatus = async (req: AuthRequest, res: Response) => {
       where: { id },
       data: { status },
       include: { items: true },
+    });
+
+    // Notify buyer about status change
+    await prisma.notification.create({
+      data: {
+        userId: updatedOrder.userId,
+        type: NotificationType.ORDER,
+        title: "Zmiana statusu zamówienia",
+        message: `Twoje zamówienie zmieniło status na: ${status}`,
+        isRead: false,
+      },
     });
 
     res.json(formatOrderResponse(updatedOrder));

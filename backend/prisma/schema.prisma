@@ -249,18 +249,29 @@ model Message {
 }
 
 // 9. Powiadomienia
-model Notification {
-  id   String @id @default(uuid())
-  type String // np. 'BID', 'ORDER', 'FOLLOW', 'MESSAGE'
+//Definicja Enuma 
+enum NotificationType {
+  SYSTEM
+  FOLLOW
+  OFFER
+  BID
+  ORDER
+  MESSAGE
+}
 
-  title String  @default("Powiadomienie")
-  link  String?
+model Notification {
+  id      String @id @default(uuid())
+
+  type    NotificationType 
+
+  title   String  @default("Powiadomienie")
+  link    String?
 
   message String
   isRead  Boolean @default(false)
 
-  user   User   @relation(fields: [userId], references: [id])
-  userId String
+  user    User    @relation(fields: [userId], references: [id])
+  userId  String
 
   createdAt DateTime @default(now())
 }
