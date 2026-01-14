@@ -18,6 +18,7 @@ import chatRoutes from "./routes/chat.routes";
 import notificationRoutes from "./routes/notification.routes";
 import adminRoutes from "./routes/admin.routes";
 import userRoutes from "./routes/user.routes";
+import uploadRoutes from "./routes/upload.routes";
 
 // Jobs
 import { startAuctionJob } from "./jobs/auctionCloser";
@@ -74,6 +75,7 @@ app.use("/api/chat", chatRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/users", userRoutes);
+app.use("api/upload", uploadRoutes);
 
 // Background Jobs
 startAuctionJob();
