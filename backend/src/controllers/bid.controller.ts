@@ -39,15 +39,23 @@ export const placeBid = async (req: AuthRequest, res: Response) => {
         .json({ message: "Aukcja dla tego produktu już się zakończyła" });
     }
 
-    // prevent self bidding
+    // prevent self bidding (seller cannot bid)
     if (product.sellerId === userId) {
       return res
         .status(400)
         .json({ message: "Nie możesz licytować własnego produktu" });
     }
 
-    // check bid amount logic
     const currentHighestBid = product.bids[0];
+
+    // Check if the user is already the highest bidder
+    if (currentHighestBid && currentHighestBid.userId === userId) {
+      return res.status(400).json({
+        message: "Już prowadzisz w tej licytacji",
+      });
+    }
+
+    // check bid amount logic
     const currentHighestAmount = currentHighestBid?.amount || product.price;
 
     if (amount <= currentHighestAmount) {
@@ -56,13 +64,24 @@ export const placeBid = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    // 2. create bid
-    const bid = await prisma.bid.create({
-      data: {
-        userId,
-        productId,
-        amount,
-      },
+    // 2. create bid AND update product price (Transaction)
+    const bid = await prisma.$transaction(async (tx) => {
+      // Create the bid
+      const newBid = await tx.bid.create({
+        data: {
+          userId,
+          productId,
+          amount,
+        },
+      });
+
+      // Update the product price to reflect the new highest bid
+      await tx.product.update({
+        where: { id: productId },
+        data: { price: amount },
+      });
+
+      return newBid;
     });
 
     // Notify the Seller
