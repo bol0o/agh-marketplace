@@ -1,15 +1,19 @@
+// app/marketplace/[id]/page.tsx - ZAKTUALIZOWANA WERSJA
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Edit, Trash2 } from 'lucide-react';
+import { ArrowLeft, Edit, Trash2, AlertCircle } from 'lucide-react';
 import { Product } from '@/types/marketplace';
 import { useAuth } from '@/store/useAuth';
 import { ProductImageSection } from '@/components/marketplace/ProductImageSection';
 import { SellerInfoCard } from '@/components/marketplace/SellerInfoCard';
 import { ProductDetailsCard } from '@/components/marketplace/ProductDetailsCard';
 import { ProductActions } from '@/components/marketplace/ProductActions';
+import { BidHistory } from '@/components/marketplace/BidHistory';
+import { BidForm } from '@/components/marketplace/BidForm';
+import { AuctionTimer } from '@/components/marketplace/AuctionTimer';
 import styles from './ProductPage.module.scss';
 import api from '@/lib/axios';
 
@@ -28,9 +32,9 @@ const CONDITION_NAMES: Record<string, string> = {
 };
 
 export default function ProductPage() {
-	const { id } = useParams();
+	const { id } = useParams() as { id: string };
 	const router = useRouter();
-	const { user } = useAuth();
+	const { user, isLoading: authLoading, isAuthenticated } = useAuth();
 
 	const [product, setProduct] = useState<Product | null>(null);
 	const [loading, setLoading] = useState(true);
@@ -38,22 +42,33 @@ export default function ProductPage() {
 	const [isDeleting, setIsDeleting] = useState(false);
 	const [isOwner, setIsOwner] = useState(false);
 	const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+	const [refreshBids, setRefreshBids] = useState(0);
+	const [authChecked, setAuthChecked] = useState(false);
+
+	const isInitialMount = useRef(true);
 
 	useEffect(() => {
+		if (!isInitialMount.current) {
+			return;
+		}
+		isInitialMount.current = false;
+
 		fetchProduct();
 	}, [id]);
 
-	const fetchProduct = async () => {
+	useEffect(() => {
+		if (!authLoading && product) {
+			checkOwnership();
+			setAuthChecked(true);
+		}
+	}, [authLoading, product, user]);
+
+	const fetchProduct = async (): Promise<void> => {
 		try {
 			setLoading(true);
-			const response = await api.get(`/products/${id}`);
+			const response = await api.get<Product>(`/products/${id}`);
 			const productData = response.data;
-
 			setProduct(productData);
-
-			if (user && productData.seller.id === user.id) {
-				setIsOwner(true);
-			}
 		} catch (err: any) {
 			setError(err.response?.data?.error || 'Nie udało się pobrać produktu');
 		} finally {
@@ -61,11 +76,20 @@ export default function ProductPage() {
 		}
 	};
 
-	const handleDelete = async () => {
+	const checkOwnership = (): void => {
+		if (user && product && product.seller.id === user.id) {
+			setIsOwner(true);
+		} else {
+			setIsOwner(false);
+		}
+	};
+
+	const handleDelete = async (): Promise<void> => {
 		try {
 			setIsDeleting(true);
 			await api.delete(`/products/${id}`);
 			router.push('/marketplace');
+			router.refresh();
 		} catch {
 			setError('Nie udało się usunąć produktu');
 		} finally {
@@ -74,36 +98,97 @@ export default function ProductPage() {
 		}
 	};
 
-	const handleEdit = () => {
+	const handleEdit = (): void => {
 		router.push(`/marketplace/${id}/edit`);
 	};
 
-	const handleContactSeller = () => {
+	const handleContactSeller = (): void => {
 		console.log('Otwórz chat z sprzedawcą');
 	};
 
-	const handleBuyNow = () => {
+	const handleBuyNow = (): void => {
 		console.log('Kup teraz');
 	};
 
-	const handleBid = () => {
-		console.log('Licytuj');
+	const handleBid = (): void => {
+		const bidSection = document.getElementById('bid-form-section');
+		if (bidSection) {
+			bidSection.scrollIntoView({
+				behavior: 'smooth',
+				block: 'start',
+			});
+		}
 	};
 
-	const handleFollowSeller = () => {
-		console.log('Licytuj');
+	const handleBidSuccess = (newBidAmount: number): void => {
+		if (product) {
+			setProduct({
+				...product,
+				price: newBidAmount,
+			});
+		}
+		setRefreshBids((prev) => prev + 1);
+	};
+
+	const handleFollowSeller = (): void => {
+		console.log('Obserwuj sprzedawcę');
+	};
+
+	// Funkcja renderująca przyciski właściciela
+	const renderOwnerActions = () => {
+		if (authLoading || !authChecked) {
+			return null; // Nie pokazuj nic podczas ładowania
+		}
+
+		if (isOwner) {
+			return (
+				<div className={styles.ownerActions}>
+					<button onClick={handleEdit} className={styles.editButton}>
+						<Edit size={18} />
+						<span>Edytuj</span>
+					</button>
+
+					<button
+						onClick={() => setShowDeleteConfirm(true)}
+						className={styles.deleteButton}
+						disabled={isDeleting}
+					>
+						<Trash2 size={18} />
+						<span>{isDeleting ? 'Usuwanie...' : 'Usuń'}</span>
+					</button>
+				</div>
+			);
+		}
+
+		return null;
 	};
 
 	if (loading) {
-		return <div className={styles.loadingWrapper}>Ładowanie...</div>;
+		return (
+			<div className={styles.loadingWrapper}>
+				<div className={styles.spinner}></div>
+				<p>Ładowanie produktu...</p>
+			</div>
+		);
 	}
 
 	if (error || !product) {
-		return <div className={styles.errorWrapper}>Błąd: {error}</div>;
+		return (
+			<div className={styles.errorWrapper}>
+				<AlertCircle size={48} />
+				<h3>Błąd</h3>
+				<p>{error || 'Produkt nie został znaleziony'}</p>
+				<Link href="/marketplace" className={styles.backButton}>
+					Wróć do przeglądania
+				</Link>
+			</div>
+		);
 	}
 
 	const isAuction = product.type === 'auction';
 	const isActive = product.status === 'active';
+	const auctionEnded = isAuction && product.endsAt && new Date(product.endsAt) <= new Date();
+	const canBid = isAuction && isActive && !auctionEnded && isAuthenticated && user && !isOwner;
 
 	return (
 		<div className={styles.container}>
@@ -113,22 +198,7 @@ export default function ProductPage() {
 					<span>Wróć do przeglądania</span>
 				</Link>
 
-				{isOwner && (
-					<div className={styles.ownerActions}>
-						<button onClick={handleEdit} className={styles.editButton}>
-							<Edit size={18} />
-							<span>Edytuj</span>
-						</button>
-
-						<button
-							onClick={() => setShowDeleteConfirm(true)}
-							className={styles.deleteButton}
-						>
-							<Trash2 size={18} />
-							<span>Usuń</span>
-						</button>
-					</div>
-				)}
+				{renderOwnerActions()}
 			</header>
 
 			<div className={styles.mainContent}>
@@ -157,11 +227,22 @@ export default function ProductPage() {
 							categoryNames={CATEGORY_NAMES}
 							conditionNames={CONDITION_NAMES}
 						/>
+
+						{isAuction && product.endsAt && (
+							<div className={styles.auctionTimerSection}>
+								<AuctionTimer endsAt={product.endsAt} />
+							</div>
+						)}
 					</div>
 				</div>
 
 				<div className={styles.rightColumn}>
 					<div className={styles.productHeader}>
+						<div className={styles.categoryBadge}>
+							<span className={styles.category}>
+								{CATEGORY_NAMES[product.category]}
+							</span>
+						</div>
 						<h1 className={styles.productTitle}>{product.title}</h1>
 					</div>
 
@@ -170,6 +251,7 @@ export default function ProductPage() {
 						isActive={isActive}
 						price={product.price}
 						stock={product.stock}
+						endsAt={product.endsAt}
 						onBuy={handleBuyNow}
 						onBid={handleBid}
 						onContact={handleContactSeller}
@@ -177,8 +259,58 @@ export default function ProductPage() {
 
 					<div className={styles.descriptionSection}>
 						<h3>Opis produktu</h3>
-						<p>{product.description}</p>
+						<p className={styles.description}>{product.description}</p>
 					</div>
+
+					{isAuction && (
+						<div className={styles.auctionSection}>
+							{isActive && !auctionEnded ? (
+								<>
+									<BidHistory
+										productId={product.id}
+										currentPrice={product.price}
+										key={refreshBids}
+									/>
+
+									<div id="bid-form-section" className={styles.bidFormSection}>
+										{canBid ? (
+											<BidForm
+												productId={product.id}
+												currentPrice={product.price}
+												onBidSuccess={handleBidSuccess}
+												minBidIncrement={1}
+											/>
+										) : !isAuthenticated ? (
+											<div className={styles.loginPrompt}>
+												<p>
+													Aby złożyć ofertę, musisz się{' '}
+													<Link href="/login">zalogować</Link>
+												</p>
+											</div>
+										) : isOwner ? (
+											<div className={styles.ownerNote}>
+												<p>
+													Jesteś właścicielem tej aukcji i nie możesz
+													składać ofert
+												</p>
+											</div>
+										) : null}
+									</div>
+								</>
+							) : (
+								<div className={styles.auctionEnded}>
+									<h3>
+										{auctionEnded ? 'Aukcja zakończona' : 'Produkt niedostępny'}
+									</h3>
+									<p>
+										{auctionEnded
+											? 'Ten produkt nie jest już dostępny do licytacji'
+											: 'Ten produkt jest aktualnie niedostępny'}
+									</p>
+								</div>
+							)}
+						</div>
+					)}
 				</div>
 			</div>
 

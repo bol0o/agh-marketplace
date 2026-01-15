@@ -44,3 +44,51 @@ export interface ProductsResponse {
 	pagination: PaginationData;
 	products: Product[];
 }
+
+export interface UserInfo {
+	firstName: string;
+	lastName: string;
+	avatarUrl: string | null;
+}
+
+export interface Bid {
+	id: string;
+	amount: number;
+	userId: string;
+	productId: string;
+	createdAt: string;
+	user: UserInfo;
+}
+
+export interface BidResponse {
+	message: string;
+	bid: Omit<Bid, 'user'>;
+}
+
+export interface BidFormData {
+	amount: number;
+	productId: string;
+}
+
+export interface Product {
+	id: string;
+	title: string;
+	description: string;
+	price: number;
+	image?: string;
+	category: ProductCategory;
+	condition: ProductCondition;
+	type: 'auction' | 'buy_now';
+	location: string;
+	stock: number;
+	status: ProductStatus;
+	seller: Seller;
+	views: number;
+	createdAt: string;
+	endsAt?: string | null;
+	bids?: Bid[];
+}
+
+export interface ProductWithBids extends Product {
+	bids: Bid[];
+}

@@ -6,7 +6,12 @@ const nextConfig: NextConfig = {
 			{
 				protocol: 'https',
 				hostname: 'placehold.co',
-				pathname: '/**', // Wszystkie ścieżki
+				pathname: '/**',
+			},
+			{
+				protocol: 'https',
+				hostname: 'res.cloudinary.com',
+				pathname: '/**',
 			},
 		],
 	},

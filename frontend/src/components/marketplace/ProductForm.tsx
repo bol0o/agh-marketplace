@@ -14,8 +14,9 @@ import {
 	Tag,
 } from 'lucide-react';
 import { Product, ProductCategory, ProductCondition } from '@/types/marketplace';
-// import { useImageUpload } from '@/hooks/useImageUpload';
+import { useImageUpload } from '@/hooks/useImageUpload';
 import styles from './ProductForm.module.scss';
+import Image from 'next/image';
 
 const CATEGORIES: {
 	value: ProductCategory;
@@ -67,9 +68,9 @@ interface ProductFormProps {
 	isSubmitting: boolean;
 	submitError?: string;
 	mode: 'create' | 'edit';
+	setSubmitError: (error: string | null) => void;
 }
 
-// Typ danych które wysyłamy do API (bez id, seller, views, createdAt, status)
 type ProductFormData = Omit<Product, 'id' | 'seller' | 'views' | 'createdAt' | 'status'> & {
 	isAuction?: boolean;
 	auctionEnd?: string;
@@ -81,8 +82,9 @@ export function ProductForm({
 	isSubmitting,
 	submitError,
 	mode,
+	setSubmitError,
 }: ProductFormProps) {
-	//   const { uploadImage, uploading: imageUploading, error: uploadError } = useImageUpload();
+	const { uploadImage, uploading: imageUploading, error: uploadError } = useImageUpload();
 
 	const [formData, setFormData] = useState<ProductFormData>({
 		title: '',
@@ -118,7 +120,9 @@ export function ProductForm({
 			setFormData(transformedData);
 
 			if (initialData.image) {
+				console.log(initialData.image);
 				setImagePreview(initialData.image);
+				console.log(imagePreview);
 			}
 		}
 	}, [initialData]);
@@ -126,9 +130,17 @@ export function ProductForm({
 	const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files && e.target.files[0]) {
 			const file = e.target.files[0];
+
+			if (file.size > 5 * 1024 * 1024) {
+				throw new Error('Plik jest zbyt duży. Maksymalny rozmiar to 5MB.');
+			}
+
+			if (!file.type.match('image/(jpeg|jpg|png|gif|webp)')) {
+				return;
+			}
+
 			setSelectedImage(file);
 
-			// Podgląd lokalny
 			const reader = new FileReader();
 			reader.onloadend = () => {
 				setImagePreview(reader.result as string);
@@ -136,7 +148,6 @@ export function ProductForm({
 			reader.readAsDataURL(file);
 		}
 	};
-
 	const removeImage = () => {
 		setSelectedImage(null);
 		setImagePreview(null);
@@ -147,18 +158,48 @@ export function ProductForm({
 		e.preventDefault();
 
 		try {
-			// 1. Upload obrazka jeśli jest nowy
-			//   let imageUrl = formData.image;
+			if (!formData.title || formData.title.length < 3) {
+				throw new Error('Tytuł musi mieć co najmniej 3 znaki');
+			}
 
-			// if (selectedImage) {
-			// const uploadedUrl = await uploadImage(selectedImage);
-			// if (!uploadedUrl) {
-			//   throw new Error('Nie udało się przesłać obrazka');
-			// }
-			// imageUrl = uploadedUrl;
-			// }
+			if (!formData.description || formData.description.length < 10) {
+				throw new Error('Opis musi mieć co najmniej 10 znaków');
+			}
 
-			// 2. Przygotuj dane do wysłania (zgodne z typem Product)
+			if (formData.price <= 0) {
+				throw new Error('Cena musi być większa niż 0');
+			}
+
+			if (formData.stock < 1) {
+				throw new Error('Ilość musi być większa niż 0');
+			}
+
+			if (!formData.location) {
+				throw new Error('Podaj lokalizację');
+			}
+
+			if (formData.type === 'auction' && !formData.endsAt) {
+				throw new Error('Podaj datę zakończenia aukcji');
+			}
+
+			let imageUrl = formData.image || '';
+
+			if (selectedImage) {
+				try {
+					const uploadedUrl = await uploadImage(selectedImage);
+					if (!uploadedUrl) {
+						throw new Error('Nie udało się przesłać obrazka');
+					}
+					imageUrl = uploadedUrl;
+				} catch (uploadErr: any) {
+					console.error('Image upload error:', uploadErr);
+					throw new Error(
+						`Błąd przesyłania obrazka: ${uploadErr.message || 'Nieznany błąd'}`
+					);
+				}
+			}
+
+			// 3. Przygotuj dane do wysłania
 			const submitData: any = {
 				title: formData.title.trim(),
 				description: formData.description.trim(),
@@ -168,41 +209,17 @@ export function ProductForm({
 				isAuction: formData.type === 'auction',
 				location: formData.location.trim(),
 				stock: Number(formData.stock),
-				image: '',
-				endsAt:
+				imageUrl: imageUrl, // Użyj URL z uploadu
+				auctionEnd:
 					formData.type === 'auction' && formData.endsAt
 						? new Date(formData.endsAt).toISOString()
-						: null,
+						: '',
 			};
 
-			// 3. Walidacja
-			if (!submitData.title || submitData.title.length < 3) {
-				throw new Error('Tytuł musi mieć co najmniej 3 znaki');
-			}
-
-			if (submitData.price <= 0) {
-				throw new Error('Cena musi być większa niż 0');
-			}
-
-			if (submitData.stock < 1) {
-				throw new Error('Ilość musi być większa niż 0');
-			}
-
-			if (!submitData.location) {
-				throw new Error('Podaj lokalizację');
-			}
-
-			if (submitData.type === 'auction' && !submitData.endsAt) {
-				throw new Error('Podaj datę zakończenia aukcji');
-			}
-
-			console.log(submitData);
-
-			// 4. Wyślij do parenta
 			await onSubmit(submitData);
 		} catch (err: any) {
-			console.error('Form submit error:', err);
-			// Error będzie obsłużony przez parenta
+			console.log(err);
+			setSubmitError(err.message);
 		}
 	};
 
@@ -257,10 +274,13 @@ export function ProductForm({
 					<div className={styles.imageUploadArea}>
 						{imagePreview ? (
 							<div className={styles.imagePreviewContainer}>
-								<img
+								<Image
 									src={imagePreview}
-									alt="Podgląd"
+									alt="Podgląd produktu"
+									fill
 									className={styles.imagePreview}
+									sizes="(max-width: 768px) 100vw, 50vw"
+									priority={mode === 'create'}
 								/>
 								<button
 									type="button"
@@ -281,12 +301,12 @@ export function ProductForm({
 									accept="image/*"
 									onChange={handleImageChange}
 									className={styles.fileInput}
-									// disabled={imageUploading}
+									disabled={imageUploading}
 								/>
 							</label>
 						)}
 
-						{/* {imageUploading && (
+						{imageUploading && (
 							<div className={styles.uploadingOverlay}>
 								<div className={styles.uploadingSpinner}></div>
 								<span>Przesyłanie obrazka...</span>
@@ -298,7 +318,7 @@ export function ProductForm({
 								<AlertCircle size={16} />
 								<span>{uploadError}</span>
 							</div>
-						)} */}
+						)}
 					</div>
 
 					<div className={styles.imageTips}>
@@ -574,13 +594,13 @@ export function ProductForm({
 					type="button"
 					onClick={() => window.history.back()}
 					className={styles.cancelButton}
-					disabled={isSubmitting}
+					disabled={isSubmitting || imageUploading}
 				>
 					Anuluj
 				</button>
 
 				<button type="submit" disabled={isSubmitting} className={styles.submitButton}>
-					{isSubmitting ? (
+					{isSubmitting || imageUploading ? (
 						<>
 							<div className={styles.spinner}></div>
 							<span>{mode === 'edit' ? 'Zapisywanie...' : 'Dodawanie...'}</span>

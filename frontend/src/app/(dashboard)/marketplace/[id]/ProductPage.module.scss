@@ -909,7 +909,114 @@
 	}
 }
 
-// Animations
+.bidFormSection {
+	margin-top: 32px;
+	padding-top: 32px;
+	border-top: 1px solid $color-border;
+}
+
+.loginPrompt {
+	margin-top: 24px;
+	padding: 20px;
+	background-color: rgba($color-primary, 0.05);
+	border-radius: 12px;
+	text-align: center;
+
+	p {
+		color: $color-text;
+		margin: 0;
+	}
+
+	a {
+		color: $color-primary;
+		font-weight: 600;
+		text-decoration: none;
+
+		&:hover {
+			text-decoration: underline;
+		}
+	}
+}
+
+.ownerNote {
+	margin-top: 24px;
+	padding: 20px;
+	background-color: rgba(#f59e0b, 0.05);
+	border-radius: 12px;
+	text-align: center;
+
+	p {
+		color: $color-text;
+		margin: 0;
+	}
+}
+
+.auctionEnded {
+	margin-top: 32px;
+	padding: 24px;
+	background-color: rgba(#6b7280, 0.05);
+	border-radius: 12px;
+	text-align: center;
+
+	h3 {
+		font-size: 1.2rem;
+		color: $color-dark;
+		margin-bottom: 8px;
+	}
+
+	p {
+		color: $color-text-light;
+		margin: 0;
+	}
+}
+
+.infoBoxes {
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+
+	@include md {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 24px;
+	}
+
+	@include lg {
+		display: flex;
+		grid-template-columns: 1fr;
+	}
+
+	.auctionTimerSection {
+		@include md {
+			grid-column: span 2;
+		}
+
+		@include lg {
+			grid-column: unset;
+		}
+	}
+}
+
+.auctionTimerSection {
+	background-color: white;
+	border-radius: 16px;
+	border: 1px solid $color-border;
+	padding: 24px;
+	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+	transition: all 0.3s;
+
+	&:hover {
+		box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+	}
+}
+
+.auctionSection {
+	margin-top: 40px;
+	padding-top: 32px;
+	border-top: 1px solid $color-border;
+	width: 85%;
+}
+
 @keyframes fadeIn {
 	from {
 		opacity: 0;

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Plus, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Plus } from 'lucide-react';
 import { ProductForm } from '@/components/marketplace/ProductForm';
 import api from '@/lib/axios';
 import styles from './CreateProduct.module.scss';
@@ -19,10 +19,13 @@ export default function CreateProductPage() {
 			setSubmitting(true);
 			setError(null);
 
+			console.log(productData);
+
 			const response = await api.post('/products', productData);
 
 			router.push(`/marketplace/${response.data.id}`);
 		} catch (err: any) {
+			console.log(err);
 			setError(err.response?.data?.error || 'Nie udało się dodać produktu');
 		} finally {
 			setSubmitting(false);
@@ -47,6 +50,7 @@ export default function CreateProductPage() {
 				onSubmit={handleSubmit}
 				isSubmitting={submitting}
 				submitError={error}
+				setSubmitError={setError}
 				mode="create"
 			/>
 		</div>

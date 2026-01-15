@@ -1,6 +1,6 @@
 'use client';
 
-import { ShoppingBag, Gavel, MessageCircle } from 'lucide-react';
+import { ShoppingBag, Gavel, MessageCircle, Clock } from 'lucide-react';
 import styles from './ProductActions.module.scss';
 
 interface ProductActionsProps {
@@ -19,6 +19,7 @@ export function ProductActions({
 	isActive,
 	price,
 	stock,
+	endsAt,
 	onBuy,
 	onBid,
 	onContact,
@@ -32,6 +33,14 @@ export function ProductActions({
 					<div className={styles.auctionPrice}>
 						<span className={styles.priceLabel}>Aktualna oferta</span>
 						<span className={styles.price}>{price.toLocaleString('pl-PL')} zł</span>
+						{endsAt && (
+							<div className={styles.endsAt}>
+								<Clock size={14} />
+								<span>
+									Kończy się: {new Date(endsAt).toLocaleDateString('pl-PL')}
+								</span>
+							</div>
+						)}
 					</div>
 					<button onClick={onBid} className={styles.bidButton}>
 						<Gavel size={20} />

@@ -9,28 +9,25 @@ import styles from '../../create/CreateProduct.module.scss';
 import { Product } from '@/types/marketplace';
 
 export default function EditProductPage() {
-	const { id } = useParams();
+	const { id } = useParams() as { id: string };
 	const router = useRouter();
 
 	const [loading, setLoading] = useState(true);
 	const [submitting, setSubmitting] = useState(false);
 	const [error, setError] = useState<string | null>(null);
-	const [product, setProduct] = useState<any>(null);
+	const [product, setProduct] = useState<Product | null>(null);
 
 	useEffect(() => {
 		fetchProduct();
 	}, [id]);
 
-	const fetchProduct = async () => {
+	const fetchProduct = async (): Promise<void> => {
 		try {
-			const response = await api.get(`/products/${id}`);
-			const productData = response.data;
+			const response = await api.get<Product>(`/products/${id}`);
 
-			const formData = {
-				...productData,
-			};
+			console.log(response.data);
 
-			setProduct(formData);
+			setProduct(response.data);
 		} catch (err: any) {
 			setError('Nie udało się pobrać produktu');
 		} finally {
@@ -38,7 +35,12 @@ export default function EditProductPage() {
 		}
 	};
 
-	const handleSubmit = async (productData: Product) => {
+	const handleSubmit = async (
+		productData: Omit<Product, 'id' | 'seller' | 'views' | 'createdAt' | 'status'> & {
+			isAuction?: boolean;
+			auctionEnd?: string;
+		}
+	): Promise<void> => {
 		try {
 			setSubmitting(true);
 			setError(null);
@@ -93,13 +95,16 @@ export default function EditProductPage() {
 				</h1>
 			</header>
 
-			<ProductForm
-				initialData={product}
-				onSubmit={handleSubmit}
-				isSubmitting={submitting}
-				submitError={error}
-				mode="edit"
-			/>
+			{product && (
+				<ProductForm
+					initialData={product}
+					onSubmit={handleSubmit}
+					isSubmitting={submitting}
+					submitError={error}
+					setSubmitError={setError}
+					mode="edit"
+				/>
+			)}
 		</div>
 	);
 }

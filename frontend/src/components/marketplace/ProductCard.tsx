@@ -1,3 +1,4 @@
+// components/marketplace/ProductCard.tsx - ZAKTUALIZOWANA WERSJA
 'use client';
 
 import Link from 'next/link';
@@ -5,6 +6,7 @@ import { Gavel, ShoppingBag, Clock, MapPin, Eye, Star } from 'lucide-react';
 import styles from './ProductCard.module.scss';
 import Image from 'next/image';
 import { Product } from '@/types/marketplace';
+import { AuctionTimer } from './AuctionTimer';
 
 const CATEGORY_NAMES: Record<string, string> = {
 	BOOKS: 'Książki',
@@ -21,7 +23,7 @@ const CONDITION_NAMES: Record<string, string> = {
 };
 
 export function ProductCard({ product }: { product: Product }) {
-	const formatDate = (dateString: string) => {
+	const formatDate = (dateString: string): string => {
 		const date = new Date(dateString);
 		const now = new Date();
 		const diffTime = Math.abs(now.getTime() - date.getTime());
@@ -42,7 +44,6 @@ export function ProductCard({ product }: { product: Product }) {
 	};
 
 	const isActive = product.status === 'active';
-
 	const rating = parseFloat(product.seller.rating) || 0;
 
 	return (
@@ -117,12 +118,9 @@ export function ProductCard({ product }: { product: Product }) {
 						</span>
 					</div>
 
-					{product.type === 'auction' && product.endsAt && (
+					{product.type === 'auction' && product.endsAt && isActive && (
 						<div className={styles.auctionTimer}>
-							<Clock size={14} />
-							<span className={styles.timerText}>
-								Kończy się: {new Date(product.endsAt).toLocaleDateString('pl-PL')}
-							</span>
+							<AuctionTimer endsAt={product.endsAt} compact />
 						</div>
 					)}
 				</div>

@@ -1,3 +1,4 @@
+// ProductActions.module.scss - zaktualizowane
 @use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
@@ -6,7 +7,6 @@
 	flex-direction: column;
 	gap: 16px;
 	margin-bottom: 32px;
-	width: 100%;
 
 	@include md {
 		width: 85%;
@@ -18,7 +18,7 @@
 	display: flex;
 	flex-direction: column;
 	gap: 16px;
-	padding: 24px;
+	padding: 20px;
 	background-color: $color-bg;
 	border-radius: 16px;
 	border: 1px solid $color-border;
@@ -44,23 +44,42 @@
 }
 
 .price {
-	font-size: 2.2rem;
+	font-size: 1.8rem;
 	font-weight: 800;
 	color: $color-dark;
 	line-height: 1;
+
+	@include sm {
+		font-size: 2rem;
+	}
 
 	@include md {
 		font-size: 2.5rem;
 	}
 }
 
+.endsAt {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 0.85rem;
+	color: #7c3aed;
+	font-weight: 600;
+	margin-top: 6px;
+
+	svg {
+		color: #7c3aed;
+	}
+}
+
 .stockInfo {
-	font-size: 0.95rem;
+	font-size: 0.9rem;
 	color: $color-text;
 	font-weight: 600;
 	display: flex;
 	align-items: center;
-	gap: 8px;
+	gap: 6px;
+	margin-top: 4px;
 
 	&::before {
 		content: '•';
@@ -74,16 +93,17 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	gap: 12px;
-	padding: 16px 28px;
+	gap: 10px;
+	padding: 14px 24px;
 	border-radius: 12px;
 	font-weight: 700;
-	font-size: 1.05rem;
+	font-size: 1rem;
 	border: none;
 	cursor: pointer;
 	transition: all 0.3s;
-	min-width: 200px;
-	height: 56px;
+	min-width: 180px;
+	height: 52px;
+	width: 100%;
 
 	&:disabled {
 		opacity: 0.5;
@@ -91,7 +111,15 @@
 	}
 
 	@include sm {
+		width: auto;
 		flex-shrink: 0;
+		padding: 16px 28px;
+		height: 56px;
+	}
+
+	@include md {
+		font-size: 1.05rem;
+		min-width: 200px;
 	}
 }
 
@@ -119,18 +147,18 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	gap: 12px;
-	padding: 16px 24px;
+	gap: 10px;
+	padding: 14px 20px;
 	background-color: white;
 	color: $color-primary;
 	border: 2px solid $color-primary;
 	border-radius: 12px;
 	font-weight: 700;
-	font-size: 1rem;
+	font-size: 0.95rem;
 	cursor: pointer;
 	transition: all 0.3s;
 	width: 100%;
-	height: 56px;
+	height: 52px;
 
 	&:hover {
 		background-color: rgba($color-primary, 0.05);
@@ -140,60 +168,35 @@
 
 	@include sm {
 		width: auto;
-		min-width: 200px;
+		min-width: 180px;
 		align-self: flex-start;
-	}
-}
-
-// Responsive adjustments
-@include sm {
-	.mainActions {
-		gap: 20px;
+		padding: 16px 24px;
+		height: 56px;
 	}
 
-	.auctionSection,
-	.buySection {
-		gap: 32px;
-	}
-
-	.contactButton {
-		align-self: flex-start;
-		width: auto;
-		min-width: 200px;
-	}
-}
-
-// Prevent overflow on mobile
-@media (max-width: 640px) {
-	.auctionSection,
-	.buySection {
-		flex-direction: column;
-		align-items: stretch;
-	}
-
-	.bidButton,
-	.buyButton,
-	.contactButton {
-		width: 100%;
-		min-width: unset;
-	}
-
-	.price {
-		font-size: 2rem;
-	}
-}
-
-// Fix for small screens
-@media (max-width: 380px) {
-	.price {
-		font-size: 1.8rem;
-	}
-
-	.bidButton,
-	.buyButton,
-	.contactButton {
-		padding: 14px 20px;
+	@include md {
 		font-size: 1rem;
-		height: 52px;
+		min-width: 200px;
+	}
+}
+
+// Poprawki dla bardzo małych ekranów
+@media (max-width: 380px) {
+	.auctionSection,
+	.buySection {
+		padding: 16px;
+	}
+
+	.price {
+		font-size: 1.6rem;
+	}
+
+	.bidButton,
+	.buyButton,
+	.contactButton {
+		padding: 12px 20px;
+		height: 48px;
+		font-size: 0.95rem;
+		min-width: unset;
 	}
 }
