@@ -25,7 +25,6 @@ export function BidHistory({ productId, currentPrice }: BidHistoryProps) {
 			setLoading(true);
 			const response = await api.get<Bid[]>(`/bids/product/${productId}`);
 
-			// Sortowanie od najwyższej oferty do najniższej
 			const sortedBids = response.data.sort((a, b) => b.amount - a.amount);
 			setBids(sortedBids);
 		} catch (err: any) {

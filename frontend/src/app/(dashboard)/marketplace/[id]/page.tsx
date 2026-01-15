@@ -1,10 +1,9 @@
-// app/marketplace/[id]/page.tsx - ZAKTUALIZOWANA WERSJA
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Edit, Trash2, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Edit, Trash2, AlertCircle, Loader2 } from 'lucide-react';
 import { Product } from '@/types/marketplace';
 import { useAuth } from '@/store/useAuth';
 import { ProductImageSection } from '@/components/marketplace/ProductImageSection';
@@ -134,10 +133,9 @@ export default function ProductPage() {
 		console.log('Obserwuj sprzedawcę');
 	};
 
-	// Funkcja renderująca przyciski właściciela
 	const renderOwnerActions = () => {
 		if (authLoading || !authChecked) {
-			return null; // Nie pokazuj nic podczas ładowania
+			return null;
 		}
 
 		if (isOwner) {
@@ -166,8 +164,8 @@ export default function ProductPage() {
 	if (loading) {
 		return (
 			<div className={styles.loadingWrapper}>
-				<div className={styles.spinner}></div>
-				<p>Ładowanie produktu...</p>
+				<Loader2 className={styles.spinner} size={48} />
+				<p className={styles.loadingText}>Ładowanie produktu...</p>
 			</div>
 		);
 	}

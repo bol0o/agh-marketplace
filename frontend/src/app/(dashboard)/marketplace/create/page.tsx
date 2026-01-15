@@ -19,8 +19,6 @@ export default function CreateProductPage() {
 			setSubmitting(true);
 			setError(null);
 
-			console.log(productData);
-
 			const response = await api.post('/products', productData);
 
 			router.push(`/marketplace/${response.data.id}`);

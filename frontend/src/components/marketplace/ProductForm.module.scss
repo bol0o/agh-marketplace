@@ -13,7 +13,6 @@
 	gap: 32px;
 }
 
-// Sekcje
 .imageSection,
 .detailsSection,
 .offerSection {
@@ -33,7 +32,6 @@
 	border-bottom: 2px solid $color-bg;
 }
 
-// Upload obrazka
 .imageUploadArea {
 	.uploadZone {
 		display: flex;
@@ -100,7 +98,6 @@
 	}
 }
 
-// Form controls
 .formGroup {
 	margin-bottom: 24px;
 
@@ -149,7 +146,6 @@
 	margin-top: 4px;
 }
 
-// Grid
 .grid2 {
 	display: grid;
 	grid-template-columns: 1fr;
@@ -160,7 +156,6 @@
 	}
 }
 
-// Price input
 .priceInput {
 	position: relative;
 
@@ -178,7 +173,6 @@
 	}
 }
 
-// Category select
 .categorySelect {
 	select {
 		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
@@ -190,7 +184,6 @@
 	}
 }
 
-// Condition buttons
 .conditionButtons {
 	display: flex;
 	gap: 10px;
@@ -223,7 +216,6 @@
 	}
 }
 
-// Offer types
 .offerTypes {
 	display: flex;
 	flex-direction: column;
@@ -236,8 +228,8 @@
 
 .offerType {
 	flex: 1;
-	padding: 24px;
-	background-color: $color-bg;
+	padding: 20px;
+	background-color: white;
 	border: 2px solid $color-border;
 	border-radius: 16px;
 	cursor: pointer;
@@ -256,6 +248,8 @@
 
 	&:hover:not(.active) {
 		border-color: rgba($color-primary, 0.3);
+		transform: translateY(-2px);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 	}
 }
 
@@ -265,8 +259,14 @@
 	gap: 16px;
 
 	.offerIcon {
-		font-size: 1.5rem;
+		width: 56px;
+		height: 56px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 12px;
 		flex-shrink: 0;
+		transition: all 0.3s;
 	}
 
 	h3 {
@@ -279,10 +279,10 @@
 	p {
 		font-size: 0.9rem;
 		color: $color-text-light;
+		line-height: 1.4;
 	}
 }
 
-// Auction settings
 .auctionSettings {
 	margin-top: 32px;
 	padding-top: 24px;
@@ -314,7 +314,6 @@
 	}
 }
 
-// Error message
 .errorMessage {
 	display: flex;
 	align-items: center;
@@ -331,7 +330,6 @@
 	}
 }
 
-// Form actions
 .formActions {
 	display: flex;
 	justify-content: flex-end;
@@ -404,7 +402,6 @@
 	border-top: 1px solid $color-border;
 }
 
-// Category buttons
 .categoryButtons {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
@@ -442,9 +439,9 @@
 	font-size: 1.5rem;
 }
 
-// Image upload improvements
 .imagePreviewContainer {
 	position: relative;
+	min-height: 300px;
 }
 
 .imagePreview {
@@ -537,7 +534,6 @@
 	}
 }
 
-// Category buttons - nowe style jak w sidebarze
 .categoryButtons {
 	display: grid;
 	grid-template-columns: repeat(2, 1fr);
@@ -622,8 +618,6 @@
 	}
 }
 
-// Reszta stylów pozostaje bez zmian...
-
 @keyframes spin {
 	to {
 		transform: rotate(360deg);
@@ -641,7 +635,6 @@
 	}
 }
 
-// Responsive
 @include sm {
 	.formGrid {
 		.imageSection,

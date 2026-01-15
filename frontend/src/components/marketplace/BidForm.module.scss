@@ -1,4 +1,3 @@
-// BidForm.module.scss
 @use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
@@ -204,7 +203,6 @@
 	}
 }
 
-// Aktualizacja stylów dla małych ekranów
 @media (max-width: 640px) {
 	.quickBidButtons {
 		gap: 6px;

@@ -12,6 +12,8 @@ import {
 	Shirt,
 	Package,
 	Tag,
+	Coins,
+	Gavel,
 } from 'lucide-react';
 import { Product, ProductCategory, ProductCondition } from '@/types/marketplace';
 import { useImageUpload } from '@/hooks/useImageUpload';
@@ -68,7 +70,7 @@ interface ProductFormProps {
 	isSubmitting: boolean;
 	submitError?: string;
 	mode: 'create' | 'edit';
-	setSubmitError: (error: string | null) => void;
+	setSubmitError: (error: string | undefined) => void;
 }
 
 type ProductFormData = Omit<Product, 'id' | 'seller' | 'views' | 'createdAt' | 'status'> & {
@@ -120,9 +122,7 @@ export function ProductForm({
 			setFormData(transformedData);
 
 			if (initialData.image) {
-				console.log(initialData.image);
 				setImagePreview(initialData.image);
-				console.log(imagePreview);
 			}
 		}
 	}, [initialData]);
@@ -199,21 +199,20 @@ export function ProductForm({
 				}
 			}
 
-			// 3. Przygotuj dane do wysłania
 			const submitData: any = {
 				title: formData.title.trim(),
 				description: formData.description.trim(),
 				price: Number(formData.price),
 				category: formData.category,
 				condition: formData.condition,
-				isAuction: formData.type === 'auction',
+				type: formData.type,
 				location: formData.location.trim(),
 				stock: Number(formData.stock),
-				imageUrl: imageUrl, // Użyj URL z uploadu
-				auctionEnd:
+				imageUrl: imageUrl,
+				endsAt:
 					formData.type === 'auction' && formData.endsAt
 						? new Date(formData.endsAt).toISOString()
-						: '',
+						: null,
 			};
 
 			await onSubmit(submitData);
@@ -262,12 +261,19 @@ export function ProductForm({
 		setFormData((prev) => ({ ...prev, category }));
 	};
 
+	const formatForDateTimeLocal = (date: Date | string | null) => {
+		if (!date) return '';
+
+		const d = new Date(date);
+		d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+		return d.toISOString().slice(0, 16);
+	};
+
 	const isAuction = formData.type === 'auction';
 
 	return (
 		<form onSubmit={handleSubmit} className={styles.form}>
 			<div className={styles.formGrid}>
-				{/* Zdjęcie produktu */}
 				<div className={styles.imageSection}>
 					<h2 className={styles.sectionTitle}>Zdjęcie produktu</h2>
 
@@ -322,7 +328,7 @@ export function ProductForm({
 					</div>
 
 					<div className={styles.imageTips}>
-						<h4>💡 Wskazówki:</h4>
+						<h4>Wskazówki:</h4>
 						<ul>
 							<li>Używaj wyraźnych, dobrze oświetlonych zdjęć</li>
 							<li>Pokazuj produkt z różnych stron</li>
@@ -331,7 +337,6 @@ export function ProductForm({
 					</div>
 				</div>
 
-				{/* Szczegóły produktu */}
 				<div className={styles.detailsSection}>
 					<h2 className={styles.sectionTitle}>Szczegóły produktu</h2>
 
@@ -407,14 +412,13 @@ export function ProductForm({
 						<div className={styles.formGroup}>
 							<label htmlFor="category">Kategoria *</label>
 							<div className={styles.categoryButtons}>
-								{/* Przycisk "Wszystkie" dla spójności - ale ukryty/nieaktywny w formularzu */}
 								<button
 									type="button"
 									className={`${styles.categoryButton} ${styles.categoryAll} ${
 										!formData.category ? styles.active : ''
 									}`}
-									onClick={() => handleCategorySelect('OTHER')} // W formularzu zawsze musi być wybrana kategoria
-									disabled={mode === 'create'} // W formularzu zawsze musi być wybrana kategoria
+									onClick={() => handleCategorySelect('OTHER')}
+									disabled={mode === 'create'}
 								>
 									<div className={styles.categoryIconWrapper}>
 										<Tag size={16} />
@@ -515,7 +519,16 @@ export function ProductForm({
 								onChange={handleChange}
 							/>
 							<div className={styles.offerContent}>
-								<div className={styles.offerIcon}>💰</div>
+								<div
+									className={styles.offerIcon}
+									style={{
+										backgroundColor:
+											formData.type === 'buy_now' ? '#10b981' : '#f3f4f6',
+										color: formData.type === 'buy_now' ? 'white' : '#10b981',
+									}}
+								>
+									<Coins size={24} />
+								</div>
 								<div>
 									<h3>Kup Teraz</h3>
 									<p>Stała cena, natychmiastowy zakup</p>
@@ -536,7 +549,16 @@ export function ProductForm({
 								onChange={handleChange}
 							/>
 							<div className={styles.offerContent}>
-								<div className={styles.offerIcon}>⚖️</div>
+								<div
+									className={styles.offerIcon}
+									style={{
+										backgroundColor:
+											formData.type === 'auction' ? '#a855f7' : '#f3f4f6',
+										color: formData.type === 'auction' ? 'white' : '#a855f7',
+									}}
+								>
+									<Gavel size={24} />
+								</div>
 								<div>
 									<h3>Aukcja</h3>
 									<p>Licytacja, wygrywa najwyższa oferta</p>
@@ -558,17 +580,17 @@ export function ProductForm({
 									name="endsAt"
 									value={
 										formData.endsAt
-											? new Date(formData.endsAt).toISOString().slice(0, 16)
+											? formatForDateTimeLocal(formData.endsAt)
 											: ''
 									}
 									onChange={handleChange}
 									required={isAuction}
-									min={new Date().toISOString().slice(0, 16)}
+									min={formatForDateTimeLocal(new Date())}
 								/>
 							</div>
 
 							<div className={styles.auctionTips}>
-								<h4>💡 Wskazówki dla aukcji:</h4>
+								<h4>Wskazówki dla aukcji:</h4>
 								<ul>
 									<li>Ustaw rozsądny czas trwania (3-7 dni)</li>
 									<li>Dodaj wyraźne zdjęcia produktu</li>

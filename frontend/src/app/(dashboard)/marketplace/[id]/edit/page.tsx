@@ -2,34 +2,62 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Save, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Save, AlertCircle, ShieldAlert, Loader2 } from 'lucide-react';
 import { ProductForm } from '@/components/marketplace/ProductForm';
 import api from '@/lib/axios';
 import styles from '../../create/CreateProduct.module.scss';
 import { Product } from '@/types/marketplace';
+import { useAuth } from '@/store/useAuth';
 
 export default function EditProductPage() {
 	const { id } = useParams() as { id: string };
 	const router = useRouter();
+	const { user, isAuthenticated, isLoading: authLoading } = useAuth();
 
 	const [loading, setLoading] = useState(true);
 	const [submitting, setSubmitting] = useState(false);
-	const [error, setError] = useState<string | null>(null);
+	const [error, setError] = useState<string | undefined>(undefined);
 	const [product, setProduct] = useState<Product | null>(null);
+	const [isOwner, setIsOwner] = useState<boolean>(false);
 
 	useEffect(() => {
-		fetchProduct();
-	}, [id]);
+		if (!authLoading) {
+			if (!isAuthenticated || !user) {
+				router.push(
+					'/login?redirect=' + encodeURIComponent(`/marketplace/products/${id}/edit`)
+				);
+				return;
+			}
+			fetchProduct();
+		}
+	}, [id, authLoading, isAuthenticated, user]);
 
 	const fetchProduct = async (): Promise<void> => {
 		try {
+			setLoading(true);
 			const response = await api.get<Product>(`/products/${id}`);
+			const productData = response.data;
 
-			console.log(response.data);
+			setProduct(productData);
 
-			setProduct(response.data);
+			if (user) {
+				const ownerCheck = productData.seller.id === user.id || user.role === 'admin';
+				setIsOwner(ownerCheck);
+
+				if (!ownerCheck) {
+					setError('Nie masz uprawnień do edycji tego produktu');
+					setTimeout(() => {
+						router.push(`/marketplace/${id}`);
+					}, 3000);
+				}
+			}
 		} catch (err: any) {
-			setError('Nie udało się pobrać produktu');
+			console.error('Error fetching product:', err);
+			if (err.response?.status === 404) {
+				setError('Produkt nie istnieje');
+			} else {
+				setError('Nie udało się pobrać produktu');
+			}
 		} finally {
 			setLoading(false);
 		}
@@ -43,24 +71,46 @@ export default function EditProductPage() {
 	): Promise<void> => {
 		try {
 			setSubmitting(true);
-			setError(null);
+			setError(undefined);
+
+			if (!isOwner) {
+				throw new Error('Nie masz uprawnień do edycji tego produktu');
+			}
 
 			await api.patch(`/products/${id}`, productData);
 
 			router.push(`/marketplace/${id}`);
 			router.refresh();
 		} catch (err: any) {
-			setError(err.response?.data?.error || 'Nie udało się zapisać zmian');
+			console.error('Error updating product:', err);
+			setError(err.response?.data?.error || err.message || 'Nie udało się zapisać zmian');
 		} finally {
 			setSubmitting(false);
 		}
 	};
 
-	if (loading) {
+	if (authLoading || loading) {
 		return (
 			<div className={styles.loadingWrapper}>
-				<div className={styles.spinner}></div>
-				<p>Ładowanie...</p>
+				<Loader2 className={styles.spinner} size={48} />
+				<p className={styles.loadingText}>Ładowanie produktu...</p>
+			</div>
+		);
+	}
+
+	if (!isOwner && product) {
+		return (
+			<div className={styles.errorWrapper}>
+				<ShieldAlert size={48} />
+				<h3>Brak uprawnień</h3>
+				<p>Nie masz uprawnień do edycji tego produktu.</p>
+				<p>Przekierowanie na stronę produktu za 3 sekundy...</p>
+				<button
+					onClick={() => router.push(`/marketplace/${id}`)}
+					className={styles.backButton}
+				>
+					Przejdź do produktu
+				</button>
 			</div>
 		);
 	}
@@ -92,10 +142,13 @@ export default function EditProductPage() {
 				<h1 className={styles.title}>
 					<Save size={24} />
 					<span>Edytuj produkt</span>
+					{user?.role === 'admin' && (
+						<span className={styles.adminBadge}>Tryb administratora</span>
+					)}
 				</h1>
 			</header>
 
-			{product && (
+			{product && isOwner && (
 				<ProductForm
 					initialData={product}
 					onSubmit={handleSubmit}

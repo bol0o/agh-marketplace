@@ -132,7 +132,7 @@ export function BidForm({
 					className={styles.submitButton}
 				>
 					<Gavel size={18} />
-					<span>{submitting ? 'Składanie oferty...' : 'Zaliczytuj'}</span>
+					<span>{submitting ? 'Składanie oferty...' : 'Zalicytuj'}</span>
 				</button>
 			</form>
 		</div>

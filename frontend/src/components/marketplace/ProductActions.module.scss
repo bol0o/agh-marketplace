@@ -1,4 +1,3 @@
-// ProductActions.module.scss - zaktualizowane
 @use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
@@ -180,7 +179,6 @@
 	}
 }
 
-// Poprawki dla bardzo małych ekranów
 @media (max-width: 380px) {
 	.auctionSection,
 	.buySection {

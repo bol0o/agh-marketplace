@@ -56,16 +56,28 @@
 	align-items: center;
 	justify-content: center;
 	min-height: 400px;
-	gap: 20px;
+	padding: 40px 20px;
 }
 
 .spinner {
-	width: 48px;
-	height: 48px;
-	border: 3px solid $color-border;
-	border-top-color: $color-primary;
-	border-radius: 50%;
+	color: $color-primary;
 	animation: spin 1s linear infinite;
+	margin-bottom: 20px;
+}
+
+@keyframes spin {
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+.loadingText {
+	color: $color-text;
+	font-size: 1rem;
+	font-weight: 500;
 }
 
 .errorWrapper {

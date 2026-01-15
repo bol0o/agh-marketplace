@@ -1,4 +1,3 @@
-// components/marketplace/ProductCard.tsx - ZAKTUALIZOWANA WERSJA
 'use client';
 
 import Link from 'next/link';

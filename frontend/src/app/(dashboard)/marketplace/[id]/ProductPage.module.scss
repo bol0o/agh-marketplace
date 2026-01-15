@@ -17,32 +17,36 @@
 	}
 }
 
-// Loading
 .loadingWrapper {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
 	min-height: 400px;
-	gap: 20px;
+	padding: 40px 20px;
 }
 
 .spinner {
-	width: 48px;
-	height: 48px;
-	border: 3px solid $color-border;
-	border-top-color: $color-primary;
-	border-radius: 50%;
+	color: $color-primary;
 	animation: spin 1s linear infinite;
+	margin-bottom: 20px;
 }
 
 @keyframes spin {
+	from {
+		transform: rotate(0deg);
+	}
 	to {
 		transform: rotate(360deg);
 	}
 }
 
-// Error
+.loadingText {
+	color: $color-text;
+	font-size: 1rem;
+	font-weight: 500;
+}
+
 .errorWrapper {
 	display: flex;
 	flex-direction: column;
@@ -81,7 +85,6 @@
 	}
 }
 
-// Header
 .header {
 	display: flex;
 	justify-content: space-between;
@@ -149,7 +152,6 @@
 	}
 }
 
-// Main content - NOWY LAYOUT
 .mainContent {
 	display: flex;
 	flex-direction: column;
@@ -180,7 +182,6 @@
 	}
 }
 
-// Image section
 .imageContainer {
 	position: relative;
 	aspect-ratio: 4/3;
@@ -257,7 +258,6 @@
 	}
 }
 
-// Info boxes w lewej kolumnie
 .infoBoxes {
 	display: flex;
 	flex-direction: column;
@@ -310,7 +310,6 @@
 	}
 }
 
-// Seller card
 .sellerCard {
 	display: flex;
 	align-items: center;
@@ -421,7 +420,6 @@
 	}
 }
 
-// Details box
 .detailsGrid {
 	display: grid;
 	grid-template-columns: 1fr;
@@ -457,7 +455,6 @@
 	}
 }
 
-// Condition styles
 .condition-new {
 	color: #16a34a;
 	background-color: rgba(#16a34a, 0.1);
@@ -485,7 +482,6 @@
 	font-size: 0.85rem;
 }
 
-// Features box
 .featuresList {
 	display: flex;
 	flex-direction: column;
@@ -508,8 +504,10 @@
 	}
 }
 
-// Right column styles
 .productHeader {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
 	width: 80%;
 	margin-bottom: 32px;
 	padding-bottom: 24px;
@@ -548,7 +546,6 @@
 	}
 }
 
-// Price section in right column
 .priceSection {
 	background-color: $color-bg;
 	border-radius: 16px;
@@ -609,7 +606,6 @@
 	font-size: 1.1rem;
 }
 
-// Main actions
 .mainActions {
 	margin-bottom: 40px;
 }
@@ -755,7 +751,6 @@
 	}
 }
 
-// Description section
 .descriptionSection {
 	margin-bottom: 40px;
 	width: 85%;
@@ -800,7 +795,6 @@
 	}
 }
 
-// Additional info
 .additionalInfo {
 	margin-bottom: 40px;
 }
@@ -833,7 +827,6 @@
 	}
 }
 
-// Modal (bez zmian)
 .modalOverlay {
 	position: fixed;
 	top: 0;
@@ -1037,7 +1030,6 @@
 	}
 }
 
-// Responsive improvements
 @include sm {
 	.infoBoxes {
 		display: grid;
