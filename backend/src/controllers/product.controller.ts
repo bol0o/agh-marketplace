@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import { AuthRequest } from "../middleware/auth.middleware";
+import { deleteImageFromCloudinary } from "./upload.controller";
 
 const prisma = new PrismaClient();
 
@@ -14,6 +15,7 @@ const mapProduct = (p: any) => ({
 
   category: p.category,
   condition: p.condition,
+
   type: p.isAuction ? "auction" : "buy_now",
 
   location: p.location,
@@ -30,6 +32,7 @@ const mapProduct = (p: any) => ({
 
   views: p.views,
   createdAt: p.createdAt,
+
   endsAt: p.auctionEnd,
 });
 
@@ -47,14 +50,14 @@ export const getProducts = async (req: AuthRequest, res: Response) => {
       minPrice,
       maxPrice,
       sort,
-      status,
+      type,
       location,
       condition,
       onlyFollowed,
     } = req.query;
 
     const where: any = {
-      status: "active", // Default: show only active products
+      status: "active",
     };
 
     // 2. Build Search Filters
@@ -77,10 +80,12 @@ export const getProducts = async (req: AuthRequest, res: Response) => {
       if (minPrice) where.price.gte = Number(minPrice);
       if (maxPrice) where.price.lte = Number(maxPrice);
     }
-    if (status) {
-      if (status === "auction") where.isAuction = true;
-      if (status === "buy_now") where.isAuction = false;
+
+    if (type) {
+      if (type === "auction") where.isAuction = true;
+      if (type === "buy_now") where.isAuction = false;
     }
+
     if (location) {
       where.location = { contains: String(location), mode: "insensitive" };
     }
@@ -91,7 +96,7 @@ export const getProducts = async (req: AuthRequest, res: Response) => {
 
       if (!userId) {
         return res.status(401).json({
-          error: "You must be logged in to filter by followed users",
+          error: "Musisz być zalogowany, aby filtrować po obserwowanych.",
         });
       }
 
@@ -167,7 +172,7 @@ export const getProducts = async (req: AuthRequest, res: Response) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Error fetching products" });
+    res.status(500).json({ error: "Błąd pobierania produktów" });
   }
 };
 
@@ -194,7 +199,7 @@ export const getProductById = async (req: Request, res: Response) => {
 
     res.json(mapProduct(product));
   } catch (error) {
-    res.status(404).json({ error: "Product not found" });
+    res.status(404).json({ error: "Produkt nie znaleziony" });
   }
 };
 
@@ -202,7 +207,7 @@ export const getProductById = async (req: Request, res: Response) => {
 export const createProduct = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
-    if (!userId) return res.status(401).json({ error: "Unauthorized" });
+    if (!userId) return res.status(401).json({ error: "Brak autoryzacji" });
 
     const {
       title,
@@ -211,11 +216,24 @@ export const createProduct = async (req: AuthRequest, res: Response) => {
       category,
       condition,
       location,
-      isAuction,
-      auctionEnd,
       imageUrl,
       stock,
+      type,
+      endsAt,
     } = req.body;
+
+    const isAuctionBool = type === "auction";
+
+    let finalAuctionEnd = null;
+
+    if (isAuctionBool) {
+      if (!endsAt) {
+        return res
+          .status(400)
+          .json({ error: "Aukcje muszą posiadać datę zakończenia" });
+      }
+      finalAuctionEnd = new Date(endsAt);
+    }
 
     const product = await prisma.product.create({
       data: {
@@ -231,8 +249,9 @@ export const createProduct = async (req: AuthRequest, res: Response) => {
         stock: stock ? Number(stock) : 1,
         status: "active",
 
-        isAuction: Boolean(isAuction),
-        auctionEnd: auctionEnd ? new Date(auctionEnd) : null,
+        // Mapped values for DB
+        isAuction: isAuctionBool,
+        auctionEnd: finalAuctionEnd,
       },
       include: {
         seller: {
@@ -249,7 +268,7 @@ export const createProduct = async (req: AuthRequest, res: Response) => {
     res.status(201).json(mapProduct(product));
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Failed to create product" });
+    res.status(500).json({ error: "Błąd podczas tworzenia produktu" });
   }
 };
 
@@ -268,17 +287,35 @@ export const updateProduct = async (req: AuthRequest, res: Response) => {
       location,
       imageUrl,
       stock,
-      isAuction,
-      auctionEnd,
+      type,
+      endsAt,
     } = req.body;
 
-    // Check ownership
-    const existing = await prisma.product.findUnique({ where: { id } });
+    // Check ownership and current bids
+    const existing = await prisma.product.findUnique({
+      where: { id },
+      include: { bids: true }, // Need to check bids
+    });
+
     if (!existing || existing.sellerId !== userId) {
       return res
         .status(403)
-        .json({ error: "You can only edit your own products" });
+        .json({ error: "Możesz edytować tylko swoje produkty" });
     }
+
+    // Prevent price editing if auction has bids
+    if (existing.isAuction && existing.bids.length > 0) {
+      // If user tries to change price
+      if (price && Number(price) !== existing.price) {
+        return res.status(400).json({
+          error: "Nie można zmienić ceny aukcji, w której są już oferty",
+        });
+      }
+    }
+
+    // Mapping logic for updates
+    const isAuctionBool = type ? type === "auction" : undefined;
+    const auctionEndDate = endsAt ? new Date(endsAt) : undefined;
 
     const updated = await prisma.product.update({
       where: { id },
@@ -293,8 +330,8 @@ export const updateProduct = async (req: AuthRequest, res: Response) => {
         price: price ? Number(price) : undefined,
         stock: stock ? Number(stock) : undefined,
 
-        isAuction: isAuction !== undefined ? Boolean(isAuction) : undefined,
-        auctionEnd: auctionEnd ? new Date(auctionEnd) : undefined,
+        isAuction: isAuctionBool,
+        auctionEnd: auctionEndDate,
       },
       include: {
         seller: {
@@ -311,7 +348,7 @@ export const updateProduct = async (req: AuthRequest, res: Response) => {
     res.json(mapProduct(updated));
   } catch (error) {
     console.error("Update error:", error);
-    res.status(500).json({ error: "Failed to update product" });
+    res.status(500).json({ error: "Błąd aktualizacji produktu" });
   }
 };
 
@@ -324,19 +361,25 @@ export const deleteProduct = async (req: AuthRequest, res: Response) => {
 
     const product = await prisma.product.findUnique({ where: { id } });
     if (!product)
-      return res.status(404).json({ error: "Product does not exist" });
+      return res.status(404).json({ error: "Produkt nie istnieje" });
 
     // Allow owner OR admin to delete
     if (product.sellerId !== userId && role !== "ADMIN") {
       return res
         .status(403)
-        .json({ error: "Unauthorized to delete this product" });
+        .json({ error: "Brak uprawnień do usunięcia tego produktu" });
+    }
+
+    // Logic: Delete image from Cloudinary
+    if (product.imageUrl) {
+      await deleteImageFromCloudinary(product.imageUrl);
     }
 
     await prisma.product.delete({ where: { id } });
 
-    res.json({ message: "Product deleted successfully" });
+    res.json({ message: "Produkt został usunięty" });
   } catch (error) {
-    res.status(500).json({ error: "Failed to delete product" });
+    console.error(error);
+    res.status(500).json({ error: "Błąd podczas usuwania produktu" });
   }
 };

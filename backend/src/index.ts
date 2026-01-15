@@ -75,7 +75,7 @@ app.use("/api/chat", chatRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/users", userRoutes);
-app.use("api/upload", uploadRoutes);
+app.use("/api/upload", uploadRoutes);
 
 // Background Jobs
 startAuctionJob();
