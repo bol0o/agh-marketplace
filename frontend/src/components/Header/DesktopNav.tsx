@@ -3,6 +3,8 @@ import { PlusCircle, MessageSquare, Bell, ShoppingCart } from 'lucide-react';
 import { IconButton } from './IconButton';
 import { UserDropdown } from './UserDropdown';
 import styles from './DesktopNav.module.scss';
+import { useNotifications } from '@/hooks/useNotifications';
+import { useEffect } from 'react';
 
 const NOTIFICATION_COUNT = 3;
 const MESSAGE_COUNT = 2;
@@ -12,6 +14,16 @@ interface DesktopNavProps {
 }
 
 export function DesktopNav({ pathname }: DesktopNavProps) {
+	const { unreadCount, fetchUnreadCount, startPolling } = useNotifications();
+
+	useEffect(() => {
+		fetchUnreadCount();
+
+		const cleanup = startPolling(30000);
+
+		return cleanup;
+	}, [fetchUnreadCount, startPolling]);
+
 	const isActive = (path: string) => {
 		if (path === '/home') return pathname === '/home';
 		return pathname.startsWith(path);
@@ -46,7 +58,7 @@ export function DesktopNav({ pathname }: DesktopNavProps) {
 					href="/notifications"
 					icon={<Bell size={20} />}
 					isActive={isActive('/notifications')}
-					badge={NOTIFICATION_COUNT}
+					badge={unreadCount}
 					title="Powiadomienia"
 				/>
 

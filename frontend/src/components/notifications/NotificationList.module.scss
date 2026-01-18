@@ -1,0 +1,47 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.listContainer {
+	background-color: $color-white;
+	border-radius: $radius-lg;
+	border: 1px solid $color-border;
+	overflow: hidden;
+}
+
+.notifications {
+	display: flex;
+	flex-direction: column;
+}
+
+.emptyState {
+	@include flex-center;
+	flex-direction: column;
+	padding: $spacing-2xl;
+	text-align: center;
+	color: $color-text-light;
+	gap: $spacing-md;
+}
+
+.emptyIcon {
+	color: $color-border;
+}
+
+.emptyTitle {
+	font-size: 1.25rem;
+	color: $color-dark;
+	margin: 0;
+	font-weight: 600;
+}
+
+.emptyMessage {
+	max-width: 400px;
+	line-height: 1.5;
+	margin: 0;
+	font-size: 0.95rem;
+}
+
+.pagination {
+	padding: $spacing-xl;
+	border-top: 1px solid $color-border;
+	background-color: $color-bg;
+}

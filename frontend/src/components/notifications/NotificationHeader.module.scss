@@ -1,0 +1,252 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.header {
+	background-color: $color-white;
+	border-radius: $radius-lg;
+	margin-bottom: $spacing-xl;
+	border: 1px solid $color-border;
+	box-shadow: $shadow-md;
+	overflow: hidden;
+}
+
+.topSection {
+	padding: $spacing-xl;
+	border-bottom: 1px solid $color-border;
+	display: flex;
+	flex-direction: column;
+	gap: $spacing-xl;
+
+	@include md {
+		flex-direction: row;
+		align-items: flex-start;
+		justify-content: space-between;
+	}
+}
+
+.titleSection {
+	display: flex;
+	align-items: center;
+	gap: $spacing-md;
+	flex: 1;
+
+	h1 {
+		font-size: 1.75rem;
+		font-weight: 700;
+		color: $color-dark;
+		margin: 0 0 $spacing-xs 0;
+		line-height: 1.2;
+
+		@include md {
+			font-size: 2rem;
+		}
+	}
+}
+
+.subtitle {
+	color: $color-text-light;
+	font-size: 0.95rem;
+	margin: 0;
+}
+
+.actionButtons {
+	display: flex;
+	flex-direction: column;
+	gap: $spacing-md;
+	width: 100%;
+
+	@include sm {
+		flex-direction: row;
+	}
+
+	@include md {
+		width: auto;
+		flex-shrink: 0;
+	}
+}
+
+.markAllButton,
+.deleteAllButton {
+	display: flex;
+	align-items: center;
+	gap: $spacing-sm;
+	padding: $spacing-md $spacing-lg;
+	border-radius: $radius-md;
+	font-weight: 600;
+	font-size: 0.9rem;
+	border: none;
+	cursor: pointer;
+	transition: all 0.2s;
+	white-space: nowrap;
+
+	&:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+}
+
+.markAllButton {
+	background-color: $color-primary;
+	color: $color-white;
+
+	&:hover:not(:disabled) {
+		background-color: $color-primary-hover;
+		transform: translateY(-2px);
+		box-shadow: 0 4px 12px rgba($color-primary, 0.3);
+	}
+}
+
+.deleteAllButton {
+	background-color: $color-white;
+	color: $color-text;
+	border: 1px solid $color-border;
+
+	&:hover:not(:disabled) {
+		border-color: #ef4444;
+		color: #ef4444;
+		transform: translateY(-2px);
+	}
+}
+
+.smallSpinner {
+	width: 18px;
+	height: 18px;
+	border: 2px solid rgba(255, 255, 255, 0.3);
+	border-top-color: white;
+	border-radius: 50%;
+	animation: spin 1s linear infinite;
+}
+
+.filterSection {
+	padding: $spacing-lg $spacing-xl;
+	background-color: $color-bg;
+}
+
+.filterControls {
+	display: flex;
+	flex-direction: column;
+	gap: $spacing-lg;
+
+	@include md {
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+	}
+}
+
+.filterGroup {
+	display: flex;
+	align-items: flex-start;
+	gap: $spacing-md;
+	flex-wrap: wrap;
+
+	@include md {
+		align-items: center;
+	}
+}
+
+.filterLabel {
+	font-weight: 600;
+	color: $color-dark;
+	font-size: 0.95rem;
+	white-space: nowrap;
+	margin-top: 2px;
+}
+
+.typeFilters {
+	display: flex;
+	gap: $spacing-xs;
+	flex-wrap: wrap;
+}
+
+.typeFilter {
+	display: flex;
+	align-items: center;
+	gap: $spacing-xs;
+	padding: $spacing-sm $spacing-md;
+	border-radius: $radius-md;
+	border: 1px solid $color-border;
+	background-color: $color-white;
+	color: $color-text;
+	font-size: 0.85rem;
+	font-weight: 500;
+	cursor: pointer;
+	transition: all 0.2s;
+	white-space: nowrap;
+
+	&:hover {
+		border-color: $color-primary;
+		transform: translateY(-1px);
+	}
+
+	&.active {
+		font-weight: 600;
+		box-shadow: $shadow-sm;
+	}
+}
+
+.unreadFilter {
+	display: flex;
+	align-items: center;
+	gap: $spacing-sm;
+	padding: $spacing-sm $spacing-md;
+	background-color: $color-white;
+	border: 1px solid $color-border;
+	border-radius: $radius-md;
+	color: $color-text;
+	font-size: 0.9rem;
+	font-weight: 500;
+	cursor: pointer;
+	transition: all 0.2s;
+	white-space: nowrap;
+	align-self: flex-start;
+
+	&:hover {
+		border-color: $color-primary;
+		background-color: rgba($color-primary, 0.05);
+	}
+
+	&.active {
+		background-color: $color-primary;
+		border-color: $color-primary;
+		color: $color-white;
+		font-weight: 600;
+	}
+
+	@include md {
+		align-self: center;
+	}
+}
+
+@keyframes spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+@media (max-width: 640px) {
+	.typeFilters {
+		flex-direction: column;
+		width: 100%;
+
+		.typeFilter {
+			justify-content: center;
+		}
+	}
+
+	.filterGroup {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: $spacing-sm;
+	}
+
+	.filterLabel {
+		margin-top: 0;
+	}
+
+	.actionButtons {
+		button {
+			justify-content: center;
+		}
+	}
+}
