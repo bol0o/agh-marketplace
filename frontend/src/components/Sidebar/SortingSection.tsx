@@ -11,7 +11,7 @@ type SortOption =
 	| 'name_asc'
 	| 'name_desc'
 	| 'newest'
-	| 'date_desc'
+	| 'date_asc'
 	| 'views_desc';
 
 interface SortingSectionProps {
@@ -38,7 +38,7 @@ export default function SortingSection({
 
 	const sortOptions: { value: SortOption; label: string }[] = [
 		{ value: 'newest', label: 'Najnowsze' },
-		{ value: 'date_desc', label: 'Najstarsze' },
+		{ value: 'date_asc', label: 'Najstarsze' },
 		{ value: 'price_asc', label: 'Cena: rosnąco' },
 		{ value: 'price_desc', label: 'Cena: malejąco' },
 		{ value: 'name_asc', label: 'Nazwa: A-Z' },

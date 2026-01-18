@@ -14,7 +14,7 @@ export function Sidebar() {
 	const pathname = usePathname();
 	const [isMobileOpen, setIsMobileOpen] = useState(false);
 
-	const isMarketplacePage = pathname === '/marketplace' || pathname.startsWith('/marketplace/');
+	const isMarketplacePage = pathname === '/marketplace';
 
 	const handleOpenDrawer = useCallback(() => {
 		setIsMobileOpen(true);

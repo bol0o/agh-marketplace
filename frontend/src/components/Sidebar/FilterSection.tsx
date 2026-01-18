@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Filter, X } from 'lucide-react';
 import styles from './FilterSection.module.scss';
@@ -15,6 +15,7 @@ interface FilterSectionProps {
 	onTypeChange?: (type: ListingType) => void;
 	onConditionChange?: (condition: string[]) => void;
 	onPriceChange?: (minPrice: string, maxPrice: string) => void;
+	onOnlyFollowedChange?: (isFollowed: boolean) => void;
 }
 
 export default function FilterSection({
@@ -24,6 +25,7 @@ export default function FilterSection({
 	onTypeChange,
 	onConditionChange,
 	onPriceChange,
+	onOnlyFollowedChange,
 }: FilterSectionProps) {
 	const router = useRouter();
 	const searchParams = useSearchParams();
@@ -38,6 +40,7 @@ export default function FilterSection({
 	const [localFilters, setLocalFilters] = useState({
 		type: (searchParams.get('type') as ListingType) || 'all',
 		condition: searchParams.get('condition')?.split(',').filter(Boolean) || [],
+		onlyFollowed: searchParams.get('onlyFollowed') === 'true',
 	});
 
 	const updateURL = useCallback(
@@ -94,6 +97,20 @@ export default function FilterSection({
 		}
 	};
 
+	const handleOnlyFollowedChange = () => {
+		const newValue = !localFilters.onlyFollowed;
+
+		setLocalFilters((prev) => ({ ...prev, onlyFollowed: newValue }));
+
+		if (onOnlyFollowedChange) {
+			onOnlyFollowedChange(newValue);
+		}
+
+		if (immediateUpdate) {
+			updateURL({ onlyFollowed: newValue ? 'true' : null });
+		}
+	};
+
 	const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target;
 		const numericValue = value.replace(/[^0-9]/g, '');
@@ -140,7 +157,7 @@ export default function FilterSection({
 	};
 
 	const clearFilters = () => {
-		setLocalFilters({ type: 'all', condition: [] });
+		setLocalFilters({ type: 'all', condition: [], onlyFollowed: false });
 		setPrice({ min: '', max: '' });
 
 		if (onTypeChange) {
@@ -158,23 +175,6 @@ export default function FilterSection({
 			if (closeDrawer) closeDrawer();
 		}
 	};
-
-	const hasActiveFilters = useMemo(() => {
-		return (
-			localFilters.type !== 'all' ||
-			price.min ||
-			price.max ||
-			localFilters.condition.length > 0
-		);
-	}, [localFilters, price]);
-
-	useEffect(() => {
-		return () => {
-			if (updateTimeoutRef.current) {
-				clearTimeout(updateTimeoutRef.current);
-			}
-		};
-	}, []);
 
 	const priceInputsClass = `${styles.priceInputs} ${isCompact ? styles.compact : ''}`;
 
@@ -259,6 +259,17 @@ export default function FilterSection({
 								label="Uszkodzony"
 								checked={localFilters.condition.includes('damaged')}
 								onChange={() => handleCheckboxChange('damaged')}
+							/>
+						</div>
+					</div>
+
+					<div className={styles.filterGroup}>
+						<label className={styles.filterLabel}>Społeczne</label>
+						<div className={styles.checkboxGroup}>
+							<Checkbox
+								label="Od obserwowanych"
+								checked={localFilters.onlyFollowed}
+								onChange={handleOnlyFollowedChange}
 							/>
 						</div>
 					</div>

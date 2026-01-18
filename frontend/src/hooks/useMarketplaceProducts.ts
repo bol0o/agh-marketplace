@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Product, ProductsResponse } from '@/types/marketplace';
+import api from '@/lib/axios';
 
 interface UseMarketplaceProductsReturn {
 	products: Product[];
@@ -10,8 +11,6 @@ interface UseMarketplaceProductsReturn {
 	refresh: () => Promise<void>;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
-
 export const useMarketplaceProducts = (): UseMarketplaceProductsReturn => {
 	const searchParams = useSearchParams();
 
@@ -20,7 +19,6 @@ export const useMarketplaceProducts = (): UseMarketplaceProductsReturn => {
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
-	// Budowanie parametrów dla API
 	const buildApiParams = useCallback(() => {
 		const params = new URLSearchParams();
 
@@ -31,9 +29,7 @@ export const useMarketplaceProducts = (): UseMarketplaceProductsReturn => {
 		if (search) params.set('search', search);
 
 		const cat = searchParams.get('cat');
-		if (cat) {
-			params.set('cat', cat.toUpperCase());
-		}
+		if (cat) params.set('cat', cat.toUpperCase());
 
 		const minPrice = searchParams.get('minPrice');
 		if (minPrice) params.set('minPrice', minPrice);
@@ -42,9 +38,10 @@ export const useMarketplaceProducts = (): UseMarketplaceProductsReturn => {
 		if (maxPrice) params.set('maxPrice', maxPrice);
 
 		const type = searchParams.get('type');
-		if (type && type !== 'all') {
-			params.set('status', type);
-		}
+		if (type && type !== 'all') params.set('status', type);
+
+		const onlyFollowed = searchParams.get('onlyFollowed');
+		if (onlyFollowed) params.set('onlyFollowed', 'true');
 
 		const sort = searchParams.get('sort');
 		if (sort) {
@@ -53,8 +50,8 @@ export const useMarketplaceProducts = (): UseMarketplaceProductsReturn => {
 				price_desc: 'price_desc',
 				name_asc: 'name_asc',
 				name_desc: 'name_desc',
-				newest: 'date_desc',
-				date_desc: 'date_asc',
+				date_asc: 'createdAt_asc',
+				newest: 'newest',
 			};
 			params.set('sort', sortMap[sort] || sort);
 		}
@@ -63,9 +60,7 @@ export const useMarketplaceProducts = (): UseMarketplaceProductsReturn => {
 		if (location) params.set('location', location);
 
 		const condition = searchParams.get('condition');
-		if (condition) {
-			params.set('condition', condition);
-		}
+		if (condition) params.set('condition', condition);
 
 		return params.toString();
 	}, [searchParams]);
@@ -76,19 +71,16 @@ export const useMarketplaceProducts = (): UseMarketplaceProductsReturn => {
 			setError(null);
 
 			const queryString = buildApiParams();
-			const response = await fetch(`${API_URL}/products?${queryString}`);
 
-			if (!response.ok) {
-				throw new Error(`Błąd API (${response.status}): ${response.statusText}`);
-			}
+			const response = await api.get<ProductsResponse>(`/products?${queryString}`);
 
-			const data: ProductsResponse = await response.json();
+			const data = response.data;
 
 			setProducts(data.products || []);
 			setPagination(data.pagination);
-		} catch (err) {
+		} catch (err: any) {
 			const errorMessage =
-				err instanceof Error ? err.message : 'Nie udało się pobrać produktów';
+				err.response?.data?.error || err.message || 'Nie udało się pobrać produktów';
 			setError(errorMessage);
 			console.error('Błąd pobierania produktów:', err);
 		} finally {

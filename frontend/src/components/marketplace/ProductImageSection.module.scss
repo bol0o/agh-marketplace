@@ -1,0 +1,78 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.imageContainer {
+	position: relative;
+	aspect-ratio: 4/3;
+	border-radius: 20px;
+	overflow: hidden;
+	background-color: $color-bg;
+	margin-bottom: 24px;
+	box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+
+	@include lg {
+		margin-bottom: 32px;
+	}
+}
+
+.productImage {
+	object-fit: cover;
+	transition: transform 0.7s cubic-bezier(0.25, 0.8, 0.25, 1);
+
+	&:hover {
+		transform: scale(1.05);
+	}
+}
+
+.statusBadge {
+	position: absolute;
+	top: 20px;
+	left: 20px;
+	padding: 10px 20px;
+	background-color: rgba(0, 0, 0, 0.85);
+	backdrop-filter: blur(10px);
+	color: white;
+	border-radius: 10px;
+	font-weight: 700;
+	font-size: 0.9rem;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	z-index: 2;
+
+	&.sold {
+		background-color: rgba(#16a34a, 0.9);
+	}
+
+	&.ended {
+		background-color: rgba(#6b7280, 0.9);
+	}
+
+	&.reserved {
+		background-color: rgba(#f59e0b, 0.9);
+	}
+}
+
+.typeBadge {
+	position: absolute;
+	top: 20px;
+	right: 20px;
+	padding: 10px 18px;
+	border-radius: 10px;
+	font-weight: 700;
+	font-size: 0.85rem;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	z-index: 2;
+	backdrop-filter: blur(10px);
+
+	&.auction {
+		background-color: rgba(#7c3aed, 0.9);
+		color: white;
+	}
+
+	&.buy_now {
+		background-color: rgba(#16a34a, 0.9);
+		color: white;
+	}
+}

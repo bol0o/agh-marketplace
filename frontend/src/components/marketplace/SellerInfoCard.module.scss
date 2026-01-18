@@ -1,0 +1,145 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.sellerBox {
+	background-color: white;
+	border-radius: 16px;
+	border: 1px solid $color-border;
+	padding: 24px;
+	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+	transition: all 0.3s;
+
+	&:hover {
+		box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+	}
+}
+
+.boxHeader {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin-bottom: 20px;
+	padding-bottom: 16px;
+	border-bottom: 2px solid $color-bg;
+
+	h3 {
+		font-size: 1.1rem;
+		font-weight: 700;
+		color: $color-dark;
+		margin: 0;
+	}
+
+	svg {
+		color: $color-primary;
+	}
+}
+
+.sellerCard {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+}
+
+.sellerAvatar {
+	flex-shrink: 0;
+}
+
+.avatar {
+	width: 48px;
+	height: 48px;
+	border-radius: 50%;
+	object-fit: cover;
+	border: 2px solid $color-border;
+}
+
+.avatarPlaceholder {
+	width: 48px;
+	height: 48px;
+	border-radius: 50%;
+	background: linear-gradient(135deg, $color-primary, $color-secondary);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: white;
+	font-weight: 700;
+	font-size: 1rem;
+	border: 2px solid white;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.sellerInfo {
+	flex: 1;
+	min-width: 0;
+}
+
+.sellerName {
+	font-size: 1rem;
+	font-weight: 700;
+	color: $color-dark;
+	margin-bottom: 6px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.sellerRating {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin-bottom: 12px;
+
+	svg {
+		color: #f59e0b;
+	}
+
+	span {
+		font-weight: 600;
+		color: $color-text;
+		font-size: 0.9rem;
+	}
+}
+
+.ratingLabel {
+	color: $color-text-light !important;
+	font-weight: 400 !important;
+	margin-left: 4px;
+	font-size: 0.8rem !important;
+}
+
+.sellerActions {
+	display: flex;
+	gap: 8px;
+}
+
+.followButton,
+.messageButton {
+	padding: 8px 12px;
+	border-radius: 8px;
+	font-size: 0.85rem;
+	font-weight: 600;
+	transition: all 0.2s;
+	border: none;
+	cursor: pointer;
+}
+
+.followButton {
+	background-color: $color-primary;
+	color: white;
+
+	&:hover {
+		background-color: $color-primary-hover;
+	}
+}
+
+.messageButton {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	background-color: transparent;
+	color: $color-primary;
+	border: 1px solid $color-primary;
+
+	&:hover {
+		background-color: rgba($color-primary, 0.05);
+	}
+}

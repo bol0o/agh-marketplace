@@ -15,7 +15,14 @@ interface MobileFilterDrawerProps {
 
 type CategoryType = 'BOOKS' | 'ELECTRONICS' | 'ACCESSORIES' | 'CLOTHING' | 'OTHER';
 type ListingType = 'all' | 'buy_now' | 'auction';
-type SortOption = 'price_asc' | 'price_desc' | 'name_asc' | 'name_desc' | 'newest' | 'date_desc';
+type SortOption =
+	| 'price_asc'
+	| 'price_desc'
+	| 'name_asc'
+	| 'name_desc'
+	| 'newest'
+	| 'date_asc'
+	| 'views_desc';
 
 export default function MobileFilterDrawer({ isOpen, onClose }: MobileFilterDrawerProps) {
 	const router = useRouter();
@@ -32,6 +39,7 @@ export default function MobileFilterDrawer({ isOpen, onClose }: MobileFilterDraw
 		condition: searchParams.get('condition')?.split(',').filter(Boolean) || [],
 		minPrice: searchParams.get('minPrice') || '',
 		maxPrice: searchParams.get('maxPrice') || '',
+		onlyFollowed: searchParams.get('onlyFollowed') === 'true',
 	});
 
 	useEffect(() => {
@@ -43,6 +51,7 @@ export default function MobileFilterDrawer({ isOpen, onClose }: MobileFilterDraw
 				condition: searchParams.get('condition')?.split(',').filter(Boolean) || [],
 				minPrice: searchParams.get('minPrice') || '',
 				maxPrice: searchParams.get('maxPrice') || '',
+				onlyFollowed: searchParams.get('onlyFollowed') === 'true',
 			});
 		}
 	}, [isOpen, searchParams]);
@@ -99,6 +108,10 @@ export default function MobileFilterDrawer({ isOpen, onClose }: MobileFilterDraw
 		setMobileFilters((prev) => ({ ...prev, minPrice, maxPrice }));
 	}, []);
 
+	const handleOnlyFollowedChange = useCallback((isFollowed: boolean) => {
+		setMobileFilters((prev) => ({ ...prev, onlyFollowed: isFollowed }));
+	}, []);
+
 	const applyAllFilters = () => {
 		const params = new URLSearchParams(searchParams.toString());
 
@@ -136,6 +149,12 @@ export default function MobileFilterDrawer({ isOpen, onClose }: MobileFilterDraw
 			params.set('maxPrice', mobileFilters.maxPrice);
 		} else {
 			params.delete('maxPrice');
+		}
+
+		if (mobileFilters.onlyFollowed) {
+			params.set('onlyFollowed', 'true');
+		} else {
+			params.delete('onlyFollowed');
 		}
 
 		router.push(`/marketplace?${params.toString()}`, { scroll: false });
@@ -208,6 +227,7 @@ export default function MobileFilterDrawer({ isOpen, onClose }: MobileFilterDraw
 						onTypeChange={handleTypeChange}
 						onConditionChange={handleConditionChange}
 						onPriceChange={handlePriceChange}
+						onOnlyFollowedChange={handleOnlyFollowedChange}
 					/>
 				</div>
 

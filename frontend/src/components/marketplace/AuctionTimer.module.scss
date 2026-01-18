@@ -1,0 +1,99 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.timer {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	padding: 20px;
+	background: linear-gradient(135deg, rgba(#7c3aed, 0.1), rgba(#6d28d9, 0.1));
+	border-radius: 16px;
+	border: 1px solid rgba(#7c3aed, 0.2);
+
+	&.ended {
+		background: linear-gradient(135deg, rgba(#6b7280, 0.1), rgba(#4b5563, 0.1));
+		border-color: rgba(#6b7280, 0.2);
+		color: #6b7280;
+	}
+}
+
+.timerIcon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 40px;
+	height: 40px;
+	background-color: white;
+	border-radius: 12px;
+	color: #7c3aed;
+
+	.ended & {
+		color: #6b7280;
+	}
+}
+
+.timerContent {
+	flex: 1;
+}
+
+.timerLabel {
+	font-size: 0.9rem;
+	color: $color-text-light;
+	margin-bottom: 8px;
+	font-weight: 500;
+}
+
+.timerDigits {
+	display: flex;
+	gap: 12px;
+}
+
+.timeUnit {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	min-width: 60px;
+}
+
+.number {
+	font-size: 1.5rem;
+	font-weight: 800;
+	color: #7c3aed;
+	line-height: 1;
+	font-variant-numeric: tabular-nums;
+
+	.ended & {
+		color: #6b7280;
+	}
+}
+
+.label {
+	font-size: 0.75rem;
+	color: $color-text-light;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	margin-top: 4px;
+}
+
+.timerCompact {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 0.85rem;
+	color: #7c3aed;
+	font-weight: 600;
+
+	svg {
+		color: #7c3aed;
+	}
+}
+
+@include sm {
+	.timerDigits {
+		gap: 16px;
+	}
+
+	.number {
+		font-size: 1.8rem;
+	}
+}
