@@ -43,7 +43,7 @@ export function NotificationList({
 	formatDate,
 	onMarkAsRead,
 }: NotificationListProps) {
-	if (!Array.isArray(notifications) || notifications.length === 0) {
+	if (notifications.length === 0) {
 		return (
 			<div className={styles.emptyState}>
 				<Bell size={48} className={styles.emptyIcon} />

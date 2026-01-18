@@ -49,7 +49,12 @@ export function NotificationHeader({
 						<h1>Powiadomienia</h1>
 						<p className={styles.subtitle}>
 							Masz {unreadCount} nieprzeczytanych powiadomień
-							{totalCount > 0 && ` • Łącznie: ${totalCount}`}
+						</p>
+						<p className={styles.subtitle}>
+							{!showOnlyUnread &&
+								selectedType === 'ALL' &&
+								totalCount > 0 &&
+								`Łącznie: ${totalCount}`}
 						</p>
 					</div>
 				</div>

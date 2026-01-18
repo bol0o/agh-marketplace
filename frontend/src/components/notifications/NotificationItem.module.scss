@@ -129,7 +129,7 @@
 
 .unreadBadge {
 	position: absolute;
-	top: $spacing-xl;
+	top: calc($spacing-xl - 10px);
 	right: $spacing-xl;
 	width: 8px;
 	height: 8px;

@@ -15,7 +15,6 @@ import api from '@/lib/axios';
 import { useNotifications } from '@/hooks/useNotifications';
 import { NotificationHeader } from '@/components/notifications/NotificationHeader';
 import { NotificationList } from '@/components/notifications/NotificationList';
-
 import styles from './notifications.module.scss';
 
 interface Notification {
@@ -67,9 +66,20 @@ const NOTIFICATION_TYPES = {
 	},
 };
 
+interface ApiResponse {
+	pagination: {
+		totalItems: number;
+		totalPages: number;
+		currentPage: number;
+		itemsPerPage: number;
+	};
+	notifications: Notification[];
+}
+
 export default function NotificationsPage() {
 	const searchParams = useSearchParams();
 	const page = searchParams.get('page') || '1';
+	const limit = searchParams.get('limit') || '12';
 
 	const {
 		unreadCount: storeUnreadCount,
@@ -84,8 +94,12 @@ export default function NotificationsPage() {
 	const [error, setError] = useState<string | null>(null);
 	const [selectedType, setSelectedType] = useState<string>('ALL');
 	const [showOnlyUnread, setShowOnlyUnread] = useState(false);
-	const [totalPages, setTotalPages] = useState(1);
-	const [totalCount, setTotalCount] = useState(0);
+	const [pagination, setPagination] = useState({
+		totalItems: 0,
+		totalPages: 1,
+		currentPage: 1,
+		itemsPerPage: 12,
+	});
 	const [markingAll, setMarkingAll] = useState(false);
 	const [deletingAll, setDeletingAll] = useState(false);
 
@@ -94,28 +108,39 @@ export default function NotificationsPage() {
 		fetchStoreCount();
 	}, [page, selectedType, showOnlyUnread]);
 
+	// W funkcji fetchNotifications w page.tsx
 	const fetchNotifications = async () => {
 		try {
 			setLoading(true);
 			setError(null);
 
-			const response = await api.get(`/notifications`);
+			const params = new URLSearchParams({
+				page,
+				limit,
+			});
 
-			if (Array.isArray(response.data)) {
-				setNotifications(response.data);
-				setTotalPages(1);
-				setTotalCount(response.data.length);
+			if (selectedType !== 'ALL') {
+				params.append('type', selectedType);
+			}
 
-				const localUnreadCount = response.data.filter((n) => !n.isRead).length;
-				if (localUnreadCount !== storeUnreadCount) {
-					setUnreadCount(localUnreadCount);
+			if (showOnlyUnread) {
+				params.append('unread', 'true');
+			}
+
+			const response = await api.get<ApiResponse>(`/notifications?${params}`);
+			const data = response.data;
+
+			setNotifications(data.notifications);
+			setPagination(data.pagination);
+
+			if (selectedType === 'ALL' && !showOnlyUnread) {
+				const localUnread = data.notifications.filter((n) => !n.isRead).length;
+				console.log('Local unread count from notifications:', localUnread);
+
+				if (Math.abs(localUnread - storeUnreadCount) > 5) {
+					console.log('Large difference, fetching from API...');
+					await fetchStoreCount();
 				}
-			} else if (response.data.notifications) {
-				setNotifications(response.data.notifications);
-				setTotalPages(response.data.totalPages || 1);
-				setTotalCount(response.data.total || response.data.notifications.length);
-			} else {
-				setNotifications([]);
 			}
 		} catch (err: any) {
 			console.error('Error fetching notifications:', err);
@@ -131,13 +156,9 @@ export default function NotificationsPage() {
 			await api.patch(`/notifications/${id}/read`);
 
 			setNotifications((prev) =>
-				Array.isArray(prev)
-					? prev.map((notification) =>
-							notification.id === id
-								? { ...notification, isRead: true }
-								: notification
-						)
-					: []
+				prev.map((notification) =>
+					notification.id === id ? { ...notification, isRead: true } : notification
+				)
 			);
 
 			markStoreAsRead();
@@ -152,12 +173,13 @@ export default function NotificationsPage() {
 			await api.patch('/notifications/mark-all-read');
 
 			setNotifications((prev) =>
-				Array.isArray(prev)
-					? prev.map((notification) => ({ ...notification, isRead: true }))
-					: []
+				prev.map((notification) => ({ ...notification, isRead: true }))
 			);
 
 			markAllStoreAsRead();
+
+			// Odśwież listę aby pokazać zmiany
+			await fetchNotifications();
 		} catch (err) {
 			console.error('Error marking all as read:', err);
 		} finally {
@@ -173,9 +195,7 @@ export default function NotificationsPage() {
 		try {
 			setDeletingAll(true);
 
-			const readNotifications = Array.isArray(notifications)
-				? notifications.filter((n) => n.isRead)
-				: [];
+			const readNotifications = notifications.filter((n) => n.isRead);
 
 			for (const notification of readNotifications) {
 				try {
@@ -231,8 +251,7 @@ export default function NotificationsPage() {
 		);
 	};
 
-	const hasReadNotifications =
-		Array.isArray(notifications) && notifications.some((n) => n.isRead);
+	const hasReadNotifications = notifications.some((n) => n.isRead);
 
 	if (loading && notifications.length === 0) {
 		return (
@@ -247,7 +266,7 @@ export default function NotificationsPage() {
 		<div className={styles.container}>
 			<NotificationHeader
 				unreadCount={storeUnreadCount}
-				totalCount={totalCount}
+				totalCount={pagination.totalItems}
 				markingAll={markingAll}
 				deletingAll={deletingAll}
 				hasReadNotifications={hasReadNotifications}
@@ -271,7 +290,7 @@ export default function NotificationsPage() {
 			<div className={styles.mainContent}>
 				<NotificationList
 					notifications={notifications}
-					totalPages={totalPages}
+					totalPages={pagination.totalPages}
 					showOnlyUnread={showOnlyUnread}
 					selectedType={selectedType}
 					notificationTypes={NOTIFICATION_TYPES}

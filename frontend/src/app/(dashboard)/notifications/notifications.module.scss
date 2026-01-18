@@ -44,7 +44,6 @@
 	}
 }
 
-/* Alert błędu */
 .errorAlert {
 	display: flex;
 	align-items: center;
@@ -77,7 +76,6 @@
 	margin-top: $spacing-xl;
 }
 
-/* Responsywność */
 @media (max-width: 640px) {
 	.container {
 		padding: $spacing-md;
