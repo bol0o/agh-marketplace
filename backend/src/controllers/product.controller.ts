@@ -135,6 +135,11 @@ export const getProducts = async (req: AuthRequest, res: Response) => {
       case "createdAt_desc":
         orderBy = { createdAt: "desc" };
         break;
+      case "ending_soon":
+        orderBy = { auctionEnd: "asc" };
+        where.isAuction = true;
+        where.auctionEnd = { gt: new Date() };
+        break;
       default:
         orderBy = { createdAt: "desc" };
     }
