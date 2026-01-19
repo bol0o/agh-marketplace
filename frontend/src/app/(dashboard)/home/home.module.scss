@@ -1,0 +1,22 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.container {
+	max-width: 1100px;
+	margin: 0 auto;
+	padding: $spacing-lg;
+	width: 100%;
+	overflow: hidden;
+
+	@include md {
+		padding: $spacing-xl;
+	}
+}
+
+.swipersSection {
+	display: flex;
+	flex-direction: column;
+	gap: $spacing-xl;
+	width: 100%;
+	overflow: hidden;
+}

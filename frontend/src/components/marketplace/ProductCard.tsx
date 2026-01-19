@@ -81,8 +81,8 @@ export function ProductCard({ product }: { product: Product }) {
 						{product.status === 'sold'
 							? 'Sprzedane'
 							: product.status === 'reserved'
-							? 'Zarezerwowane'
-							: 'Zakończone'}
+								? 'Zarezerwowane'
+								: 'Zakończone'}
 					</div>
 				)}
 			</div>
