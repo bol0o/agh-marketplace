@@ -55,20 +55,49 @@ export const addReview = async (req: AuthRequest, res: Response) => {
   }
 };
 
-//Get reviews for specific user
+// Get reviews for specific user (With Pagination)
 export const getReviewsForUser = async (req: AuthRequest, res: Response) => {
   try {
-    const { userId } = req.params; //This is the ID of the user being reviewed
-    const reviews = await prisma.review.findMany({
-      where: { revieweeId: userId },
-      include: {
-        reviewer: {
-          select: { firstName: true, lastName: true },
+    const { userId } = req.params;
+
+    // 1. Pagination Parameters
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 5;
+    const skip = (page - 1) * limit;
+
+    // 2. Fetch Data & Count
+    const [reviews, totalItems] = await prisma.$transaction([
+      prisma.review.findMany({
+        where: { revieweeId: userId },
+        take: limit,
+        skip: skip,
+        include: {
+          reviewer: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              avatarUrl: true,
+            },
+          },
         },
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.review.count({
+        where: { revieweeId: userId },
+      }),
+    ]);
+
+    // 3. Return Response
+    res.json({
+      pagination: {
+        totalItems,
+        totalPages: Math.ceil(totalItems / limit),
+        currentPage: page,
+        itemsPerPage: limit,
       },
-      orderBy: { createdAt: "desc" },
+      data: reviews,
     });
-    res.json(reviews);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Błąd pobierania opinii" });

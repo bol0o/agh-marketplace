@@ -10,7 +10,7 @@ const formatUserResponse = (user: any) => {
   const reviewsCount = user.reviewsReceived.length;
   const ratingSum = user.reviewsReceived.reduce(
     (acc: number, r: any) => acc + r.rating,
-    0
+    0,
   );
   const avgRating = reviewsCount > 0 ? ratingSum / reviewsCount : 0;
 
@@ -160,30 +160,43 @@ export const updateSettings = async (req: AuthRequest, res: Response) => {
   }
 };
 
-//GET /api/users/:id (Public Profile)
+// GET /api/users/:id (Public Profile)
 export const getPublicProfile = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
 
-    const user = await prisma.user.findUnique({
-      where: { id },
-      include: {
-        reviewsReceived: { select: { rating: true } },
-        _count: { select: { products: true } },
-      },
-    });
+    // fetch
+    const [user, soldCount] = await prisma.$transaction([
+      // 1. Get User Data
+      prisma.user.findUnique({
+        where: { id },
+        include: {
+          reviewsReceived: { select: { rating: true } },
+          _count: { select: { products: true } },
+        },
+      }),
+      // 2. Count items sold by this user
+      prisma.product.count({
+        where: {
+          sellerId: id,
+          status: "SOLD",
+        },
+      }),
+    ]);
 
-    if (!user) return res.status(404).json({ error: "User not found" });
+    if (!user) {
+      return res.status(404).json({ error: "Użytkownik nie znaleziony" });
+    }
 
-    //Calculate rating
+    // Calculate average rating
     const reviewsCount = user.reviewsReceived.length;
     const ratingSum = user.reviewsReceived.reduce(
       (acc, r) => acc + r.rating,
-      0
+      0,
     );
     const avgRating = reviewsCount > 0 ? ratingSum / reviewsCount : 0;
 
-    //Map to 'PublicUserProfile' interface (Restrict private data)
+    // Map to 'PublicUserProfile' interface
     const publicProfile = {
       id: user.id,
       name: `${user.firstName} ${user.lastName}`,
@@ -196,10 +209,14 @@ export const getPublicProfile = async (req: AuthRequest, res: Response) => {
       ratingCount: reviewsCount,
       joinedAt: user.createdAt,
       listedProductsCount: user._count.products,
+      soldItemsCount: soldCount,
     };
 
     res.json(publicProfile);
   } catch (error) {
-    res.status(500).json({ error: "Error fetching public profile" });
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: "Błąd podczas pobierania profilu użytkownika" });
   }
 };
