@@ -1,0 +1,337 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.container {
+	background: $color-white;
+	border-radius: $radius-lg;
+	padding: $spacing-lg;
+	box-shadow: $shadow-md;
+	border: 1px solid $color-border;
+	width: 100%;
+	overflow: hidden;
+
+	@include md {
+		padding: $spacing-xl;
+	}
+}
+
+.header {
+	@include flex-between;
+	margin-bottom: $spacing-lg;
+	padding-bottom: $spacing-md;
+	border-bottom: 1px solid $color-border;
+	flex-wrap: wrap; // Dodajemy wrap
+	gap: $spacing-md;
+
+	@include md {
+		margin-bottom: $spacing-xl;
+		padding-bottom: $spacing-lg;
+		flex-wrap: nowrap;
+	}
+}
+
+.title {
+	font-size: 1.25rem;
+	font-weight: 700;
+	color: $color-dark;
+	margin: 0;
+
+	@include md {
+		font-size: 1.5rem;
+	}
+}
+
+.addReviewButton {
+	background: $color-primary;
+	color: $color-white;
+	border: none;
+	padding: $spacing-sm $spacing-md;
+	border-radius: $radius-md;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background-color 0.2s ease;
+	font-size: 0.9rem;
+	white-space: nowrap;
+
+	&:hover {
+		background: darken($color-primary, 10%);
+	}
+
+	&:focus-visible {
+		outline: 2px solid $color-primary;
+		outline-offset: 2px;
+	}
+
+	@include sm {
+		padding: $spacing-sm $spacing-lg;
+		font-size: inherit;
+	}
+}
+
+.reviewsList {
+	display: flex;
+	flex-direction: column;
+	gap: $spacing-md;
+
+	@include md {
+		gap: $spacing-lg;
+	}
+}
+
+.reviewCard {
+	padding: $spacing-md;
+	background: $color-bg;
+	border-radius: $radius-lg;
+	border: 1px solid $color-border;
+	width: 100%;
+	overflow: hidden;
+
+	@include md {
+		padding: $spacing-lg;
+	}
+}
+
+.reviewHeader {
+	@include flex-between;
+	margin-bottom: $spacing-md;
+	flex-wrap: wrap; // Dodajemy wrap
+	gap: $spacing-md;
+}
+
+.reviewerLink {
+	text-decoration: none;
+	color: inherit;
+	flex: 1;
+	min-width: 0; // Kluczowe
+	overflow: hidden;
+
+	&:hover {
+		.reviewerName {
+			color: $color-primary;
+			text-decoration: underline;
+			text-underline-offset: 2px;
+		}
+
+		.reviewerIcon {
+			color: $color-primary;
+		}
+	}
+
+	&:focus-visible {
+		outline: 2px solid $color-primary;
+		outline-offset: 4px;
+		border-radius: $radius-md;
+	}
+}
+
+.reviewerInfo {
+	display: flex;
+	align-items: center;
+	gap: $spacing-md;
+	min-width: 0; // Kluczowe
+}
+
+.reviewerIcon {
+	width: 32px;
+	height: 32px;
+	color: $color-text-light;
+	flex-shrink: 0;
+	transition: color 0.2s ease;
+
+	@include sm {
+		width: 40px;
+		height: 40px;
+	}
+}
+
+.reviewerName {
+	font-weight: 600;
+	color: $color-dark;
+	margin-bottom: $spacing-xs;
+	transition: color 0.2s ease;
+	display: flex;
+	align-items: center;
+	gap: $spacing-xs;
+	flex-wrap: wrap; // Dodajemy wrap
+	word-break: break-word; // Łamanie długich nazw
+}
+
+.youBadge {
+	font-size: 0.75rem;
+	background: rgba($color-primary, 0.1);
+	color: $color-primary;
+	padding: 2px 6px;
+	border-radius: $radius-sm;
+	font-weight: 500;
+	white-space: nowrap;
+
+	@include sm {
+		font-size: 0.8rem;
+		padding: 2px 8px;
+	}
+}
+
+.reviewDate {
+	display: flex;
+	align-items: center;
+	gap: $spacing-xs;
+	font-size: 0.8rem;
+	color: $color-text-light;
+	flex-wrap: wrap;
+
+	@include sm {
+		font-size: 0.85rem;
+	}
+}
+
+.dateIcon {
+	flex-shrink: 0;
+}
+
+.reviewRating {
+	display: flex;
+	gap: 2px;
+	flex-shrink: 0;
+	align-self: flex-start; // Zmieniamy align
+}
+
+.star {
+	color: $color-border;
+	fill: transparent;
+	width: 14px;
+	height: 14px;
+
+	&.starFilled {
+		color: #fbbf24; // yellow-400
+		fill: currentColor;
+	}
+
+	@include sm {
+		width: 16px;
+		height: 16px;
+	}
+}
+
+.reviewComment {
+	padding-top: $spacing-md;
+	border-top: 1px solid $color-border;
+	color: $color-text;
+	line-height: 1.6;
+	font-size: 0.9rem;
+	word-break: break-word; // Łamanie długich komentarzy
+
+	@include sm {
+		font-size: 0.95rem;
+	}
+}
+
+.emptyReviews {
+	@include flex-center;
+	flex-direction: column;
+	background: $color-white;
+	border-radius: $radius-lg;
+	padding: $spacing-xl;
+	box-shadow: $shadow-md;
+	border: 1px solid $color-border;
+	text-align: center;
+	width: 100%;
+	overflow: hidden;
+}
+
+.emptyContent {
+	max-width: 100%;
+	padding: $spacing-md;
+}
+
+.emptyIcon {
+	width: 48px;
+	height: 48px;
+	color: $color-border;
+	margin-bottom: $spacing-md;
+
+	@include sm {
+		width: 64px;
+		height: 64px;
+		margin-bottom: $spacing-lg;
+	}
+}
+
+.emptyTitle {
+	font-size: 1.1rem;
+	font-weight: 600;
+	color: $color-dark;
+	margin-bottom: $spacing-sm;
+
+	@include sm {
+		font-size: 1.25rem;
+	}
+}
+
+.emptyText {
+	color: $color-text-light;
+	margin-bottom: $spacing-lg;
+	line-height: 1.6;
+	font-size: 0.9rem;
+
+	@include sm {
+		font-size: 0.95rem;
+	}
+}
+
+// Dla bardzo małych ekranów
+@include max-xs {
+	.container {
+		padding: $spacing-md;
+		margin-left: -$spacing-md;
+		margin-right: -$spacing-md;
+		border-radius: 0;
+		border-left: none;
+		border-right: none;
+	}
+
+	.header {
+		flex-direction: column;
+		align-items: stretch;
+		gap: $spacing-sm;
+	}
+
+	.title {
+		font-size: 1.1rem;
+		text-align: center;
+	}
+
+	.addReviewButton {
+		width: 100%;
+		padding: $spacing-sm;
+	}
+
+	.reviewHeader {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+
+	.reviewerInfo {
+		width: 100%;
+	}
+
+	.reviewerName {
+		font-size: 0.95rem;
+	}
+
+	.reviewRating {
+		align-self: center; // Wyśrodkowujemy na mobilce
+	}
+
+	.reviewComment {
+		font-size: 0.85rem;
+	}
+
+	.emptyReviews {
+		padding: $spacing-lg;
+		margin-left: -$spacing-md;
+		margin-right: -$spacing-md;
+		border-radius: 0;
+		border-left: none;
+		border-right: none;
+	}
+}

@@ -1,0 +1,346 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.container {
+	background: $color-white;
+	border-radius: $radius-lg;
+	padding: $spacing-lg;
+	box-shadow: $shadow-lg;
+	border: 2px solid $color-border;
+	margin-bottom: $spacing-xl;
+	width: 100%;
+	overflow: hidden;
+
+	@include md {
+		padding: $spacing-xl;
+	}
+}
+
+.header {
+	@include flex-between;
+	margin-bottom: $spacing-lg;
+	padding-bottom: $spacing-md;
+	border-bottom: 1px solid $color-border;
+
+	@include md {
+		margin-bottom: $spacing-xl;
+		padding-bottom: $spacing-lg;
+	}
+}
+
+.title {
+	font-size: 1.1rem;
+	font-weight: 700;
+	color: $color-dark;
+	margin: 0;
+
+	@include sm {
+		font-size: 1.25rem;
+	}
+}
+
+.closeButton {
+	@include flex-center;
+	width: 32px;
+	height: 32px;
+	border-radius: $radius-circle;
+	background: transparent;
+	border: none;
+	color: $color-text-light;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	flex-shrink: 0;
+
+	&:hover {
+		background: $color-bg;
+		color: $color-dark;
+	}
+
+	&:focus-visible {
+		outline: 2px solid $color-primary;
+		outline-offset: 2px;
+	}
+
+	@include sm {
+		width: 36px;
+		height: 36px;
+	}
+}
+
+.form {
+	display: flex;
+	flex-direction: column;
+	gap: $spacing-lg;
+
+	@include md {
+		gap: $spacing-xl;
+	}
+}
+
+.ratingSection {
+	display: flex;
+	flex-direction: column;
+	gap: $spacing-md;
+}
+
+.ratingLabel {
+	font-weight: 600;
+	color: $color-dark;
+	font-size: 0.9rem;
+
+	@include sm {
+		font-size: 0.95rem;
+	}
+}
+
+.starsContainer {
+	display: flex;
+	align-items: center;
+	gap: $spacing-sm;
+	flex-wrap: wrap; // Dodajemy wrap
+
+	@include sm {
+		gap: $spacing-md;
+		flex-wrap: nowrap;
+	}
+}
+
+.starButton {
+	background: none;
+	border: none;
+	padding: $spacing-xs;
+	cursor: pointer;
+	color: $color-border;
+	transition: all 0.2s ease;
+	flex-shrink: 0; // Zapobiega skurczeniu
+
+	&:hover:not(:disabled) {
+		color: #fbbf24;
+		transform: scale(1.1);
+	}
+
+	&:focus-visible {
+		outline: 2px solid $color-primary;
+		outline-offset: 2px;
+		border-radius: $radius-circle;
+	}
+
+	&:disabled {
+		cursor: not-allowed;
+		opacity: 0.6;
+	}
+
+	svg {
+		display: block;
+		width: 24px;
+		height: 24px;
+
+		@include sm {
+			width: 28px;
+			height: 28px;
+		}
+
+		@include md {
+			width: 32px;
+			height: 32px;
+		}
+	}
+}
+
+.starFilled {
+	color: #fbbf24 !important;
+
+	svg {
+		fill: currentColor;
+	}
+}
+
+.ratingValue {
+	font-size: 1.1rem;
+	font-weight: 700;
+	color: $color-dark;
+	margin-left: 0;
+	margin-top: $spacing-sm;
+	min-width: 40px;
+	text-align: center;
+
+	@include sm {
+		margin-left: $spacing-md;
+		margin-top: 0;
+		font-size: 1.25rem;
+	}
+}
+
+.commentSection {
+	display: flex;
+	flex-direction: column;
+	gap: $spacing-sm;
+}
+
+.commentLabel {
+	font-weight: 600;
+	color: $color-dark;
+	font-size: 0.9rem;
+
+	@include sm {
+		font-size: 0.95rem;
+	}
+}
+
+.commentInput {
+	width: 100%;
+	padding: $spacing-md;
+	border: 1px solid $color-border;
+	border-radius: $radius-md;
+	font-family: inherit;
+	font-size: 0.9rem;
+	resize: vertical;
+	min-height: 100px;
+	transition: border-color 0.2s ease;
+
+	&:focus {
+		outline: none;
+		border-color: $color-primary;
+		box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
+	}
+
+	&:disabled {
+		background: $color-bg;
+		cursor: not-allowed;
+	}
+
+	&::placeholder {
+		color: $color-text-lighter;
+	}
+
+	@include sm {
+		font-size: 0.95rem;
+		min-height: 120px;
+	}
+}
+
+.commentCounter {
+	text-align: right;
+	font-size: 0.8rem;
+	color: $color-text-light;
+
+	@include sm {
+		font-size: 0.85rem;
+	}
+}
+
+.actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: $spacing-md;
+	flex-wrap: wrap; // Dodajemy wrap
+
+	@include sm {
+		flex-wrap: nowrap;
+	}
+}
+
+.cancelButton {
+	padding: $spacing-sm $spacing-md;
+	border: 1px solid $color-border;
+	background: $color-white;
+	color: $color-text;
+	border-radius: $radius-md;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	font-size: 0.9rem;
+	flex: 1;
+
+	&:hover:not(:disabled) {
+		background: $color-bg;
+		border-color: $color-text-lighter;
+	}
+
+	&:focus-visible {
+		outline: 2px solid $color-primary;
+		outline-offset: 2px;
+	}
+
+	&:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+
+	@include sm {
+		flex: 0;
+		font-size: inherit;
+		padding: $spacing-sm $spacing-lg;
+	}
+}
+
+.submitButton {
+	padding: $spacing-sm $spacing-md;
+	background: $color-primary;
+	color: $color-white;
+	border: none;
+	border-radius: $radius-md;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background-color 0.2s ease;
+	font-size: 0.9rem;
+	flex: 1;
+
+	&:hover:not(:disabled) {
+		background: darken($color-primary, 10%);
+	}
+
+	&:focus-visible {
+		outline: 2px solid $color-primary;
+		outline-offset: 2px;
+	}
+
+	&:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+
+	@include sm {
+		flex: 0;
+		font-size: inherit;
+		padding: $spacing-sm $spacing-lg;
+	}
+}
+
+// Dla bardzo małych ekranów
+@include max-xs {
+	.container {
+		padding: $spacing-md;
+		margin-left: -$spacing-md;
+		margin-right: -$spacing-md;
+		border-radius: 0;
+		border-left: none;
+		border-right: none;
+	}
+
+	.starsContainer {
+		justify-content: center;
+	}
+
+	.starButton {
+		svg {
+			width: 20px;
+			height: 20px;
+		}
+	}
+
+	.ratingValue {
+		font-size: 1rem;
+	}
+
+	.actions {
+		flex-direction: column;
+		gap: $spacing-sm;
+	}
+
+	.cancelButton,
+	.submitButton {
+		width: 100%;
+		padding: $spacing-sm;
+	}
+}

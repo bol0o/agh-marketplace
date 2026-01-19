@@ -1,0 +1,73 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.container {
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: $spacing-md;
+	width: 100%;
+	overflow: hidden; // Dodajemy
+
+	@include sm {
+		padding: $spacing-lg;
+	}
+
+	@include md {
+		padding: $spacing-xl;
+	}
+}
+
+.loadingContainer,
+.errorContainer {
+	@include flex-center;
+	flex-direction: column;
+	min-height: 60vh;
+	text-align: center;
+	padding: $spacing-xl;
+}
+
+.spinner {
+	animation: spin 1s linear infinite;
+	color: $color-primary;
+	margin-bottom: $spacing-lg;
+}
+
+.errorIcon {
+	color: #ef4444; // red-500
+	margin-bottom: $spacing-lg;
+}
+
+.errorContainer {
+	h2 {
+		font-size: 1.25rem;
+		font-weight: 600;
+		color: $color-dark;
+		margin-bottom: $spacing-sm;
+
+		@include sm {
+			font-size: 1.5rem;
+		}
+	}
+
+	p {
+		color: $color-text-light;
+		font-size: 0.9rem;
+
+		@include sm {
+			font-size: 1rem;
+		}
+	}
+}
+
+@keyframes spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+// Dla bardzo małych ekranów
+@include max-xs {
+	.container {
+		padding: $spacing-sm;
+	}
+}

@@ -1,0 +1,244 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.container {
+	display: flex;
+	flex-direction: column;
+	gap: $spacing-lg;
+	background: $color-white;
+	border-radius: $radius-lg;
+	padding: $spacing-lg;
+	margin-bottom: $spacing-xl;
+	box-shadow: $shadow-md;
+	border: 1px solid $color-border;
+	width: 100%;
+	overflow: hidden; // Dodajemy
+
+	@include md {
+		flex-direction: row;
+		align-items: center;
+		gap: $spacing-2xl;
+		padding: $spacing-xl;
+	}
+}
+
+.avatarSection {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: $spacing-md;
+}
+
+.avatar {
+	width: 80px;
+	height: 80px;
+	border-radius: $radius-circle;
+	background: linear-gradient(135deg, $color-primary 0%, rgba($color-primary, 0.9) 100%);
+	@include flex-center;
+	overflow: hidden;
+	border: 4px solid $color-white;
+	box-shadow: $shadow-lg;
+	flex-shrink: 0; // Zapobiega skurczeniu
+
+	img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	@include sm {
+		width: 100px;
+		height: 100px;
+	}
+
+	@include md {
+		width: 120px;
+		height: 120px;
+	}
+}
+
+.avatarFallback {
+	font-size: 2rem;
+	font-weight: 700;
+	color: $color-white;
+	text-transform: uppercase;
+
+	@include sm {
+		font-size: 2.5rem;
+	}
+
+	@include md {
+		font-size: 3rem;
+	}
+}
+
+.currentUserBadge {
+	background: $color-primary;
+	color: $color-white;
+	padding: $spacing-xs $spacing-md;
+	border-radius: $radius-md;
+	font-size: 0.75rem;
+	font-weight: 600;
+	white-space: nowrap;
+
+	@include sm {
+		font-size: 0.8rem;
+	}
+}
+
+.userInfo {
+	flex: 1;
+	min-width: 0; // Kluczowe dla responsywności
+	overflow: hidden; // Dodajemy
+}
+
+.userName {
+	font-size: 1.5rem;
+	font-weight: 700;
+	color: $color-dark;
+	margin: 0 0 $spacing-sm 0;
+	line-height: 1.2;
+	word-break: break-word; // Łamanie długich nazw
+
+	@include sm {
+		font-size: 1.75rem;
+	}
+
+	@include md {
+		font-size: 2rem;
+	}
+}
+
+.ratingSection {
+	margin-bottom: $spacing-md;
+}
+
+.rating {
+	display: inline-flex;
+	align-items: center;
+	gap: $spacing-xs;
+	background: rgba($color-primary, 0.1);
+	padding: $spacing-xs $spacing-md;
+	border-radius: $radius-md;
+	flex-wrap: wrap; // Dodajemy wrap
+}
+
+.starIcon {
+	color: #fbbf24; // yellow-400
+	width: 18px;
+	height: 18px;
+	fill: currentColor;
+	flex-shrink: 0;
+
+	@include sm {
+		width: 20px;
+		height: 20px;
+	}
+}
+
+.ratingValue {
+	font-size: 1.1rem;
+	font-weight: 700;
+	color: $color-dark;
+
+	@include sm {
+		font-size: 1.25rem;
+	}
+}
+
+.ratingCount {
+	color: $color-text-light;
+	font-size: 0.85rem;
+	white-space: nowrap;
+
+	@include sm {
+		font-size: 0.9rem;
+	}
+}
+
+.details {
+	display: flex;
+	flex-direction: column;
+	gap: $spacing-xs;
+
+	@include sm {
+		gap: $spacing-sm;
+	}
+}
+
+.detailItem {
+	display: flex;
+	align-items: center;
+	gap: $spacing-sm;
+	color: $color-text;
+	font-size: 0.9rem;
+	flex-wrap: wrap; // Dodajemy wrap
+
+	@include sm {
+		font-size: 0.95rem;
+	}
+}
+
+.detailIcon {
+	width: 16px;
+	height: 16px;
+	color: $color-text-light;
+	flex-shrink: 0;
+
+	@include sm {
+		width: 18px;
+		height: 18px;
+	}
+}
+
+// Dla bardzo małych ekranów
+@include max-xs {
+	.container {
+		padding: $spacing-md;
+		margin-left: -$spacing-md;
+		margin-right: -$spacing-md;
+		border-radius: 0;
+		border-left: none;
+		border-right: none;
+	}
+
+	.avatar {
+		width: 64px;
+		height: 64px;
+	}
+
+	.avatarFallback {
+		font-size: 1.5rem;
+	}
+
+	.userName {
+		font-size: 1.25rem;
+	}
+
+	.rating {
+		padding: 4px 8px;
+	}
+
+	.starIcon {
+		width: 16px;
+		height: 16px;
+	}
+
+	.ratingValue {
+		font-size: 1rem;
+	}
+
+	.ratingCount {
+		font-size: 0.8rem;
+	}
+
+	.detailItem {
+		font-size: 0.85rem;
+	}
+
+	.detailIcon {
+		width: 14px;
+		height: 14px;
+	}
+}

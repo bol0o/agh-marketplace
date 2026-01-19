@@ -2,7 +2,7 @@
 @use '@/styles/mixins' as *;
 
 .welcomeBanner {
-	background: linear-gradient(135deg, $color-primary 0%, darken($color-primary, 8%) 100%);
+	background: linear-gradient(135deg, $color-primary 0%, rgba($color-primary, 0.92) 100%);
 	border-radius: $radius-lg;
 	padding: $spacing-lg $spacing-xl;
 	color: $color-white;
