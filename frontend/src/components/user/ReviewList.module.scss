@@ -54,7 +54,7 @@
 	white-space: nowrap;
 
 	&:hover {
-		background: darken($color-primary, 10%);
+		background: rgba($color-primary, 0.9);
 	}
 
 	&:focus-visible {

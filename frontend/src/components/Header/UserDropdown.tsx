@@ -87,7 +87,7 @@ export function UserDropdown() {
 						Zamówienia
 					</Link>
 
-					<Link href="/user/settings" onClick={closeDropdown}>
+					<Link href="/settings" onClick={closeDropdown}>
 						<Settings size={16} />
 						Ustawienia
 					</Link>

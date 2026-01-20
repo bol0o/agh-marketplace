@@ -11,13 +11,8 @@ export interface User {
 	rating: number;
 	ratingCount: number;
 	joinedAt: string;
-	settings: {
-		notifications: {
-			email: boolean;
-			push: boolean;
-			marketing: boolean;
-		};
-	};
+	settings: UserSettings;
+	address?: UserAddress;
 	listedProductsCount: number;
 	soldItemsCount: number;
 }
@@ -48,4 +43,44 @@ export interface UserStats {
 	totalReviews: number;
 	responseRate?: number;
 	completionTime?: number; // in hours
+}
+
+export interface UserAddress {
+	street: string;
+	buildingNumber: string;
+	apartmentNumber?: string | null;
+	city: string;
+	zipCode: string;
+	phone: string;
+}
+
+export interface UserSettings {
+	notifications: {
+		email: boolean;
+		push: boolean;
+		marketing: boolean;
+	};
+}
+
+export interface UpdateProfileData {
+	firstName?: string;
+	lastName?: string;
+	avatarUrl?: string;
+	faculty?: string;
+	year?: number;
+}
+
+export interface UpdateAddressData {
+	street?: string;
+	buildingNumber?: string;
+	apartmentNumber?: string | null;
+	city?: string;
+	zipCode?: string;
+	phone?: string;
+}
+
+export interface UpdateSettingsData {
+	email?: boolean;
+	push?: boolean;
+	marketing?: boolean;
 }

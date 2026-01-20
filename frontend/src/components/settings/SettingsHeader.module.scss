@@ -1,0 +1,154 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.container {
+	background: $color-white;
+	border-radius: $radius-lg;
+	box-shadow: $shadow-md;
+	border: 1px solid $color-border;
+	margin-bottom: $spacing-xl;
+	overflow: hidden;
+}
+
+.header {
+	padding: $spacing-xl;
+	border-bottom: 1px solid $color-border;
+
+	@include max-sm {
+		padding: $spacing-lg;
+	}
+}
+
+.titleSection {
+	display: flex;
+	align-items: center;
+	gap: $spacing-md;
+	margin-bottom: $spacing-sm;
+}
+
+.settingsIcon {
+	width: 32px;
+	height: 32px;
+	color: $color-primary;
+
+	@include max-sm {
+		width: 28px;
+		height: 28px;
+	}
+}
+
+.title {
+	font-size: 1.75rem;
+	font-weight: 700;
+	color: $color-dark;
+	margin: 0;
+
+	@include max-sm {
+		font-size: 1.5rem;
+	}
+}
+
+.subtitle {
+	color: $color-text-light;
+	font-size: 0.95rem;
+	margin: 0;
+
+	@include max-sm {
+		font-size: 0.9rem;
+	}
+}
+
+.tabs {
+	display: flex;
+	background: $color-bg;
+	border-bottom: 1px solid $color-border;
+	overflow-x: auto;
+	scrollbar-width: none; /* Firefox */
+	-ms-overflow-style: none; /* IE and Edge */
+
+	&::-webkit-scrollbar {
+		display: none; /* Chrome, Safari, Opera */
+	}
+}
+
+.tab {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: $spacing-xs;
+	padding: $spacing-lg $spacing-xl;
+	background: none;
+	border: none;
+	color: $color-text-light;
+	font-weight: 600;
+	cursor: pointer;
+	position: relative;
+	transition: all 0.2s ease;
+	flex: 1;
+	min-width: 120px;
+	white-space: nowrap;
+
+	&:hover:not(.tabActive) {
+		color: $color-primary;
+		background: rgba($color-primary, 0.05);
+	}
+
+	&:focus-visible {
+		outline: 2px solid $color-primary;
+		outline-offset: -2px;
+		z-index: 1;
+	}
+
+	@include max-sm {
+		padding: $spacing-md $spacing-lg;
+		min-width: 100px;
+	}
+}
+
+.tabActive {
+	color: $color-primary;
+	background: $color-white;
+}
+
+.tabIcon {
+	width: 24px;
+	height: 24px;
+
+	@include max-sm {
+		width: 20px;
+		height: 20px;
+	}
+}
+
+.tabLabel {
+	font-size: 0.9rem;
+
+	@include max-sm {
+		font-size: 0.85rem;
+	}
+}
+
+.activeIndicator {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	height: 3px;
+	background: $color-primary;
+	border-radius: 3px 3px 0 0;
+}
+
+@include max-xs {
+	.header {
+		padding: $spacing-md;
+	}
+
+	.tab {
+		padding: $spacing-sm $spacing-md;
+		min-width: 90px;
+	}
+
+	.tabLabel {
+		font-size: 0.8rem;
+	}
+}

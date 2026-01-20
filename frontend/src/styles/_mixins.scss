@@ -47,6 +47,12 @@ $breakpoint-xxl: 1920px;
 	}
 }
 
+@mixin max-sm {
+	@media (max-width: #{$breakpoint-sm - 1}) {
+		@content;
+	}
+}
+
 @mixin flex-center {
 	display: flex;
 	align-items: center;
@@ -57,4 +63,9 @@ $breakpoint-xxl: 1920px;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
+}
+
+@mixin size($size) {
+	width: $size;
+	height: $size;
 }
