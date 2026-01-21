@@ -16,6 +16,7 @@ import OrderDetailsItem from '@/components/orders/OrderDetailsItem';
 import { useOrder } from '@/hooks/useOrder';
 import { formatDate } from '@/lib/utils';
 import styles from './OrderDetailsPage.module.scss';
+import { PageLoading } from '@/components/shared/PageLoading';
 
 const OrderDetailsPage: React.FC = () => {
 	const { id } = useParams<{ id: string }>();
@@ -73,11 +74,7 @@ const OrderDetailsPage: React.FC = () => {
 	};
 
 	if (loading) {
-		return (
-			<div className={`${styles.loadingContainer} ${styles.flexCenter}`}>
-				<p className={styles.loadingText}>Ładowanie szczegółów zamówienia...</p>
-			</div>
-		);
+		return <PageLoading text={'Ładowanie zamówienia...'} />;
 	}
 
 	if (error || !order) {

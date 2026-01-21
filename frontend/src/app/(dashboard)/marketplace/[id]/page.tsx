@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Edit, Trash2, AlertCircle, Loader2 } from 'lucide-react';
+import { ArrowLeft, Edit, Trash2, AlertCircle } from 'lucide-react';
 import { Product } from '@/types/marketplace';
 import { useAuth } from '@/store/useAuth';
 import { useCart } from '@/hooks/useCart';
@@ -17,6 +17,7 @@ import { AuctionTimer } from '@/components/marketplace/AuctionTimer';
 import styles from './ProductPage.module.scss';
 import api from '@/lib/axios';
 import { useUIStore } from '@/store/uiStore';
+import { PageLoading } from '@/components/shared/PageLoading';
 
 const CATEGORY_NAMES: Record<string, string> = {
 	BOOKS: 'Książki',
@@ -48,6 +49,8 @@ export default function ProductPage() {
 	const [refreshBids, setRefreshBids] = useState(0);
 	const [authChecked, setAuthChecked] = useState(false);
 	const [isAddingToCart, setIsAddingToCart] = useState(false);
+	const [isFollowingSeller, setIsFollowingSeller] = useState(false);
+	const [isFollowingLoading, setIsFollowingLoading] = useState(false);
 
 	const isInitialMount = useRef(true);
 
@@ -64,6 +67,10 @@ export default function ProductPage() {
 		if (!authLoading && product) {
 			checkOwnership();
 			setAuthChecked(true);
+
+			if (user && product.seller.id !== user.id) {
+				checkFollowStatus();
+			}
 		}
 	}, [authLoading, product, user]);
 
@@ -88,6 +95,18 @@ export default function ProductPage() {
 		}
 	};
 
+	const checkFollowStatus = useCallback(async () => {
+		if (!user || !product || product.seller.id === user.id) return;
+
+		try {
+			const response = await api.get(`/social/follow/status/${product.seller.id}`);
+			setIsFollowingSeller(response.data.isFollowing);
+		} catch (error) {
+			console.error('Error checking follow status:', error);
+			setIsFollowingSeller(false);
+		}
+	}, [user, product]);
+
 	const handleDelete = async (): Promise<void> => {
 		try {
 			setIsDeleting(true);
@@ -108,6 +127,8 @@ export default function ProductPage() {
 
 	const handleContactSeller = (): void => {
 		console.log('Otwórz chat z sprzedawcą');
+		// Możesz dodać routing do chatu
+		// router.push(`/messages?userId=${product.seller.id}`);
 	};
 
 	const handleBuyNow = async (): Promise<void> => {
@@ -143,8 +164,42 @@ export default function ProductPage() {
 		setRefreshBids((prev) => prev + 1);
 	};
 
-	const handleFollowSeller = (): void => {
-		console.log('Obserwuj sprzedawcę');
+	const handleFollowSeller = async (): Promise<void> => {
+		if (!user) {
+			addToast('Musisz być zalogowany, aby obserwować użytkowników', 'error');
+			return;
+		}
+
+		if (isOwner) {
+			addToast('Nie możesz obserwować samego siebie', 'info');
+			return;
+		}
+
+		if (!product) return;
+
+		try {
+			setIsFollowingLoading(true);
+
+			if (isFollowingSeller) {
+				await api.delete(`/social/unfollow/${product.seller.id}`);
+				setIsFollowingSeller(false);
+				addToast(`Przestałeś obserwować ${product.seller.name}`, 'success');
+			} else {
+				await api.post('/social/follow', { followingId: product.seller.id });
+				setIsFollowingSeller(true);
+				addToast(`Zacząłeś obserwować ${product.seller.name}`, 'success');
+			}
+		} catch (error: any) {
+			console.error('Error toggling follow:', error);
+			const message =
+				error.response?.data?.message ||
+				(isFollowingSeller
+					? 'Nie udało się przestać obserwować'
+					: 'Nie udało się obserwować użytkownika');
+			addToast(message, 'error');
+		} finally {
+			setIsFollowingLoading(false);
+		}
 	};
 
 	const renderOwnerActions = () => {
@@ -176,12 +231,7 @@ export default function ProductPage() {
 	};
 
 	if (loading) {
-		return (
-			<div className={styles.loadingWrapper}>
-				<Loader2 className={styles.spinner} size={48} />
-				<p className={styles.loadingText}>Ładowanie produktu...</p>
-			</div>
-		);
+		return <PageLoading text={'Ładowanie produktu'} />;
 	}
 
 	if (error || !product) {
@@ -216,7 +266,7 @@ export default function ProductPage() {
 			<div className={styles.mainContent}>
 				<div className={styles.leftColumn}>
 					<ProductImageSection
-						imageUrl={product.image || '/images/placeholder.jpg'}
+						imageUrl={product.image}
 						type={product.type}
 						status={product.status}
 						title={product.title}
@@ -227,6 +277,7 @@ export default function ProductPage() {
 							seller={product.seller}
 							onContact={handleContactSeller}
 							onFollow={handleFollowSeller}
+							initialIsFollowing={isFollowingSeller}
 						/>
 
 						<ProductDetailsCard
@@ -262,6 +313,7 @@ export default function ProductPage() {
 						isAuction={isAuction}
 						isActive={isActive}
 						price={product.price}
+						isOwner={isOwner}
 						stock={product.stock}
 						endsAt={product.endsAt}
 						onBuy={handleBuyNow}

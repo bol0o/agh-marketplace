@@ -6,10 +6,11 @@ import { UserProfileHeader } from '@/components/user/UserProfileHeader';
 import { UserStats } from '@/components/user/UserStats';
 import { ReviewList } from '@/components/user/ReviewList';
 import { AddReviewForm } from '@/components/user/AddReviewForm';
-import { Loader, AlertCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import { useUser } from '@/hooks/useUser';
 import { useAuth } from '@/store/useAuth';
 import styles from '../user.module.scss';
+import { PageLoading } from '@/components/shared/PageLoading';
 
 export default function UserProfilePage() {
 	const params = useParams();
@@ -35,12 +36,7 @@ export default function UserProfilePage() {
 	};
 
 	if (loading) {
-		return (
-			<div className={styles.loadingContainer}>
-				<Loader className={styles.spinner} size={48} />
-				<p>Ładowanie profilu...</p>
-			</div>
-		);
+		return <PageLoading text={'Ładowanie użytkownika...'} />;
 	}
 
 	if (error || !user) {

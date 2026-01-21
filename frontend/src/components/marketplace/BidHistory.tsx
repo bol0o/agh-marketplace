@@ -5,6 +5,7 @@ import { Gavel, User, TrendingUp, AlertCircle } from 'lucide-react';
 import { Bid } from '@/types/marketplace';
 import api from '@/lib/axios';
 import styles from './BidHistory.module.scss';
+import { PageLoading } from '../shared/PageLoading';
 
 interface BidHistoryProps {
 	productId: string;
@@ -50,12 +51,7 @@ export function BidHistory({ productId, currentPrice }: BidHistoryProps) {
 	};
 
 	if (loading) {
-		return (
-			<div className={styles.loading}>
-				<div className={styles.spinner}></div>
-				<p>Ładowanie historii ofert...</p>
-			</div>
-		);
+		return <PageLoading text={'Ładowanie historii ofert...'} />;
 	}
 
 	if (error) {

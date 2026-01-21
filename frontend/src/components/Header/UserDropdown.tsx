@@ -82,7 +82,7 @@ export function UserDropdown() {
 						Twój Profil
 					</Link>
 
-					<Link href="/user/orders" onClick={closeDropdown}>
+					<Link href="/orders" onClick={closeDropdown}>
 						<Package size={16} />
 						Zamówienia
 					</Link>

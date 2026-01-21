@@ -11,6 +11,7 @@ import { useUserSettings } from '@/hooks/useUserSettings';
 import { useAuth } from '@/store/useAuth';
 import { useUIStore } from '@/store/uiStore';
 import styles from './settings.module.scss';
+import { PageLoading } from '@/components/shared/PageLoading';
 
 export default function SettingsPage() {
 	const { user: currentUser } = useAuth();
@@ -55,12 +56,7 @@ export default function SettingsPage() {
 	}, []);
 
 	if (loading) {
-		return (
-			<div className={styles.loadingContainer}>
-				<Loader className={styles.spinner} size={48} />
-				<p>Ładowanie ustawień...</p>
-			</div>
-		);
+		return <PageLoading text={'Ładowanie ustawień...'} />;
 	}
 
 	if (userError || !user) {

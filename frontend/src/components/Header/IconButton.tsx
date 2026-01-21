@@ -18,7 +18,7 @@ export function IconButton({ href, icon, isActive = false, badge, title }: IconB
 			aria-label={title}
 		>
 			{icon}
-			{badge && badge > 0 && (
+			{badge !== undefined && badge > 0 && (
 				<span className={styles.badge}>{badge > 99 ? '99+' : badge}</span>
 			)}
 		</Link>

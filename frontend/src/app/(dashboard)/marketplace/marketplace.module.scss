@@ -17,36 +17,6 @@
 	}
 }
 
-.loadingWrapper {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	min-height: 400px;
-	padding: 40px 20px;
-}
-
-.spinner {
-	color: $color-primary;
-	animation: spin 1s linear infinite;
-	margin-bottom: 20px;
-}
-
-@keyframes spin {
-	from {
-		transform: rotate(0deg);
-	}
-	to {
-		transform: rotate(360deg);
-	}
-}
-
-.loadingText {
-	color: $color-text;
-	font-size: 1rem;
-	font-weight: 500;
-}
-
 .errorWrapper {
 	display: flex;
 	flex-direction: column;

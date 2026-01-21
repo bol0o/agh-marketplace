@@ -24,6 +24,13 @@
 	animation: slideUp 0.3s ease;
 	box-shadow: $shadow-2xl;
 
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+
+	&::-webkit-scrollbar {
+		display: none;
+	}
+
 	@include max-sm {
 		max-height: 95vh;
 	}
@@ -137,12 +144,6 @@
 	display: flex;
 	flex-direction: column;
 	gap: $spacing-xs;
-
-	&:nth-child(2) {
-		@include sm {
-			grid-column: span 2;
-		}
-	}
 }
 
 .label {

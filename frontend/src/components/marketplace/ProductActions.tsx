@@ -9,6 +9,7 @@ interface ProductActionsProps {
 	price: number;
 	stock: number;
 	endsAt?: string | null;
+	isOwner: boolean;
 	onBuy: () => void;
 	onBid: () => void;
 	onContact: () => void;
@@ -20,6 +21,7 @@ export function ProductActions({
 	price,
 	stock,
 	endsAt,
+	isOwner,
 	onBuy,
 	onBid,
 	onContact,
@@ -42,9 +44,14 @@ export function ProductActions({
 							</div>
 						)}
 					</div>
-					<button onClick={onBid} className={styles.bidButton}>
+					<button
+						onClick={onBid}
+						className={styles.bidButton}
+						disabled={isOwner}
+						title={isOwner ? 'Nie możesz licytować własnej aukcji' : 'Zalicytuj'}
+					>
 						<Gavel size={20} />
-						<span>Zalicytuj</span>
+						<span>{isOwner ? 'Twoja aukcja' : 'Zalicytuj'}</span>
 					</button>
 				</div>
 			) : (
@@ -58,16 +65,38 @@ export function ProductActions({
 							</div>
 						)}
 					</div>
-					<button onClick={onBuy} className={styles.buyButton} disabled={stock === 0}>
+					<button
+						onClick={onBuy}
+						className={styles.buyButton}
+						disabled={stock === 0 || isOwner}
+						title={
+							isOwner
+								? 'Nie możesz kupić własnego produktu'
+								: stock > 0
+									? 'Dodaj do koszyka'
+									: 'Brak na stanie'
+						}
+					>
 						<ShoppingBag size={20} />
-						<span>{stock > 0 ? 'Dodaj do koszyka' : 'Brak na stanie'}</span>
+						<span>
+							{isOwner
+								? 'Twój produkt'
+								: stock > 0
+									? 'Dodaj do koszyka'
+									: 'Brak na stanie'}
+						</span>
 					</button>
 				</div>
 			)}
 
-			<button onClick={onContact} className={styles.contactButton}>
+			<button
+				onClick={onContact}
+				className={styles.contactButton}
+				disabled={isOwner}
+				title={isOwner ? 'Nie możesz wysłać wiadomości do siebie' : 'Zapytaj o produkt'}
+			>
 				<MessageCircle size={18} />
-				<span>Zapytaj o produkt</span>
+				<span>{isOwner ? 'Twój produkt' : 'Zapytaj o produkt'}</span>
 			</button>
 		</div>
 	);

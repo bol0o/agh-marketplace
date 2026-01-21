@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Gavel, ShoppingBag, Clock, MapPin, Eye, Star } from 'lucide-react';
+import { Gavel, ShoppingBag, MapPin, Eye, Star } from 'lucide-react';
 import styles from './ProductCard.module.scss';
 import Image from 'next/image';
 import { Product } from '@/types/marketplace';
@@ -48,13 +48,17 @@ export function ProductCard({ product }: { product: Product }) {
 	return (
 		<Link href={`/marketplace/${product.id}`} className={styles.card}>
 			<div className={styles.imageContainer}>
-				<Image
-					src={product.image || '/images/placeholder.jpg'}
-					alt={product.title}
-					fill
-					sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-					className={styles.image}
-				/>
+				{product.image ? (
+					<Image
+						src={product.image}
+						alt={product.title}
+						fill
+						sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+						className={styles.image}
+					/>
+				) : (
+					<div className={styles.imagePlaceholder}>{product.title}</div>
+				)}
 
 				<div
 					className={`${styles.badge} ${

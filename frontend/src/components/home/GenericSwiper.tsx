@@ -7,6 +7,7 @@ import 'swiper/css/navigation';
 import { Loader, AlertCircle, ChevronLeft, ChevronRight, LucideIcon } from 'lucide-react';
 import { useRef, ReactNode, useState, useEffect } from 'react';
 import styles from './GenericSwiper.module.scss';
+import { PageLoading } from '../shared/PageLoading';
 
 interface GenericSwiperProps<T> {
 	title?: string;
@@ -135,10 +136,7 @@ export function GenericSwiper<T>({
 	if (loading) {
 		return (
 			<div className={`${styles.container} ${className}`}>
-				<div className={styles.loading}>
-					<Loader className={styles.spinner} size={32} />
-					<p>{loadingText}</p>
-				</div>
+				<PageLoading text={'Ładowanie'} />
 			</div>
 		);
 	}

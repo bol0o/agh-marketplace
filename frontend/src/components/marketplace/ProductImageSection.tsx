@@ -5,7 +5,7 @@ import { Gavel, ShoppingBag } from 'lucide-react';
 import styles from './ProductImageSection.module.scss';
 
 interface ProductImageSectionProps {
-	imageUrl: string;
+	imageUrl: string | undefined;
 	type: 'auction' | 'buy_now';
 	status?: string;
 	title: string;
@@ -16,13 +16,17 @@ export function ProductImageSection({ imageUrl, type, status, title }: ProductIm
 
 	return (
 		<div className={styles.imageContainer}>
-			<Image
-				src={imageUrl || '/images/placeholder.jpg'}
-				alt={title}
-				fill
-				className={styles.productImage}
-				sizes="(max-width: 768px) 100vw, 60vw"
-			/>
+			{imageUrl ? (
+				<Image
+					src={imageUrl}
+					alt={title}
+					fill
+					sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+					className={styles.image}
+				/>
+			) : (
+				<div className={styles.imagePlaceholder}>{title}</div>
+			)}
 
 			{status && status !== 'active' && (
 				<div className={`${styles.statusBadge} ${styles[status]}`}>

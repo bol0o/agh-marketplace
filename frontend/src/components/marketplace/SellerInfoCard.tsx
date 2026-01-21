@@ -11,11 +11,17 @@ interface SellerInfoCardProps {
 		avatar: string | null;
 		rating: string;
 	};
+	initialIsFollowing: boolean;
 	onContact?: () => void;
 	onFollow?: () => void;
 }
 
-export function SellerInfoCard({ seller, onContact, onFollow }: SellerInfoCardProps) {
+export function SellerInfoCard({
+	seller,
+	initialIsFollowing,
+	onContact,
+	onFollow,
+}: SellerInfoCardProps) {
 	return (
 		<div className={styles.sellerBox}>
 			<div className={styles.boxHeader}>
@@ -53,7 +59,7 @@ export function SellerInfoCard({ seller, onContact, onFollow }: SellerInfoCardPr
 
 					<div className={styles.sellerActions}>
 						<button onClick={onFollow} className={styles.followButton}>
-							Obserwuj
+							{initialIsFollowing ? 'Obserwujesz' : 'Obserwuj'}
 						</button>
 						<button onClick={onContact} className={styles.messageButton}>
 							<MessageCircle size={14} />

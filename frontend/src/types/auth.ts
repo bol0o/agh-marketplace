@@ -1,5 +1,3 @@
-// src/types/auth.ts
-
 import { UserAddress } from './user';
 
 export interface User {

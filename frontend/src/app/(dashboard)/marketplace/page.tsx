@@ -7,6 +7,7 @@ import { Pagination } from '@/components/shared/Pagination';
 import { SearchX, Loader2, AlertCircle, Filter } from 'lucide-react';
 import styles from './marketplace.module.scss';
 import { useMarketplaceProducts } from '@/hooks/useMarketplaceProducts';
+import { PageLoading } from '@/components/shared/PageLoading';
 
 const CATEGORY_NAMES: Record<string, string> = {
 	BOOKS: 'Książki',
@@ -60,12 +61,7 @@ export default function MarketplacePage() {
 	const endItem = Math.min(currentPage * itemsPerPage, totalProducts);
 
 	if (isLoading) {
-		return (
-			<div className={styles.loadingWrapper}>
-				<Loader2 className={styles.spinner} size={48} />
-				<p className={styles.loadingText}>Ładowanie ofert...</p>
-			</div>
-		);
+		return <PageLoading text={'Ładowanie ofert...'} />;
 	}
 
 	if (error) {

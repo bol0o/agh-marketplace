@@ -10,7 +10,7 @@ import { CreateOrderRequest, OrderAddress } from '@/types/order';
 import { formatPrice } from '@/lib/utils';
 import api from '@/lib/axios';
 import styles from './CheckoutModal.module.scss';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 interface CheckoutModalProps {
 	isOpen: boolean;
@@ -23,17 +23,16 @@ export function CheckoutModal({ isOpen, onClose, items }: CheckoutModalProps) {
 	const router = useRouter();
 	const { getTotal, clearCart } = useCartStore();
 	const addToast = useUIStore((state) => state.addToast);
-
+	const [errors, setErrors] = useState<Record<string, string>>({});
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [address, setAddress] = useState<OrderAddress>({
 		street: user?.address?.street || '',
 		city: user?.address?.city || '',
 		zipCode: user?.address?.zipCode || '',
 		phone: user?.address?.phone || '',
+		buildingNumber: user?.address?.buildingNumber || '',
 		apartmentNumber: user?.address?.apartmentNumber || '',
 	});
-
-	const [errors, setErrors] = useState<Record<string, string>>({});
 
 	useEffect(() => {
 		if (user?.address) {
@@ -42,6 +41,7 @@ export function CheckoutModal({ isOpen, onClose, items }: CheckoutModalProps) {
 				city: user.address.city || '',
 				zipCode: user.address.zipCode || '',
 				phone: user.address.phone || '',
+				buildingNumber: user?.address?.buildingNumber || '',
 				apartmentNumber: user.address.apartmentNumber || '',
 			});
 		}
@@ -86,6 +86,7 @@ export function CheckoutModal({ isOpen, onClose, items }: CheckoutModalProps) {
 
 			const orderData: CreateOrderRequest = {
 				address: {
+					buildingNumber: address.buildingNumber.trim(),
 					street: address.street.trim(),
 					city: address.city.trim(),
 					zipCode: address.zipCode.trim(),
@@ -161,23 +162,6 @@ export function CheckoutModal({ isOpen, onClose, items }: CheckoutModalProps) {
 							</div>
 
 							<div className={styles.formGroup}>
-								<label htmlFor="buildingNumber" className={styles.label}>
-									Numer domu/mieszkania
-								</label>
-								<input
-									id="apartmentNumber"
-									type="text"
-									value={address.apartmentNumber || ''}
-									onChange={(e) =>
-										handleChange('apartmentNumber', e.target.value)
-									}
-									className={styles.input}
-									placeholder="np. 30/12"
-									disabled={isSubmitting}
-								/>
-							</div>
-
-							<div className={styles.formGroup}>
 								<label htmlFor="city" className={styles.label}>
 									Miasto *
 								</label>
@@ -191,6 +175,38 @@ export function CheckoutModal({ isOpen, onClose, items }: CheckoutModalProps) {
 									disabled={isSubmitting}
 								/>
 								{errors.city && <span className={styles.error}>{errors.city}</span>}
+							</div>
+
+							<div className={styles.formGroup}>
+								<label htmlFor="buildingNumber" className={styles.label}>
+									Numer budynku *
+								</label>
+								<input
+									id="building"
+									type="text"
+									value={address.buildingNumber || ''}
+									onChange={(e) => handleChange('buildingNumber', e.target.value)}
+									className={styles.input}
+									placeholder="np. 67"
+									disabled={isSubmitting}
+								/>
+							</div>
+
+							<div className={styles.formGroup}>
+								<label htmlFor="apartmentNumber" className={styles.label}>
+									Numer mieszkania
+								</label>
+								<input
+									id="apartmentNumber"
+									type="text"
+									value={address.apartmentNumber || ''}
+									onChange={(e) =>
+										handleChange('apartmentNumber', e.target.value)
+									}
+									className={styles.input}
+									placeholder="np. 12"
+									disabled={isSubmitting}
+								/>
 							</div>
 
 							<div className={styles.formGroup}>

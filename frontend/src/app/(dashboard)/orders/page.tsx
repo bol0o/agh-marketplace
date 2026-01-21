@@ -5,16 +5,13 @@ import OrderCard from '@/components/orders/OrderCard';
 import { useOrders } from '@/hooks/useOrders';
 import styles from './orders.module.scss';
 import Link from 'next/link';
+import { PageLoading } from '@/components/shared/PageLoading';
 
 const OrdersPage: React.FC = () => {
 	const { orders, loading, error, refresh, getOrderStats } = useOrders();
 
 	if (loading) {
-		return (
-			<div className={styles.loadingContainer}>
-				<p className={styles.loadingText}>Ładowanie zamówień...</p>
-			</div>
-		);
+		return <PageLoading text={'Ładowanie produktów...'} />;
 	}
 
 	if (error) {

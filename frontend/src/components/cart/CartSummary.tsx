@@ -1,6 +1,6 @@
 'use client';
 
-import { ShoppingCart, Truck, CreditCard } from 'lucide-react';
+import { Truck, CreditCard } from 'lucide-react';
 import { formatPrice } from '@/lib/utils';
 import { useCartStore } from '@/store/useCartStore';
 import styles from './CartSummary.module.scss';

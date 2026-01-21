@@ -3,6 +3,7 @@ export interface OrderAddress {
 	city: string;
 	zipCode: string;
 	phone: string;
+	buildingNumber: string;
 	apartmentNumber?: string;
 }
 

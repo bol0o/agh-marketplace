@@ -1,38 +1,20 @@
 'use client';
 
-import { useState } from 'react';
 import { UserProfileHeader } from '@/components/user/UserProfileHeader';
 import { UserStats } from '@/components/user/UserStats';
 import { ReviewList } from '@/components/user/ReviewList';
-import { Loader, AlertCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import { useUser } from '@/hooks/useUser';
 import { useAuth } from '@/store/useAuth';
 import styles from './user.module.scss';
+import { PageLoading } from '@/components/shared/PageLoading';
 
 export default function CurrentUserPage() {
 	const { user } = useAuth();
 	const { user: profileUser, reviews, loading, error } = useUser();
-	const [showAddReview, setShowAddReview] = useState(false);
-	const [isSubmittingReview, setIsSubmittingReview] = useState(false);
-
-	const handleAddReview = async (rating: number, comment: string) => {
-		try {
-			setIsSubmittingReview(true);
-			setShowAddReview(false);
-		} catch (err) {
-			console.error('Error adding review:', err);
-		} finally {
-			setIsSubmittingReview(false);
-		}
-	};
 
 	if (loading) {
-		return (
-			<div className={styles.loadingContainer}>
-				<Loader className={styles.spinner} size={48} />
-				<p>Ładowanie profilu...</p>
-			</div>
-		);
+		return <PageLoading text={'Ładowanie użytkownika...'} />;
 	}
 
 	if (error || !profileUser) {

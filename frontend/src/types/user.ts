@@ -50,7 +50,7 @@ export interface UserStats {
 export interface UserAddress {
 	street: string;
 	buildingNumber: string;
-	apartmentNumber?: string | null;
+	apartmentNumber: string;
 	city: string;
 	zipCode: string;
 	phone: string;

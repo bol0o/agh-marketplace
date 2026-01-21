@@ -3,6 +3,7 @@
 import { User } from '@/types/user';
 import { Mail, Calendar, Star, GraduationCap } from 'lucide-react';
 import styles from './UserProfileHeader.module.scss';
+import { useEffect } from 'react';
 
 interface UserProfileHeaderProps {
 	user: User;
@@ -16,6 +17,10 @@ export function UserProfileHeader({ user, isCurrentUser = false }: UserProfileHe
 			month: 'long',
 		});
 	};
+
+	useEffect(() => {
+		console.log(user);
+	}, []);
 
 	return (
 		<div className={styles.container}>
