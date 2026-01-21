@@ -20,9 +20,9 @@ export function WelcomeBanner({ className = '' }: WelcomeBannerProps) {
 
 	const userFirstName = user.name.split(' ')[0];
 
-	const faculty = user.studentInfo?.faculty;
+	const faculty = user.studentInfo?.faculty?.split(' ')[1];
 	const welcomeText = faculty
-		? `Witaj ${userFirstName}, co tam na ${faculty}?`
+		? `Witaj ${userFirstName}, co tam na Wydziale ${faculty}?`
 		: `Witaj ${userFirstName}, co tam u Ciebie?`;
 
 	const hasMessages = messageCount > 0;
@@ -73,12 +73,6 @@ export function WelcomeBanner({ className = '' }: WelcomeBannerProps) {
 						</div>
 					</div>
 				</div>
-
-				{user.studentInfo?.faculty && (
-					<div className={styles.facultyBadge}>
-						<span>{user.studentInfo.faculty}</span>
-					</div>
-				)}
 			</div>
 		</div>
 	);

@@ -9,7 +9,7 @@ import { Loader, AlertCircle } from 'lucide-react';
 import { useUser } from '@/hooks/useUser';
 import { useUserSettings } from '@/hooks/useUserSettings';
 import { useAuth } from '@/store/useAuth';
-import { useUIStore } from '@/store/uiStore'; // Dodajemy
+import { useUIStore } from '@/store/uiStore';
 import styles from './settings.module.scss';
 
 export default function SettingsPage() {
@@ -30,7 +30,6 @@ export default function SettingsPage() {
 	const [activeTab, setActiveTab] = useState<SettingsTab>('profile');
 	const [shouldRefresh, setShouldRefresh] = useState(false);
 
-	// Obsługa sukcesu/errorów z useUserSettings
 	useEffect(() => {
 		if (success) {
 			addToast(success, 'success');
@@ -44,7 +43,6 @@ export default function SettingsPage() {
 		}
 	}, [success, settingsError, addToast, clearMessages]);
 
-	// Odśwież dane po udanym zapisie
 	useEffect(() => {
 		if (shouldRefresh && !isUpdating) {
 			refresh();
@@ -52,7 +50,6 @@ export default function SettingsPage() {
 		}
 	}, [shouldRefresh, isUpdating, refresh]);
 
-	// Zmiana zakładki - wyczyść komunikaty w store (jeśli to potrzebne)
 	const handleTabChange = useCallback((tab: SettingsTab) => {
 		setActiveTab(tab);
 	}, []);

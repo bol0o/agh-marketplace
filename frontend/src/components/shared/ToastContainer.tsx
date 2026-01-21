@@ -19,28 +19,23 @@ export function ToastContainer() {
 	);
 }
 
-// --- SUB-KOMPONENT (Zarządza własnym życiem) ---
-
 function ToastItem({ toast, onRemove }: { toast: Toast; onRemove: () => void }) {
 	const [isClosing, setIsClosing] = useState(false);
 
 	useEffect(() => {
-		// Czas życia powiadomienia (np. 3 sekundy widoczności)
 		const timer = setTimeout(() => {
-			setIsClosing(true); // Rozpocznij animację wyjścia
+			setIsClosing(true);
 		}, 3000);
 
 		return () => clearTimeout(timer);
 	}, []);
 
 	const handleAnimationEnd = () => {
-		// Jeśli skończyła się animacja zamykania, usuń ze store'a
 		if (isClosing) {
 			onRemove();
 		}
 	};
 
-	// Wymuszenie zamknięcia kliknięciem X
 	const handleManualClose = () => {
 		setIsClosing(true);
 	};

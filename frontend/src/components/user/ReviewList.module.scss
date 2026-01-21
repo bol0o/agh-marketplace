@@ -20,7 +20,7 @@
 	margin-bottom: $spacing-lg;
 	padding-bottom: $spacing-md;
 	border-bottom: 1px solid $color-border;
-	flex-wrap: wrap; // Dodajemy wrap
+	flex-wrap: wrap;
 	gap: $spacing-md;
 
 	@include md {
@@ -94,7 +94,7 @@
 .reviewHeader {
 	@include flex-between;
 	margin-bottom: $spacing-md;
-	flex-wrap: wrap; // Dodajemy wrap
+	flex-wrap: wrap;
 	gap: $spacing-md;
 }
 
@@ -102,7 +102,7 @@
 	text-decoration: none;
 	color: inherit;
 	flex: 1;
-	min-width: 0; // Kluczowe
+	min-width: 0;
 	overflow: hidden;
 
 	&:hover {
@@ -128,7 +128,7 @@
 	display: flex;
 	align-items: center;
 	gap: $spacing-md;
-	min-width: 0; // Kluczowe
+	min-width: 0;
 }
 
 .reviewerIcon {
@@ -152,8 +152,8 @@
 	display: flex;
 	align-items: center;
 	gap: $spacing-xs;
-	flex-wrap: wrap; // Dodajemy wrap
-	word-break: break-word; // Łamanie długich nazw
+	flex-wrap: wrap;
+	word-break: break-word;
 }
 
 .youBadge {
@@ -192,7 +192,7 @@
 	display: flex;
 	gap: 2px;
 	flex-shrink: 0;
-	align-self: flex-start; // Zmieniamy align
+	align-self: flex-start;
 }
 
 .star {
@@ -202,7 +202,7 @@
 	height: 14px;
 
 	&.starFilled {
-		color: #fbbf24; // yellow-400
+		color: #fbbf24;
 		fill: currentColor;
 	}
 
@@ -218,7 +218,7 @@
 	color: $color-text;
 	line-height: 1.6;
 	font-size: 0.9rem;
-	word-break: break-word; // Łamanie długich komentarzy
+	word-break: break-word;
 
 	@include sm {
 		font-size: 0.95rem;
@@ -278,7 +278,6 @@
 	}
 }
 
-// Dla bardzo małych ekranów
 @include max-xs {
 	.container {
 		padding: $spacing-md;
@@ -319,7 +318,7 @@
 	}
 
 	.reviewRating {
-		align-self: center; // Wyśrodkowujemy na mobilce
+		align-self: center;
 	}
 
 	.reviewComment {

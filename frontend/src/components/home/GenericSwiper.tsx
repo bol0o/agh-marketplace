@@ -66,7 +66,6 @@ export function GenericSwiper<T>({
 	const paginationCount = calculatePaginationCount();
 	const paginationItems = Array.from({ length: paginationCount }, (_, i) => i);
 
-	// Aktualizuj slidesPerView na podstawie szerokości ekranu
 	useEffect(() => {
 		const updateSlidesPerView = () => {
 			if (!swiperRef.current?.swiper) return;
@@ -74,7 +73,6 @@ export function GenericSwiper<T>({
 			const swiper = swiperRef.current.swiper;
 			const width = window.innerWidth;
 
-			// Sprawdź breakpoints i ustaw odpowiedni slidesPerView
 			let newSlidesPerView = slidesPerView;
 
 			if (width >= 1024 && breakpoints[1024]) {
@@ -94,16 +92,12 @@ export function GenericSwiper<T>({
 		return () => window.removeEventListener('resize', updateSlidesPerView);
 	}, [slidesPerView, breakpoints]);
 
-	// Inicjalizacja nawigacji
 	useEffect(() => {
 		if (swiperRef.current && swiperRef.current.swiper) {
 			const swiper = swiperRef.current.swiper;
 
-			// Ustaw elementy nawigacji
 			if (prevRef.current && nextRef.current) {
-				// @ts-expect-error
 				swiper.params.navigation.prevEl = prevRef.current;
-				// @ts-expect-error
 				swiper.params.navigation.nextEl = nextRef.current;
 				swiper.params.navigation.disabledClass = styles.navButtonDisabled;
 
@@ -111,7 +105,6 @@ export function GenericSwiper<T>({
 				swiper.navigation.update();
 			}
 
-			// Ustaw początkowy stan
 			setIsBeginning(swiper.isBeginning);
 			setIsEnd(swiper.isEnd);
 		}
@@ -224,11 +217,9 @@ export function GenericSwiper<T>({
 							setIsBeginning(swiper.isBeginning);
 							setIsEnd(swiper.isEnd);
 
-							// Ustaw początkowy slidesPerView
 							setCurrentSlidesPerView(swiper.params.slidesPerView);
 						}}
 						onBreakpoint={(swiper, breakpointParams) => {
-							// Aktualizuj slidesPerView przy zmianie breakpointa
 							setCurrentSlidesPerView(swiper.params.slidesPerView);
 						}}
 					>

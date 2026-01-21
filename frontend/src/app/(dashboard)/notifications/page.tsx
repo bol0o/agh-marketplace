@@ -108,7 +108,6 @@ export default function NotificationsPage() {
 		fetchStoreCount();
 	}, [page, selectedType, showOnlyUnread]);
 
-	// W funkcji fetchNotifications w page.tsx
 	const fetchNotifications = async () => {
 		try {
 			setLoading(true);
@@ -178,7 +177,6 @@ export default function NotificationsPage() {
 
 			markAllStoreAsRead();
 
-			// Odśwież listę aby pokazać zmiany
 			await fetchNotifications();
 		} catch (err) {
 			console.error('Error marking all as read:', err);

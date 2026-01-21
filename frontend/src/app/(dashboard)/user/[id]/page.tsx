@@ -70,7 +70,7 @@ export default function UserProfilePage() {
 				reviews={reviews}
 				showAddReview={!isOwnProfile}
 				onAddReview={() => setShowAddReview(true)}
-				currentUserId={currentUser?.id} // Przekazujemy ID obecnego użytkownika
+				currentUserId={currentUser?.id}
 			/>
 		</div>
 	);

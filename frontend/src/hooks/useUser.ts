@@ -25,18 +25,15 @@ export const useUser = ({ userId }: UseUserProps = {}) => {
 			let userData;
 
 			if (userId) {
-				// Pobierz konkretnego użytkownika
 				const response = await api.get(`/users/${userId}`);
 				userData = response.data;
 			} else {
-				// Pobierz obecnie zalogowanego użytkownika
 				const response = await api.get('/users/me');
 				userData = response.data;
 			}
 
 			setUser(userData);
 
-			// Pobierz recenzje
 			const reviewsResponse = await api.get(`/reviews/${userData.id}`);
 			setReviews(reviewsResponse.data || []);
 		} catch (err: any) {
@@ -58,10 +55,8 @@ export const useUser = ({ userId }: UseUserProps = {}) => {
 				revieweeId: user.id,
 			});
 
-			// Dodaj nową recenzję do listy
 			setReviews((prev) => [response.data, ...prev]);
 
-			// Aktualizuj rating użytkownika
 			if (user) {
 				const newTotalRating = user.rating * user.ratingCount + reviewData.rating;
 				const newRatingCount = user.ratingCount + 1;

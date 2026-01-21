@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { ArrowLeft, Edit, Trash2, AlertCircle, Loader2 } from 'lucide-react';
 import { Product } from '@/types/marketplace';
 import { useAuth } from '@/store/useAuth';
+import { useCart } from '@/hooks/useCart';
 import { ProductImageSection } from '@/components/marketplace/ProductImageSection';
 import { SellerInfoCard } from '@/components/marketplace/SellerInfoCard';
 import { ProductDetailsCard } from '@/components/marketplace/ProductDetailsCard';
@@ -15,6 +16,7 @@ import { BidForm } from '@/components/marketplace/BidForm';
 import { AuctionTimer } from '@/components/marketplace/AuctionTimer';
 import styles from './ProductPage.module.scss';
 import api from '@/lib/axios';
+import { useUIStore } from '@/store/uiStore';
 
 const CATEGORY_NAMES: Record<string, string> = {
 	BOOKS: 'Książki',
@@ -34,6 +36,8 @@ export default function ProductPage() {
 	const { id } = useParams() as { id: string };
 	const router = useRouter();
 	const { user, isLoading: authLoading, isAuthenticated } = useAuth();
+	const { addToCart, items } = useCart();
+	const { addToast } = useUIStore();
 
 	const [product, setProduct] = useState<Product | null>(null);
 	const [loading, setLoading] = useState(true);
@@ -43,6 +47,7 @@ export default function ProductPage() {
 	const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 	const [refreshBids, setRefreshBids] = useState(0);
 	const [authChecked, setAuthChecked] = useState(false);
+	const [isAddingToCart, setIsAddingToCart] = useState(false);
 
 	const isInitialMount = useRef(true);
 
@@ -105,8 +110,17 @@ export default function ProductPage() {
 		console.log('Otwórz chat z sprzedawcą');
 	};
 
-	const handleBuyNow = (): void => {
-		console.log('Kup teraz');
+	const handleBuyNow = async (): Promise<void> => {
+		if (!product) return;
+
+		try {
+			setIsAddingToCart(true);
+			await addToCart(product.id, 1);
+		} catch (err) {
+			console.error('Error adding to cart:', err);
+		} finally {
+			setIsAddingToCart(false);
+		}
 	};
 
 	const handleBid = (): void => {

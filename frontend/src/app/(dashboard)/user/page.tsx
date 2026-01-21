@@ -6,11 +6,11 @@ import { UserStats } from '@/components/user/UserStats';
 import { ReviewList } from '@/components/user/ReviewList';
 import { Loader, AlertCircle } from 'lucide-react';
 import { useUser } from '@/hooks/useUser';
-import { useAuth } from '@/store/useAuth'; // Dodajemy
+import { useAuth } from '@/store/useAuth';
 import styles from './user.module.scss';
 
 export default function CurrentUserPage() {
-	const { user } = useAuth(); // Pobieramy currentUser z auth
+	const { user } = useAuth();
 	const { user: profileUser, reviews, loading, error } = useUser();
 	const [showAddReview, setShowAddReview] = useState(false);
 	const [isSubmittingReview, setIsSubmittingReview] = useState(false);
@@ -18,7 +18,6 @@ export default function CurrentUserPage() {
 	const handleAddReview = async (rating: number, comment: string) => {
 		try {
 			setIsSubmittingReview(true);
-			// createReview z hooka useUser
 			setShowAddReview(false);
 		} catch (err) {
 			console.error('Error adding review:', err);
@@ -51,11 +50,7 @@ export default function CurrentUserPage() {
 			<UserProfileHeader user={profileUser} isCurrentUser />
 			<UserStats user={profileUser} />
 
-			<ReviewList
-				reviews={reviews}
-				showAddReview={false}
-				currentUserId={user?.id} // Przekazujemy ID obecnego użytkownika
-			/>
+			<ReviewList reviews={reviews} showAddReview={false} currentUserId={user?.id} />
 		</div>
 	);
 }

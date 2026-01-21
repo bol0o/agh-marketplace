@@ -97,7 +97,7 @@
 	display: flex;
 	align-items: center;
 	gap: $spacing-sm;
-	flex-wrap: wrap; // Dodajemy wrap
+	flex-wrap: wrap;
 
 	@include sm {
 		gap: $spacing-md;
@@ -112,7 +112,7 @@
 	cursor: pointer;
 	color: $color-border;
 	transition: all 0.2s ease;
-	flex-shrink: 0; // Zapobiega skurczeniu
+	flex-shrink: 0;
 
 	&:hover:not(:disabled) {
 		color: #fbbf24;
@@ -233,7 +233,7 @@
 	display: flex;
 	justify-content: flex-end;
 	gap: $spacing-md;
-	flex-wrap: wrap; // Dodajemy wrap
+	flex-wrap: wrap;
 
 	@include sm {
 		flex-wrap: nowrap;
@@ -307,7 +307,6 @@
 	}
 }
 
-// Dla bardzo małych ekranów
 @include max-xs {
 	.container {
 		padding: $spacing-md;

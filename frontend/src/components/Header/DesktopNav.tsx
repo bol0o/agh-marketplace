@@ -5,8 +5,8 @@ import { UserDropdown } from './UserDropdown';
 import styles from './DesktopNav.module.scss';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useEffect } from 'react';
+import { useCartStore } from '@/store/useCartStore';
 
-const NOTIFICATION_COUNT = 3;
 const MESSAGE_COUNT = 2;
 
 interface DesktopNavProps {
@@ -15,6 +15,7 @@ interface DesktopNavProps {
 
 export function DesktopNav({ pathname }: DesktopNavProps) {
 	const { unreadCount, fetchUnreadCount, startPolling } = useNotifications();
+	const { totalItems } = useCartStore();
 
 	useEffect(() => {
 		fetchUnreadCount();
@@ -66,6 +67,7 @@ export function DesktopNav({ pathname }: DesktopNavProps) {
 					href="/cart"
 					icon={<ShoppingCart size={20} />}
 					isActive={isActive('/cart')}
+					badge={totalItems}
 					title="Koszyk"
 				/>
 

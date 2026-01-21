@@ -47,7 +47,7 @@ export function ProfileForm({ user, onSubmit, isSubmitting }: ProfileFormProps) 
 		const file = e.target.files?.[0];
 		if (!file) return;
 
-		// Sprawdź rozmiar pliku (max 5MB)
+		// max 5MB
 		if (file.size > 5 * 1024 * 1024) {
 			setErrors((prev) => ({
 				...prev,
@@ -56,7 +56,7 @@ export function ProfileForm({ user, onSubmit, isSubmitting }: ProfileFormProps) 
 			return;
 		}
 
-		// Sprawdź typ pliku
+		// File type
 		if (!file.type.startsWith('image/')) {
 			setErrors((prev) => ({ ...prev, avatar: 'Plik musi być obrazem.' }));
 			return;
@@ -66,7 +66,6 @@ export function ProfileForm({ user, onSubmit, isSubmitting }: ProfileFormProps) 
 			setIsUploadingAvatar(true);
 			setErrors((prev) => ({ ...prev, avatar: '' }));
 
-			// Utwórz tymczasowy podgląd
 			const reader = new FileReader();
 			reader.onloadend = () => {
 				const result = reader.result as string;
@@ -74,7 +73,6 @@ export function ProfileForm({ user, onSubmit, isSubmitting }: ProfileFormProps) 
 			};
 			reader.readAsDataURL(file);
 
-			// Upload do serwera
 			const uploadedUrl = await uploadImage(file);
 
 			if (uploadedUrl) {
@@ -136,6 +134,7 @@ export function ProfileForm({ user, onSubmit, isSubmitting }: ProfileFormProps) 
 
 	// Lista wydziałów AGH
 	const faculties = [
+		'Wydział Informatyki',
 		'Wydział Informatyki, Elektroniki i Telekomunikacji',
 		'Wydział Elektrotechniki, Automatyki, Informatyki i Inżynierii Biomedycznej',
 		'Wydział Inżynierii Mechanicznej i Robotyki',
@@ -145,7 +144,8 @@ export function ProfileForm({ user, onSubmit, isSubmitting }: ProfileFormProps) 
 		'Wydział Odlewnictwa',
 		'Wydział Inżynierii Materiałowej i Ceramiki',
 		'Wydział Humanistyczny',
-		'Inny',
+		'Wydział Matematyki Stosowanej',
+		'Wydział Fizyki i Informatyki Stosowanej',
 	];
 
 	const isLoading = isSubmitting || isUploadingAvatar;

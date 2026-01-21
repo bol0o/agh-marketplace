@@ -3,9 +3,7 @@
 
 .container {
 	display: flex;
-	// min-height: calc(100vh - 80px);
 	background-color: $color-bg;
-	// position: relative;
 	flex-direction: column;
 
 	@include lg {

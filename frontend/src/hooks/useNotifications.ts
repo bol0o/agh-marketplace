@@ -26,7 +26,6 @@ export const useNotifications = create<NotificationState>()(
 			isFetching: false,
 
 			fetchUnreadCount: async () => {
-				// Zapobiegaj równoczesnym requestom
 				if (get().isFetching) return get().unreadCount;
 
 				try {
@@ -42,7 +41,6 @@ export const useNotifications = create<NotificationState>()(
 						isFetching: false,
 					});
 
-					console.log('Fetched unread count from API:', count); // Debug
 					return count;
 				} catch (error) {
 					console.error('Error fetching unread count:', error);
@@ -72,25 +70,21 @@ export const useNotifications = create<NotificationState>()(
 				const current = get().unreadCount;
 				if (current > 0) {
 					set({ unreadCount: current - 1 });
-					console.log('Marked as read, new count:', current - 1); // Debug
 				}
 			},
 
 			markAllAsRead: () => {
 				set({ unreadCount: 0 });
-				console.log('Marked all as read'); // Debug
 			},
 
 			setUnreadCount: (count: number) => {
 				set({ unreadCount: count });
-				console.log('Set unread count to:', count); // Debug
 			},
 
 			updateUnreadCount: (change: number) => {
 				const current = get().unreadCount;
 				const newCount = Math.max(0, current + change);
 				set({ unreadCount: newCount });
-				console.log('Updated unread count:', current, '->', newCount); // Debug
 			},
 
 			reset: () => {

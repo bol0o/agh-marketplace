@@ -74,7 +74,7 @@
 	margin-top: $spacing-lg;
 	padding-top: $spacing-md;
 	width: 100%;
-	min-height: 28px; // Stała wysokość, żeby layout nie skakał
+	min-height: 28px;
 }
 
 .paginationDot {
@@ -87,11 +87,11 @@
 	padding: 0;
 	transition: all 0.3s ease;
 	opacity: 0.6;
-	flex-shrink: 0; // Zapobiega ściskaniu
+	flex-shrink: 0;
 
 	&:hover {
 		opacity: 0.8;
-		background: lighten($color-primary, 20%);
+		background: rgba($color-primary, 0.2);
 		transform: scale(1.1);
 	}
 
@@ -186,7 +186,6 @@
 	}
 }
 
-// Responsywność paginacji
 @media (max-width: 640px) {
 	.customPagination {
 		margin-top: $spacing-md;

@@ -1,0 +1,372 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0.5);
+	@include flex-center;
+	z-index: 1000;
+	padding: $spacing-md;
+	animation: fadeIn 0.2s ease;
+}
+
+.modal {
+	background: $color-white;
+	border-radius: $radius-lg;
+	width: 100%;
+	max-width: 800px;
+	max-height: 90vh;
+	overflow-y: auto;
+	animation: slideUp 0.3s ease;
+	box-shadow: $shadow-2xl;
+
+	@include max-sm {
+		max-height: 95vh;
+	}
+}
+
+.header {
+	@include flex-between;
+	padding: $spacing-xl;
+	border-bottom: 1px solid $color-border;
+	position: sticky;
+	top: 0;
+	background: $color-white;
+	z-index: 10;
+
+	@include max-sm {
+		padding: $spacing-lg;
+	}
+}
+
+.title {
+	display: flex;
+	align-items: center;
+	gap: $spacing-md;
+	font-size: 1.5rem;
+	font-weight: 700;
+	color: $color-dark;
+	margin: 0;
+
+	@include max-sm {
+		font-size: 1.25rem;
+	}
+}
+
+.titleIcon {
+	color: $color-primary;
+}
+
+.closeButton {
+	@include flex-center;
+	width: 40px;
+	height: 40px;
+	border-radius: $radius-circle;
+	background: transparent;
+	border: none;
+	color: $color-text-light;
+	cursor: pointer;
+	transition: all 0.2s ease;
+
+	&:hover {
+		background: $color-bg;
+		color: $color-dark;
+	}
+
+	&:focus-visible {
+		outline: 2px solid $color-primary;
+		outline-offset: 2px;
+	}
+}
+
+.form {
+	padding: $spacing-xl;
+
+	@include max-sm {
+		padding: $spacing-lg;
+	}
+}
+
+.section {
+	margin-bottom: $spacing-xl;
+
+	&:last-child {
+		margin-bottom: 0;
+	}
+
+	@include max-sm {
+		margin-bottom: $spacing-lg;
+	}
+}
+
+.sectionTitle {
+	display: flex;
+	align-items: center;
+	gap: $spacing-md;
+	font-size: 1.25rem;
+	font-weight: 600;
+	color: $color-dark;
+	margin: 0 0 $spacing-lg 0;
+
+	@include max-sm {
+		font-size: 1.1rem;
+		margin-bottom: $spacing-md;
+	}
+}
+
+.sectionIcon {
+	color: $color-primary;
+}
+
+.formGrid {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: $spacing-lg;
+
+	@include max-sm {
+		grid-template-columns: 1fr;
+		gap: $spacing-md;
+	}
+}
+
+.formGroup {
+	display: flex;
+	flex-direction: column;
+	gap: $spacing-xs;
+
+	&:nth-child(2) {
+		@include sm {
+			grid-column: span 2;
+		}
+	}
+}
+
+.label {
+	font-weight: 600;
+	color: $color-dark;
+	font-size: 0.95rem;
+}
+
+.input {
+	padding: $spacing-md;
+	border: 1px solid $color-border;
+	border-radius: $radius-md;
+	font-family: inherit;
+	font-size: 0.95rem;
+	transition: border-color 0.2s ease;
+
+	&:focus {
+		outline: none;
+		border-color: $color-primary;
+		box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
+	}
+
+	&.inputError {
+		border-color: #ef4444;
+
+		&:focus {
+			box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+		}
+	}
+
+	&:disabled {
+		background: $color-bg;
+		cursor: not-allowed;
+	}
+
+	&::placeholder {
+		color: $color-text-lighter;
+	}
+}
+
+.error {
+	color: #ef4444;
+	font-size: 0.85rem;
+}
+
+.orderSummary {
+	background: $color-bg;
+	border-radius: $radius-md;
+	padding: $spacing-lg;
+	margin-bottom: $spacing-lg;
+}
+
+.summaryItem {
+	@include flex-between;
+	padding: $spacing-sm 0;
+	color: $color-text;
+
+	&:not(:last-child) {
+		border-bottom: 1px solid $color-border;
+	}
+}
+
+.summaryTotal {
+	@include flex-between;
+	padding-top: $spacing-md;
+	margin-top: $spacing-md;
+	border-top: 2px solid $color-border;
+	font-weight: 700;
+	color: $color-dark;
+}
+
+.totalAmount {
+	font-size: 1.25rem;
+	color: $color-primary;
+}
+
+.terms {
+	margin-top: $spacing-lg;
+	padding: $spacing-md;
+	background: rgba($color-primary, 0.05);
+	border-radius: $radius-md;
+	border: 1px solid rgba($color-primary, 0.1);
+}
+
+.termsText {
+	margin: 0;
+	font-size: 0.9rem;
+	color: $color-text;
+	line-height: 1.6;
+}
+
+.termsLink {
+	color: $color-primary;
+	text-decoration: none;
+	font-weight: 600;
+
+	&:hover {
+		text-decoration: underline;
+	}
+}
+
+.actions {
+	display: flex;
+	gap: $spacing-md;
+	margin-top: $spacing-xl;
+
+	@include max-sm {
+		flex-direction: column;
+	}
+}
+
+.cancelButton {
+	flex: 1;
+	padding: $spacing-md $spacing-xl;
+	background: transparent;
+	border: 1px solid $color-border;
+	color: $color-text;
+	border-radius: $radius-md;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s ease;
+
+	&:hover:not(:disabled) {
+		background: $color-bg;
+		border-color: $color-text-lighter;
+	}
+
+	&:focus-visible {
+		outline: 2px solid $color-primary;
+		outline-offset: 2px;
+	}
+
+	&:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+
+	@include max-sm {
+		width: 100%;
+		padding: $spacing-md;
+	}
+}
+
+.submitButton {
+	flex: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: $spacing-sm;
+	padding: $spacing-md $spacing-xl;
+	background: $color-primary;
+	color: $color-white;
+	border: none;
+	border-radius: $radius-md;
+	font-weight: 600;
+	font-size: 1rem;
+	cursor: pointer;
+	transition: background-color 0.2s ease;
+
+	&:hover:not(:disabled) {
+		background: rgba($color-primary, 0.9);
+	}
+
+	&:focus-visible {
+		outline: 2px solid $color-primary;
+		outline-offset: 2px;
+	}
+
+	&:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+
+	@include max-sm {
+		width: 100%;
+		padding: $spacing-md;
+	}
+}
+
+.spinner {
+	animation: spin 1s linear infinite;
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes slideUp {
+	from {
+		transform: translateY(20px);
+		opacity: 0;
+	}
+	to {
+		transform: translateY(0);
+		opacity: 1;
+	}
+}
+
+@keyframes spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+@include max-xs {
+	.modal {
+		border-radius: 0;
+	}
+
+	.header,
+	.form {
+		padding: $spacing-md;
+	}
+
+	.formGrid {
+		gap: $spacing-sm;
+	}
+
+	.input {
+		padding: $spacing-sm;
+	}
+}

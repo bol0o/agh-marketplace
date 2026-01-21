@@ -87,14 +87,12 @@ export const useUserSettings = (user: User | null, options?: UseUserSettingsOpti
 			setError(null);
 			setSuccess(null);
 
-			// Użyj prawdziwego endpointu
 			const response = await api.patch('/users/me/settings', data);
 
 			const successMsg = 'Ustawienia powiadomień zostały zaktualizowane pomyślnie';
 			setSuccess(successMsg);
 			options?.onSuccess?.(successMsg);
 
-			// Zwróć zaktualizowane ustawienia
 			return {
 				...user,
 				settings: {

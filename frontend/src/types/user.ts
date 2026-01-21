@@ -1,9 +1,11 @@
+import { OrderAddress } from './order';
+
 export interface User {
 	id: string;
 	email: string;
 	name: string;
 	avatar: string | null;
-	role: 'user' | 'admin' | 'moderator';
+	role: 'user' | 'admin';
 	studentInfo?: {
 		faculty: string | null;
 		year: number | null;
@@ -42,7 +44,7 @@ export interface UserStats {
 	averageRating: number;
 	totalReviews: number;
 	responseRate?: number;
-	completionTime?: number; // in hours
+	completionTime?: number;
 }
 
 export interface UserAddress {

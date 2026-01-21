@@ -40,7 +40,6 @@ export function AddressForm({ user, onSubmit, isSubmitting }: AddressFormProps) 
 		const { name, value } = e.target;
 		setFormData((prev) => ({ ...prev, [name]: value }));
 
-		// Clear error for this field
 		if (errors[name]) {
 			setErrors((prev) => ({ ...prev, [name]: '' }));
 		}

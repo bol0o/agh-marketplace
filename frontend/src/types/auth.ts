@@ -1,11 +1,13 @@
 // src/types/auth.ts
 
+import { UserAddress } from './user';
+
 export interface User {
 	id: string;
 	email: string;
 	name: string;
 	avatar: string | null;
-	role: 'student' | 'admin' | string; // Backend zwraca małe litery, token duże - ujednolicimy to
+	role: 'student' | 'admin' | string;
 	studentInfo: {
 		faculty: string | null;
 		year: number;
@@ -13,11 +15,12 @@ export interface User {
 	rating: number;
 	ratingCount: number;
 	joinedAt: string;
+	address?: UserAddress;
 }
 
 export interface AuthResponse {
-	token: string; // Access Token
-	refreshToken: string; // Refresh Token
+	token: string;
+	refreshToken: string;
 	user: User;
 }
 

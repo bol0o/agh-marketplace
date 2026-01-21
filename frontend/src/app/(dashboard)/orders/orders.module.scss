@@ -1,0 +1,445 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.container {
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: $spacing-md;
+
+	@include sm {
+		padding: $spacing-lg;
+	}
+
+	@include lg {
+		padding: $spacing-xl;
+	}
+}
+
+.loadingContainer,
+.errorContainer,
+.emptyContainer {
+	@include flex-center;
+	flex-direction: column;
+	min-height: 60vh;
+	text-align: center;
+	padding: $spacing-xl;
+}
+
+.loadingText {
+	margin-top: $spacing-lg;
+	color: $color-text;
+	font-size: 1.1rem;
+}
+
+.errorContainer {
+	.errorIcon {
+		@include flex-center;
+		@include size(64px);
+		border-radius: $radius-circle;
+		background: rgba(239, 68, 68, 0.1);
+		color: $color-primary;
+		font-size: 2rem;
+		font-weight: 700;
+		margin-bottom: $spacing-lg;
+	}
+
+	.errorTitle {
+		font-size: 1.75rem;
+		font-weight: 700;
+		color: $color-dark;
+		margin-bottom: $spacing-md;
+	}
+
+	.errorMessage {
+		color: $color-text-light;
+		max-width: 400px;
+		line-height: 1.6;
+		margin-bottom: $spacing-xl;
+	}
+}
+
+.retryButton {
+	padding: $spacing-md $spacing-xl;
+	background: $color-primary;
+	color: $color-white;
+	border: none;
+	border-radius: $radius-md;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background-color 0.2s ease;
+
+	&:hover {
+		background: $color-primary-hover;
+	}
+
+	&:focus-visible {
+		outline: 2px solid $color-primary;
+		outline-offset: 2px;
+	}
+}
+
+.emptyContainer {
+	.emptyIcon {
+		color: $color-border;
+		margin-bottom: $spacing-lg;
+	}
+
+	.emptyTitle {
+		font-size: 1.75rem;
+		font-weight: 700;
+		color: $color-dark;
+		margin-bottom: $spacing-md;
+	}
+
+	.emptyDescription {
+		color: $color-text-light;
+		max-width: 400px;
+		line-height: 1.6;
+		margin-bottom: $spacing-xl;
+	}
+
+	.shopButton {
+		@include flex-center;
+		gap: $spacing-sm;
+		padding: $spacing-md $spacing-xl;
+		background: $color-primary;
+		color: $color-white;
+		border-radius: $radius-md;
+		text-decoration: none;
+		font-weight: 600;
+		transition: background-color 0.2s ease;
+
+		&:hover {
+			background: $color-primary-hover;
+		}
+
+		&:focus-visible {
+			outline: 2px solid $color-primary;
+			outline-offset: 2px;
+		}
+	}
+}
+
+.header {
+	margin-bottom: $spacing-xl;
+
+	@include max-sm {
+		margin-bottom: $spacing-lg;
+	}
+}
+
+.title {
+	display: flex;
+	align-items: center;
+	gap: $spacing-md;
+	font-size: 2rem;
+	font-weight: 700;
+	color: $color-dark;
+	margin: 0 0 $spacing-sm 0;
+
+	@include max-sm {
+		font-size: 1.5rem;
+	}
+}
+
+.titleIcon {
+	color: $color-primary;
+}
+
+.subtitle {
+	font-size: 1.1rem;
+	color: $color-text-light;
+	margin: 0;
+}
+
+.ordersList {
+	display: flex;
+	flex-direction: column;
+	gap: $spacing-lg;
+
+	@include max-sm {
+		gap: $spacing-md;
+	}
+}
+
+@include max-xs {
+	.container {
+		padding: $spacing-sm;
+	}
+
+	.errorTitle,
+	.emptyTitle {
+		font-size: 1.25rem;
+	}
+
+	.title {
+		font-size: 1.25rem;
+		gap: $spacing-sm;
+	}
+
+	.subtitle {
+		font-size: 0.9rem;
+	}
+
+	.shopButton,
+	.retryButton {
+		padding: $spacing-md;
+		width: 100%;
+		max-width: 300px;
+	}
+}
+
+.headerContent {
+	@include flex-between;
+	margin-bottom: $spacing-lg;
+}
+
+.refreshButton {
+	@include flex-center;
+	gap: $spacing-sm;
+	padding: $spacing-sm $spacing-md;
+	background: $color-white;
+	border: 1px solid $color-border;
+	color: $color-text;
+	border-radius: $radius-md;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s ease;
+
+	&:hover:not(:disabled) {
+		background: $color-bg;
+		border-color: $color-primary;
+		color: $color-primary;
+	}
+
+	&:focus-visible {
+		outline: 2px solid $color-primary;
+		outline-offset: 2px;
+	}
+
+	&:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+}
+
+.stats {
+	display: flex;
+	gap: $spacing-xl;
+	padding: $spacing-lg;
+	background: $color-white;
+	border-radius: $radius-lg;
+	border: 1px solid $color-border;
+	box-shadow: $shadow-sm;
+	margin-bottom: $spacing-xl;
+	flex-wrap: wrap;
+
+	@include max-sm {
+		gap: $spacing-lg;
+		padding: $spacing-md;
+	}
+}
+
+.statItem {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	min-width: 80px;
+}
+
+.statValue {
+	font-size: 1.5rem;
+	font-weight: 700;
+	color: $color-dark;
+	margin-bottom: $spacing-xs;
+
+	@include max-sm {
+		font-size: 1.25rem;
+	}
+}
+
+.statLabel {
+	font-size: 0.85rem;
+	color: $color-text-light;
+	text-align: center;
+}
+
+.headerContent {
+	@include flex-between;
+	margin-bottom: $spacing-lg;
+
+	@include max-sm {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: $spacing-md;
+	}
+}
+
+.refreshButton {
+	@include flex-center;
+	gap: $spacing-sm;
+	padding: $spacing-sm $spacing-md;
+	background: $color-white;
+	border: 1px solid $color-border;
+	color: $color-text;
+	border-radius: $radius-md;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s ease;
+
+	&:hover:not(:disabled) {
+		background: $color-bg;
+		border-color: $color-primary;
+		color: $color-primary;
+	}
+
+	&:focus-visible {
+		outline: 2px solid $color-primary;
+		outline-offset: 2px;
+	}
+
+	&:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+
+	@include max-sm {
+		align-self: flex-end;
+	}
+}
+
+.stats {
+	display: flex;
+	gap: $spacing-xl;
+	padding: $spacing-lg;
+	background: $color-white;
+	border-radius: $radius-lg;
+	border: 1px solid $color-border;
+	box-shadow: $shadow-sm;
+	margin-bottom: $spacing-xl;
+	flex-wrap: wrap;
+
+	@include max-sm {
+		gap: $spacing-lg;
+		padding: $spacing-md;
+		justify-content: space-around;
+	}
+
+	@include max-xs {
+		gap: $spacing-md;
+	}
+}
+
+.statItem {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	min-width: 80px;
+
+	@include max-sm {
+		min-width: 70px;
+	}
+
+	@include max-xs {
+		min-width: 60px;
+	}
+}
+
+.statValue {
+	font-size: 1.5rem;
+	font-weight: 700;
+	color: $color-dark;
+	margin-bottom: $spacing-xs;
+
+	@include max-sm {
+		font-size: 1.25rem;
+	}
+
+	@include max-xs {
+		font-size: 1.1rem;
+	}
+}
+
+.statLabel {
+	font-size: 0.85rem;
+	color: $color-text-light;
+	text-align: center;
+
+	@include max-xs {
+		font-size: 0.8rem;
+	}
+}
+
+.emptyContainer {
+	@include flex-center;
+	flex-direction: column;
+	min-height: 60vh;
+	text-align: center;
+	padding: $spacing-xl;
+
+	.emptyIcon {
+		color: $color-border;
+		margin-bottom: $spacing-lg;
+	}
+
+	.emptyTitle {
+		font-size: 1.75rem;
+		font-weight: 700;
+		color: $color-dark;
+		margin-bottom: $spacing-md;
+	}
+
+	.emptyDescription {
+		color: $color-text-light;
+		max-width: 400px;
+		line-height: 1.6;
+		margin-bottom: $spacing-xl;
+	}
+
+	.shopButton {
+		@include flex-center;
+		gap: $spacing-sm;
+		padding: $spacing-md $spacing-xl;
+		background: $color-primary;
+		color: $color-white;
+		border-radius: $radius-md;
+		text-decoration: none;
+		font-weight: 600;
+		transition: background-color 0.2s ease;
+
+		&:hover {
+			background: $color-primary-hover;
+		}
+
+		&:focus-visible {
+			outline: 2px solid $color-primary;
+			outline-offset: 2px;
+		}
+	}
+}
+
+.ordersList {
+	display: flex;
+	flex-direction: column;
+	gap: $spacing-lg;
+
+	@include max-sm {
+		gap: $spacing-md;
+	}
+}
+
+@include max-xs {
+	.emptyTitle {
+		font-size: 1.25rem;
+	}
+
+	.emptyDescription {
+		font-size: 0.9rem;
+	}
+
+	.shopButton {
+		padding: $spacing-md;
+		width: 100%;
+		max-width: 300px;
+	}
+}

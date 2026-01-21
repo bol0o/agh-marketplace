@@ -242,7 +242,6 @@
 	}
 }
 
-// Dla bardzo małych ekranów
 @include max-xs {
 	.container {
 		padding: $spacing-md;

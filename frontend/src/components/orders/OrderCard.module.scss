@@ -1,0 +1,250 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.card {
+	background: $color-white;
+	border: 1px solid $color-border;
+	border-radius: $radius-lg;
+	padding: $spacing-lg;
+	transition: all 0.2s ease;
+	box-shadow: $shadow-sm;
+
+	&:hover {
+		box-shadow: $shadow-md;
+		transform: translateY(-2px);
+	}
+
+	@include max-sm {
+		padding: $spacing-md;
+	}
+}
+
+.cardHeader {
+	@include flex-between;
+	margin-bottom: $spacing-lg;
+	padding-bottom: $spacing-md;
+	border-bottom: 1px solid $color-border;
+
+	@include max-sm {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: $spacing-sm;
+	}
+}
+
+.headerLeft {
+	display: flex;
+	flex-direction: column;
+	gap: $spacing-xs;
+}
+
+.orderNumber {
+	font-weight: 700;
+	color: $color-dark;
+	font-size: 1.1rem;
+}
+
+.date {
+	font-size: 0.9rem;
+	color: $color-text-light;
+}
+
+.status {
+	padding: $spacing-xs $spacing-md;
+	border-radius: $radius-md;
+	font-size: 0.85rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+.statusPending {
+	background: rgba(245, 158, 11, 0.1);
+	color: #f59e0b;
+	border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.statusProcessing {
+	background: rgba(59, 130, 246, 0.1);
+	color: $color-status-blue;
+	border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.statusShipped {
+	background: rgba(139, 92, 246, 0.1);
+	color: $color-secondary;
+	border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.statusDelivered {
+	background: rgba(34, 197, 94, 0.1);
+	color: $color-status-green;
+	border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.statusCancelled {
+	background: rgba(239, 68, 68, 0.1);
+	color: $color-primary;
+	border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.itemsPreview {
+	margin-bottom: $spacing-lg;
+}
+
+.itemsList {
+	display: flex;
+	flex-direction: column;
+	gap: $spacing-md;
+}
+
+.item {
+	display: flex;
+	gap: $spacing-md;
+	align-items: center;
+}
+
+.itemImage {
+	width: 60px;
+	height: 60px;
+	border-radius: $radius-md;
+	overflow: hidden;
+	background: $color-bg;
+	flex-shrink: 0;
+
+	img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+}
+
+.itemInfo {
+	flex: 1;
+	min-width: 0;
+}
+
+.itemTitle {
+	font-size: 0.95rem;
+	font-weight: 600;
+	color: $color-dark;
+	margin: 0 0 $spacing-xs 0;
+	line-height: 1.4;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+}
+
+.itemDetails {
+	display: flex;
+	gap: $spacing-sm;
+	align-items: center;
+	font-size: 0.9rem;
+}
+
+.quantity {
+	color: $color-text;
+}
+
+.price {
+	font-weight: 600;
+	color: $color-dark;
+}
+
+.moreItems {
+	margin-top: $spacing-md;
+	padding: $spacing-xs $spacing-sm;
+	background: $color-bg;
+	border-radius: $radius-sm;
+	font-size: 0.85rem;
+	color: $color-text-light;
+	text-align: center;
+}
+
+.cardFooter {
+	@include flex-between;
+	padding-top: $spacing-md;
+	border-top: 1px solid $color-border;
+
+	@include max-sm {
+		flex-direction: column;
+		gap: $spacing-md;
+		align-items: stretch;
+	}
+}
+
+.footerLeft,
+.footerRight {
+	display: flex;
+	flex-direction: column;
+	gap: $spacing-sm;
+}
+
+.address {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.addressLabel {
+	font-size: 0.85rem;
+	color: $color-text-light;
+}
+
+.totalAmount {
+	display: flex;
+	align-items: baseline;
+	gap: $spacing-sm;
+}
+
+.totalLabel {
+	font-size: 0.9rem;
+	color: $color-text;
+}
+
+.totalValue {
+	font-size: 1.25rem;
+	font-weight: 700;
+	color: $color-dark;
+}
+
+.detailsLink {
+	color: $color-primary;
+	text-decoration: none;
+	font-weight: 600;
+	font-size: 0.95rem;
+	padding: $spacing-xs 0;
+	transition: color 0.2s ease;
+
+	&:hover {
+		color: $color-primary-hover;
+		text-decoration: underline;
+	}
+
+	&:focus-visible {
+		outline: 2px solid $color-primary;
+		outline-offset: 2px;
+		border-radius: $radius-sm;
+	}
+}
+
+@include max-xs {
+	.card {
+		padding: $spacing-sm;
+	}
+
+	.item {
+		gap: $spacing-sm;
+	}
+
+	.itemImage {
+		width: 50px;
+		height: 50px;
+	}
+
+	.totalValue {
+		font-size: 1.1rem;
+	}
+}
