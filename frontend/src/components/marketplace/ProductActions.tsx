@@ -10,6 +10,7 @@ interface ProductActionsProps {
 	stock: number;
 	endsAt?: string | null;
 	isOwner: boolean;
+	isLoading: boolean;
 	onBuy: () => void;
 	onBid: () => void;
 	onContact: () => void;
@@ -22,6 +23,7 @@ export function ProductActions({
 	stock,
 	endsAt,
 	isOwner,
+	isLoading,
 	onBuy,
 	onBid,
 	onContact,

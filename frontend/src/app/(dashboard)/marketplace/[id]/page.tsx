@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Edit, Trash2, AlertCircle } from 'lucide-react';
+import { isAxiosError } from 'axios';
 import { Product } from '@/types/marketplace';
 import { useAuth } from '@/store/useAuth';
 import { useCart } from '@/hooks/useCart';
@@ -37,63 +38,37 @@ export default function ProductPage() {
 	const { id } = useParams() as { id: string };
 	const router = useRouter();
 	const { user, isLoading: authLoading, isAuthenticated } = useAuth();
-	const { addToCart, items } = useCart();
+	const { addToCart } = useCart();
 	const { addToast } = useUIStore();
 
 	const [product, setProduct] = useState<Product | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 	const [isDeleting, setIsDeleting] = useState(false);
-	const [isOwner, setIsOwner] = useState(false);
 	const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 	const [refreshBids, setRefreshBids] = useState(0);
-	const [authChecked, setAuthChecked] = useState(false);
 	const [isAddingToCart, setIsAddingToCart] = useState(false);
 	const [isFollowingSeller, setIsFollowingSeller] = useState(false);
 	const [isFollowingLoading, setIsFollowingLoading] = useState(false);
 
-	const isInitialMount = useRef(true);
+	const isOwner = !!(user && product && product.seller.id === user.id);
 
-	useEffect(() => {
-		if (!isInitialMount.current) {
-			return;
-		}
-		isInitialMount.current = false;
-
-		fetchProduct();
-	}, [id]);
-
-	useEffect(() => {
-		if (!authLoading && product) {
-			checkOwnership();
-			setAuthChecked(true);
-
-			if (user && product.seller.id !== user.id) {
-				checkFollowStatus();
-			}
-		}
-	}, [authLoading, product, user]);
-
-	const fetchProduct = async (): Promise<void> => {
+	const fetchProduct = useCallback(async (): Promise<void> => {
 		try {
 			setLoading(true);
 			const response = await api.get<Product>(`/products/${id}`);
 			const productData = response.data;
 			setProduct(productData);
-		} catch (err: any) {
-			setError(err.response?.data?.error || 'Nie udało się pobrać produktu');
+		} catch (err: unknown) {
+			if (isAxiosError(err)) {
+				setError(err.response?.data?.error || 'Nie udało się pobrać produktu');
+			} else {
+				setError('Wystąpił nieoczekiwany błąd');
+			}
 		} finally {
 			setLoading(false);
 		}
-	};
-
-	const checkOwnership = (): void => {
-		if (user && product && product.seller.id === user.id) {
-			setIsOwner(true);
-		} else {
-			setIsOwner(false);
-		}
-	};
+	}, [id]);
 
 	const checkFollowStatus = useCallback(async () => {
 		if (!user || !product || product.seller.id === user.id) return;
@@ -106,6 +81,16 @@ export default function ProductPage() {
 			setIsFollowingSeller(false);
 		}
 	}, [user, product]);
+
+	useEffect(() => {
+		fetchProduct();
+	}, [fetchProduct]);
+
+	useEffect(() => {
+		if (!authLoading && product && user && product.seller.id !== user.id) {
+			checkFollowStatus();
+		}
+	}, [authLoading, product, user, checkFollowStatus]);
 
 	const handleDelete = async (): Promise<void> => {
 		try {
@@ -127,8 +112,6 @@ export default function ProductPage() {
 
 	const handleContactSeller = (): void => {
 		console.log('Otwórz chat z sprzedawcą');
-		// Możesz dodać routing do chatu
-		// router.push(`/messages?userId=${product.seller.id}`);
 	};
 
 	const handleBuyNow = async (): Promise<void> => {
@@ -189,13 +172,17 @@ export default function ProductPage() {
 				setIsFollowingSeller(true);
 				addToast(`Zacząłeś obserwować ${product.seller.name}`, 'success');
 			}
-		} catch (error: any) {
+		} catch (error: unknown) {
 			console.error('Error toggling follow:', error);
-			const message =
-				error.response?.data?.message ||
-				(isFollowingSeller
-					? 'Nie udało się przestać obserwować'
-					: 'Nie udało się obserwować użytkownika');
+
+			let message = isFollowingSeller
+				? 'Nie udało się przestać obserwować'
+				: 'Nie udało się obserwować użytkownika';
+
+			if (isAxiosError(error)) {
+				message = error.response?.data?.message || message;
+			}
+
 			addToast(message, 'error');
 		} finally {
 			setIsFollowingLoading(false);
@@ -203,7 +190,7 @@ export default function ProductPage() {
 	};
 
 	const renderOwnerActions = () => {
-		if (authLoading || !authChecked) {
+		if (authLoading) {
 			return null;
 		}
 
@@ -278,6 +265,7 @@ export default function ProductPage() {
 							onContact={handleContactSeller}
 							onFollow={handleFollowSeller}
 							initialIsFollowing={isFollowingSeller}
+							isLoading={isFollowingLoading}
 						/>
 
 						<ProductDetailsCard
@@ -319,6 +307,7 @@ export default function ProductPage() {
 						onBuy={handleBuyNow}
 						onBid={handleBid}
 						onContact={handleContactSeller}
+						isLoading={isAddingToCart}
 					/>
 
 					<div className={styles.descriptionSection}>

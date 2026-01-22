@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeft, Save, AlertCircle, ShieldAlert, Loader2 } from 'lucide-react';
+import { isAxiosError } from 'axios';
 import { ProductForm } from '@/components/marketplace/ProductForm';
 import api from '@/lib/axios';
 import styles from '../../create/CreateProduct.module.scss';
@@ -20,19 +21,7 @@ export default function EditProductPage() {
 	const [product, setProduct] = useState<Product | null>(null);
 	const [isOwner, setIsOwner] = useState<boolean>(false);
 
-	useEffect(() => {
-		if (!authLoading) {
-			if (!isAuthenticated || !user) {
-				router.push(
-					'/login?redirect=' + encodeURIComponent(`/marketplace/products/${id}/edit`)
-				);
-				return;
-			}
-			fetchProduct();
-		}
-	}, [id, authLoading, isAuthenticated, user]);
-
-	const fetchProduct = async (): Promise<void> => {
+	const fetchProduct = useCallback(async (): Promise<void> => {
 		try {
 			setLoading(true);
 			const response = await api.get<Product>(`/products/${id}`);
@@ -51,17 +40,34 @@ export default function EditProductPage() {
 					}, 3000);
 				}
 			}
-		} catch (err: any) {
+		} catch (err: unknown) {
 			console.error('Error fetching product:', err);
-			if (err.response?.status === 404) {
-				setError('Produkt nie istnieje');
+
+			if (isAxiosError(err)) {
+				if (err.response?.status === 404) {
+					setError('Produkt nie istnieje');
+				} else {
+					setError('Nie udało się pobrać produktu');
+				}
 			} else {
-				setError('Nie udało się pobrać produktu');
+				setError('Wystąpił nieoczekiwany błąd');
 			}
 		} finally {
 			setLoading(false);
 		}
-	};
+	}, [id, user, router]);
+
+	useEffect(() => {
+		if (!authLoading) {
+			if (!isAuthenticated || !user) {
+				router.push(
+					'/login?redirect=' + encodeURIComponent(`/marketplace/products/${id}/edit`)
+				);
+				return;
+			}
+			fetchProduct();
+		}
+	}, [id, authLoading, isAuthenticated, user, router, fetchProduct]);
 
 	const handleSubmit = async (
 		productData: Omit<Product, 'id' | 'seller' | 'views' | 'createdAt' | 'status'> & {
@@ -81,9 +87,18 @@ export default function EditProductPage() {
 
 			router.push(`/marketplace/${id}`);
 			router.refresh();
-		} catch (err: any) {
+		} catch (err: unknown) {
 			console.error('Error updating product:', err);
-			setError(err.response?.data?.error || err.message || 'Nie udało się zapisać zmian');
+
+			let errorMessage = 'Nie udało się zapisać zmian';
+
+			if (isAxiosError(err)) {
+				errorMessage = err.response?.data?.error || err.message || errorMessage;
+			} else if (err instanceof Error) {
+				errorMessage = err.message;
+			}
+
+			setError(errorMessage);
 		} finally {
 			setSubmitting(false);
 		}

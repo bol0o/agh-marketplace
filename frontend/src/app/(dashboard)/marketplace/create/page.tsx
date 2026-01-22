@@ -3,28 +3,36 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Plus } from 'lucide-react';
-import { ProductForm } from '@/components/marketplace/ProductForm';
+import { isAxiosError } from 'axios';
+import { ProductForm, ProductFormData } from '@/components/marketplace/ProductForm';
 import api from '@/lib/axios';
 import styles from './CreateProduct.module.scss';
-import { Product } from '@/types/marketplace';
 
 export default function CreateProductPage() {
 	const router = useRouter();
 
 	const [submitting, setSubmitting] = useState(false);
-	const [error, setError] = useState<string | null>(null);
+	const [error, setError] = useState<string | undefined>(undefined);
 
-	const handleSubmit = async (productData: Product) => {
+	const handleSubmit = async (productData: ProductFormData) => {
 		try {
 			setSubmitting(true);
-			setError(null);
+			setError(undefined);
 
 			const response = await api.post('/products', productData);
 
 			router.push(`/marketplace/${response.data.id}`);
-		} catch (err: any) {
-			console.log(err);
-			setError(err.response?.data?.error || 'Nie udało się dodać produktu');
+		} catch (err: unknown) {
+			console.error('Error creating product:', err);
+
+			if (isAxiosError(err)) {
+				const errorMessage = err.response?.data?.error || 'Nie udało się dodać produktu';
+				setError(errorMessage);
+			} else if (err instanceof Error) {
+				setError(err.message);
+			} else {
+				setError('Wystąpił nieoczekiwany błąd');
+			}
 		} finally {
 			setSubmitting(false);
 		}

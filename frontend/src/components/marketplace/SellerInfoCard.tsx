@@ -12,6 +12,7 @@ interface SellerInfoCardProps {
 		rating: string;
 	};
 	initialIsFollowing: boolean;
+	isLoading: boolean;
 	onContact?: () => void;
 	onFollow?: () => void;
 }
@@ -19,6 +20,7 @@ interface SellerInfoCardProps {
 export function SellerInfoCard({
 	seller,
 	initialIsFollowing,
+	isLoading,
 	onContact,
 	onFollow,
 }: SellerInfoCardProps) {

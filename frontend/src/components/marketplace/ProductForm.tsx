@@ -64,7 +64,7 @@ const CONDITIONS: { value: ProductCondition; label: string; color: string }[] = 
 	{ value: 'damaged', label: 'Uszkodzony', color: '#dc2626' },
 ];
 
-interface ProductFormProps {
+export interface ProductFormProps {
 	initialData?: Partial<Product> & { auctionEnd?: string };
 	onSubmit: (data: ProductFormData) => Promise<void>;
 	isSubmitting: boolean;
@@ -73,7 +73,7 @@ interface ProductFormProps {
 	setSubmitError: (error: string | undefined) => void;
 }
 
-type ProductFormData = Omit<Product, 'id' | 'seller' | 'views' | 'createdAt' | 'status'> & {
+export type ProductFormData = Omit<Product, 'id' | 'seller' | 'views' | 'createdAt' | 'status'> & {
 	isAuction?: boolean;
 	auctionEnd?: string;
 };
@@ -182,7 +182,7 @@ export function ProductForm({
 				throw new Error('Podaj datę zakończenia aukcji');
 			}
 
-			let imageUrl = formData.image || '';
+			let finalImage = formData.image || undefined;
 
 			if (selectedImage) {
 				try {
@@ -190,16 +190,18 @@ export function ProductForm({
 					if (!uploadedUrl) {
 						throw new Error('Nie udało się przesłać obrazka');
 					}
-					imageUrl = uploadedUrl;
-				} catch (uploadErr: any) {
+					finalImage = uploadedUrl;
+				} catch (uploadErr: unknown) {
 					console.error('Image upload error:', uploadErr);
-					throw new Error(
-						`Błąd przesyłania obrazka: ${uploadErr.message || 'Nieznany błąd'}`
-					);
+
+					const errorMessage =
+						uploadErr instanceof Error ? uploadErr.message : 'Nieznany błąd';
+
+					throw new Error(`Błąd przesyłania obrazka: ${errorMessage}`);
 				}
 			}
 
-			const submitData: any = {
+			const apiPayload = {
 				title: formData.title.trim(),
 				description: formData.description.trim(),
 				price: Number(formData.price),
@@ -208,17 +210,23 @@ export function ProductForm({
 				type: formData.type,
 				location: formData.location.trim(),
 				stock: Number(formData.stock),
-				imageUrl: imageUrl,
+				imageUrl: finalImage,
+				image: finalImage,
+
 				endsAt:
 					formData.type === 'auction' && formData.endsAt
 						? new Date(formData.endsAt).toISOString()
-						: null,
+						: undefined,
 			};
 
-			await onSubmit(submitData);
-		} catch (err: any) {
-			console.log(err);
-			setSubmitError(err.message);
+			await onSubmit(apiPayload as unknown as ProductFormData);
+		} catch (err: unknown) {
+			console.error(err);
+			if (err instanceof Error) {
+				setSubmitError(err.message);
+			} else {
+				setSubmitError('Wystąpił nieoczekiwany błąd formularza');
+			}
 		}
 	};
 
@@ -471,7 +479,7 @@ export function ProductForm({
 													? {
 															borderColor: cond.color,
 															backgroundColor: `${cond.color}10`,
-													  }
+														}
 													: {}
 											}
 										>
