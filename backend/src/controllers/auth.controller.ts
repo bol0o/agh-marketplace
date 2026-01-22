@@ -20,11 +20,11 @@ if (!process.env.JWT_REFRESH_SECRET) {
 const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
 
-//HELPER
+// HELPER
 const generateAuthResponse = (
   user: any,
   accessToken: string,
-  refreshToken: string
+  refreshToken: string,
 ) => {
   return {
     token: accessToken, // Frontend expects 'token'
@@ -32,17 +32,26 @@ const generateAuthResponse = (
     user: {
       id: user.id,
       email: user.email,
-      //Map: Combine first and last name into 'name'
+      // Map: Combine first and last name into 'name'
       name: `${user.firstName} ${user.lastName}`,
-      //Map: avatarUrl -> avatar
+      // Map: avatarUrl -> avatar
       avatar: user.avatarUrl,
-      //Map: STUDENT -> student (lowercase)
+      // Map: STUDENT -> student (lowercase)
       role: user.role.toLowerCase(),
 
-      // Mocks for fields required by Frontend but not in DB yet
+      // ADDED: Address fields for pre-filling orders/profile
+      address: {
+        street: user.street || null,
+        city: user.city || null,
+        zipCode: user.zipCode || null,
+        buildingNumber: user.buildingNumber || null,
+        apartmentNumber: user.apartmentNumber || null,
+        phone: user.phone || null,
+      },
+
       studentInfo: {
         faculty: user.faculty || null,
-        year: 1, // Placeholder
+        year: user.studentYear || 1,
       },
       rating: 0,
       ratingCount: 0,
@@ -92,13 +101,13 @@ export const register = async (req: Request, res: Response) => {
     const accessToken = jwt.sign(
       { userId: user.id, role: user.role },
       JWT_SECRET,
-      { expiresIn: "15m" }
+      { expiresIn: "15m" },
     );
 
     const refreshToken = jwt.sign(
       { userId: user.id, role: user.role },
       JWT_REFRESH_SECRET,
-      { expiresIn: "7d" }
+      { expiresIn: "7d" },
     );
 
     //Save refresh token
@@ -145,14 +154,14 @@ export const login = async (req: Request, res: Response) => {
     const accessToken = jwt.sign(
       { userId: user.id, role: user.role },
       JWT_SECRET,
-      { expiresIn: "15m" }
+      { expiresIn: "15m" },
     );
 
     //Generate Refresh Token (7 days)
     const refreshToken = jwt.sign(
       { userId: user.id, role: user.role },
       JWT_REFRESH_SECRET,
-      { expiresIn: "7d" }
+      { expiresIn: "7d" },
     );
 
     //Save Refresh Token in DB
@@ -193,7 +202,7 @@ export const refreshToken = async (req: Request, res: Response) => {
       const newAccessToken = jwt.sign(
         { userId: user.id, role: user.role },
         JWT_SECRET,
-        { expiresIn: "15m" }
+        { expiresIn: "15m" },
       );
 
       res.json({ accessToken: newAccessToken });

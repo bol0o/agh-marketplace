@@ -144,6 +144,8 @@ model Order {
 
   shippingCost    Float  @default(0)
   shippingStreet  String
+  shippingBuildingNumber  String   
+  shippingApartmentNumber String?
   shippingCity    String
   shippingZipCode String
   shippingPhone   String

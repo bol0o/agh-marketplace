@@ -4,7 +4,7 @@ import { AuthRequest } from "../middleware/auth.middleware";
 
 const prisma = new PrismaClient();
 
-//Add review for user (seller)
+// Add review for user (seller)
 export const addReview = async (req: AuthRequest, res: Response) => {
   try {
     const reviewerId = req.user?.userId;
@@ -14,12 +14,12 @@ export const addReview = async (req: AuthRequest, res: Response) => {
       return res.status(401).json({ error: "Brak ID użytkownika" });
     }
 
-    //Validiation: cannot review self
+    // Validation: cannot review self
     if (reviewerId === revieweeId) {
       return res.status(400).json({ error: "Nie można ocenić samego siebie" });
     }
 
-    //Validiation: check if target user exists
+    // Validation: check if target user exists
     const targetUser = await prisma.user.findUnique({
       where: { id: revieweeId },
     });
@@ -27,7 +27,7 @@ export const addReview = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ error: "Użytkownik nie istnieje" });
     }
 
-    //Validiation: check if already reviewed
+    // Validation: check if already reviewed
     const existingReview = await prisma.review.findFirst({
       where: {
         reviewerId: reviewerId,
@@ -38,7 +38,7 @@ export const addReview = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ error: "Już oceniłeś tego użytkownika" });
     }
 
-    //Create review
+    // Create review
     const review = await prisma.review.create({
       data: {
         reviewerId,
@@ -55,15 +55,20 @@ export const addReview = async (req: AuthRequest, res: Response) => {
   }
 };
 
-//Get reviews for specific user
+// Get reviews for specific user
 export const getReviewsForUser = async (req: AuthRequest, res: Response) => {
   try {
-    const { userId } = req.params; //This is the ID of the user being reviewed
+    const { userId } = req.params;
+
     const reviews = await prisma.review.findMany({
       where: { revieweeId: userId },
       include: {
         reviewer: {
-          select: { firstName: true, lastName: true },
+          select: {
+            firstName: true,
+            lastName: true,
+            avatarUrl: true,
+          },
         },
       },
       orderBy: { createdAt: "desc" },
@@ -75,21 +80,21 @@ export const getReviewsForUser = async (req: AuthRequest, res: Response) => {
   }
 };
 
-//Delete review (Author or Admin)
+// Delete review (Author or Admin)
 export const deleteReview = async (req: AuthRequest, res: Response) => {
   try {
     const { reviewId } = req.params;
     const userId = req.user?.userId;
     const role = req.user?.role;
 
-    //Fimnd review
+    // Find review to check permissions
     const review = await prisma.review.findUnique({ where: { id: reviewId } });
 
     if (!review) {
       return res.status(404).json({ error: "Opinia nie istnieje" });
     }
 
-    //Check permissions
+    // Check permissions: Author of the review OR Admin can delete
     const isAuthor = review.reviewerId === userId;
     const isAdmin = role === "ADMIN";
 
@@ -99,10 +104,10 @@ export const deleteReview = async (req: AuthRequest, res: Response) => {
         .json({ error: "Brak uprawnień do usunięcia opinii" });
     }
 
-    //Delete
+    // Delete review
     await prisma.review.delete({ where: { id: reviewId } });
 
-    res.json({ message: "Opinia usunięta" });
+    res.json({ message: "Opinia usunięta pomyślnie" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Błąd usuwania opinii" });

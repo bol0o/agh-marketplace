@@ -13,7 +13,7 @@ const router = Router();
 
 // Middleware: Admin Only
 const requireAdmin = (req: AuthRequest, res: Response, next: NextFunction) => {
-  if (req.user?.role !== "ADMIN") {
+  if (req.user?.role?.toUpperCase() !== "ADMIN") {
     return res.status(403).json({
       error: "Dostęp zabroniony: wymagane uprawnienia administratora",
     });
