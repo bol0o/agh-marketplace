@@ -5,17 +5,22 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
 import styles from './MobileSearchBar.module.scss';
 
-export function MobileSearchBar() {
+interface MobileSearchBarProps {
+	onClose: () => void;
+}
+
+export function MobileSearchBar({ onClose }: MobileSearchBarProps) {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const inputRef = useRef<HTMLInputElement>(null);
-	const [searchValue, setSearchValue] = useState('');
+	const [searchValue, setSearchValue] = useState(searchParams.get('search') || '');
 
 	useEffect(() => {
-		const searchQuery = searchParams.get('search');
-		if (searchQuery) {
-			setSearchValue(searchQuery);
+		const currentSearch = searchParams.get('search') || '';
+		if (currentSearch !== searchValue) {
+			setSearchValue(currentSearch);
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [searchParams]);
 
 	useEffect(() => {
@@ -38,6 +43,8 @@ export function MobileSearchBar() {
 		}
 
 		router.push(`/marketplace?${params.toString()}`);
+
+		onClose();
 	};
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -11,6 +11,8 @@ import { formatPrice } from '@/lib/utils';
 import api from '@/lib/axios';
 import styles from './CheckoutModal.module.scss';
 import { useRouter } from 'next/navigation';
+import { isAxiosError } from 'axios';
+import Link from 'next/link';
 
 interface CheckoutModalProps {
 	isOpen: boolean;
@@ -103,9 +105,14 @@ export function CheckoutModal({ isOpen, onClose, items }: CheckoutModalProps) {
 			onClose();
 
 			router.push(`/orders/${response.data.id}`);
-		} catch (err: any) {
+		} catch (err: unknown) {
 			console.error('Error creating order:', err);
-			const message = err.response?.data?.message || 'Nie udało się złożyć zamówienia';
+			let message = 'Nie udało się złożyć zamówienia';
+
+			if (isAxiosError(err)) {
+				message = err.response?.data?.message || message;
+			}
+
 			addToast(message, 'error');
 		} finally {
 			setIsSubmitting(false);
@@ -270,16 +277,16 @@ export function CheckoutModal({ isOpen, onClose, items }: CheckoutModalProps) {
 
 						<div className={styles.terms}>
 							<p className={styles.termsText}>
-								Klikając "Złóż zamówienie", akceptujesz
-								<a href="/terms" className={styles.termsLink}>
+								Klikając &quot;Złóż zamówienie&quot;, akceptujesz
+								<Link href="#" className={styles.termsLink}>
 									{' '}
 									Regulamin
-								</a>{' '}
+								</Link>{' '}
 								oraz
-								<a href="/privacy" className={styles.termsLink}>
+								<Link href="#" className={styles.termsLink}>
 									{' '}
 									Politykę prywatności
-								</a>
+								</Link>
 								.
 							</p>
 						</div>

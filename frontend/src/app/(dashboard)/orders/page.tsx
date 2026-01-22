@@ -62,8 +62,8 @@ const OrdersPage: React.FC = () => {
 					<h1 className={styles.title}>
 						<svg
 							className={styles.titleIcon}
-							width="24"
-							height="24"
+							width="32"
+							height="32"
 							viewBox="0 0 24 24"
 							fill="none"
 						>

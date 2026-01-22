@@ -14,6 +14,20 @@ interface CartItemCardProps {
 	disabled?: boolean;
 }
 
+const CATEGORY_NAMES: Record<string, string> = {
+	BOOKS: 'Książki',
+	ELECTRONICS: 'Elektronika',
+	ACCESSORIES: 'Akcesoria',
+	CLOTHING: 'Odzież',
+	OTHER: 'Inne',
+};
+
+const CONDITION_NAMES: Record<string, string> = {
+	new: 'Nowy',
+	used: 'Używany',
+	damaged: 'Uszkodzony',
+};
+
 export function CartItemCard({
 	item,
 	onUpdateQuantity,
@@ -39,21 +53,29 @@ export function CartItemCard({
 	return (
 		<div className={styles.container}>
 			<div className={styles.productInfo}>
-				<Link href={`/product/${item.product.id}`} className={styles.imageLink}>
-					<div className={styles.imageContainer}>
-						<Image
-							src={item.product.image}
-							alt={item.product.title}
-							width={120}
-							height={120}
-							className={styles.image}
-						/>
-					</div>
-				</Link>
+				{item.product.image ? (
+					<Link href={`/marketplace/${item.product.id}`} className={styles.imageLink}>
+						<div className={styles.imageContainer}>
+							<Image
+								src={item.product.image}
+								alt={item.product.title}
+								width={120}
+								height={120}
+								className={styles.image}
+							/>
+						</div>
+					</Link>
+				) : (
+					<Link href={`/marketplace/${item.product.id}`} className={styles.imageLink}>
+						<div className={styles.imageContainer}>
+							<div className={styles.imagePlaceholder}>{item.product.title}</div>
+						</div>
+					</Link>
+				)}
 
 				<div className={styles.details}>
 					<div className={styles.header}>
-						<Link href={`/product/${item.product.id}`} className={styles.titleLink}>
+						<Link href={`/marketplace/${item.product.id}`} className={styles.titleLink}>
 							<h3 className={styles.title}>{item.product.title}</h3>
 						</Link>
 						<button
@@ -96,8 +118,12 @@ export function CartItemCard({
 					</div>
 
 					<div className={styles.productMeta}>
-						<span className={styles.category}>{item.product.category}</span>
-						<span className={styles.condition}>{item.product.condition}</span>
+						<span className={styles.category}>
+							{CATEGORY_NAMES[item.product.category]}
+						</span>
+						<span className={styles.condition}>
+							{CONDITION_NAMES[item.product.condition]}
+						</span>
 					</div>
 				</div>
 			</div>

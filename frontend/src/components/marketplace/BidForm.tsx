@@ -5,6 +5,7 @@ import { Gavel, AlertCircle } from 'lucide-react';
 import { BidFormData, BidResponse } from '@/types/marketplace';
 import api from '@/lib/axios';
 import styles from './BidForm.module.scss';
+import { isAxiosError } from 'axios';
 
 interface BidFormProps {
 	productId: string;
@@ -50,12 +51,22 @@ export function BidForm({
 			onBidSuccess(response.data.bid.amount);
 
 			setTimeout(() => {
-				setAmount(currentPrice + minBidIncrement);
+				const newMin = response.data.bid.amount + minBidIncrement;
+				setAmount(newMin);
 				setSuccess(null);
 			}, 2000);
-		} catch (err: any) {
-			console.log(err.response);
-			setError(err.response?.data?.message || 'Nie udało się złożyć oferty');
+		} catch (err: unknown) {
+			console.error(err);
+
+			let errorMessage = 'Nie udało się złożyć oferty';
+
+			if (isAxiosError(err)) {
+				errorMessage = err.response?.data?.message || errorMessage;
+			} else if (err instanceof Error) {
+				errorMessage = err.message;
+			}
+
+			setError(errorMessage);
 		} finally {
 			setSubmitting(false);
 		}

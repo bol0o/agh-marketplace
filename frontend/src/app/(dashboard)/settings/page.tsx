@@ -5,11 +5,12 @@ import { SettingsHeader, SettingsTab } from '@/components/settings/SettingsHeade
 import { ProfileForm } from '@/components/settings/ProfileForm';
 import { AddressForm } from '@/components/settings/AddressForm';
 import { NotificationsForm } from '@/components/settings/NotificationsForm';
-import { Loader, AlertCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import { useUser } from '@/hooks/useUser';
 import { useUserSettings } from '@/hooks/useUserSettings';
 import { useAuth } from '@/store/useAuth';
 import { useUIStore } from '@/store/uiStore';
+import { UpdateSettingsData } from '@/types/user';
 import styles from './settings.module.scss';
 import { PageLoading } from '@/components/shared/PageLoading';
 
@@ -27,33 +28,28 @@ export default function SettingsPage() {
 	} = useUserSettings(user);
 
 	const addToast = useUIStore((state) => state.addToast);
-
 	const [activeTab, setActiveTab] = useState<SettingsTab>('profile');
-	const [shouldRefresh, setShouldRefresh] = useState(false);
 
 	useEffect(() => {
 		if (success) {
 			addToast(success, 'success');
-			setShouldRefresh(true);
 			clearMessages();
+			refresh();
 		}
 
 		if (settingsError) {
 			addToast(settingsError, 'error');
 			clearMessages();
 		}
-	}, [success, settingsError, addToast, clearMessages]);
-
-	useEffect(() => {
-		if (shouldRefresh && !isUpdating) {
-			refresh();
-			setShouldRefresh(false);
-		}
-	}, [shouldRefresh, isUpdating, refresh]);
+	}, [success, settingsError, addToast, clearMessages, refresh]);
 
 	const handleTabChange = useCallback((tab: SettingsTab) => {
 		setActiveTab(tab);
 	}, []);
+
+	const handleNotificationsSubmit = async (data: UpdateSettingsData): Promise<void> => {
+		await updateSettings(data);
+	};
 
 	if (loading) {
 		return <PageLoading text={'Ładowanie ustawień...'} />;
@@ -104,7 +100,7 @@ export default function SettingsPage() {
 			{activeTab === 'notifications' && (
 				<NotificationsForm
 					user={user}
-					onSubmit={updateSettings}
+					onSubmit={handleNotificationsSubmit} // Używamy wrappera
 					isSubmitting={isUpdating}
 				/>
 			)}

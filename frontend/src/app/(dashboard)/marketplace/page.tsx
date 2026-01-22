@@ -4,7 +4,7 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { ProductCard } from '@/components/marketplace/ProductCard';
 import { Pagination } from '@/components/shared/Pagination';
-import { SearchX, Loader2, AlertCircle, Filter } from 'lucide-react';
+import { SearchX, AlertCircle, Filter } from 'lucide-react';
 import styles from './marketplace.module.scss';
 import { useMarketplaceProducts } from '@/hooks/useMarketplaceProducts';
 import { PageLoading } from '@/components/shared/PageLoading';

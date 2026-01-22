@@ -450,6 +450,81 @@
 	text-align: center;
 }
 
+.modalOverlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: rgba(0, 0, 0, 0.5);
+	backdrop-filter: blur(4px);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 1000;
+	animation: fadeIn 0.2s ease-out;
+}
+
+.modal {
+	background-color: white;
+	border-radius: 20px;
+	padding: 32px;
+	max-width: 400px;
+	width: 90%;
+	animation: slideUp 0.3s ease-out;
+
+	h3 {
+		font-size: 1.5rem;
+		margin-bottom: 12px;
+		color: $color-dark;
+	}
+
+	p {
+		color: $color-text;
+		margin-bottom: 24px;
+		line-height: 1.5;
+	}
+}
+
+.modalActions {
+	display: flex;
+	gap: 12px;
+	justify-content: flex-end;
+}
+
+.modalCancel,
+.modalDelete {
+	padding: 10px 24px;
+	border-radius: 8px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s;
+	border: none;
+}
+
+.modalCancel {
+	background-color: $color-bg;
+	color: $color-text;
+
+	&:hover {
+		background-color: rgba($color-bg, 0.95);
+	}
+}
+
+.modalDelete {
+	background-color: #ef4444;
+	color: white;
+
+	&:hover:not(:disabled) {
+		background-color: rgba(#ef4444, 0.9);
+	}
+
+	&:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+}
+
 @media (max-width: 374px) {
 	.container {
 		padding: $spacing-sm;

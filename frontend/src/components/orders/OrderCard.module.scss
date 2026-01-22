@@ -50,6 +50,8 @@
 }
 
 .status {
+	@include flex-center;
+	gap: 8px;
 	padding: $spacing-xs $spacing-md;
 	border-radius: $radius-md;
 	font-size: 0.85rem;
@@ -105,6 +107,7 @@
 }
 
 .itemImage {
+	position: relative;
 	width: 60px;
 	height: 60px;
 	border-radius: $radius-md;
@@ -113,10 +116,22 @@
 	flex-shrink: 0;
 
 	img {
-		width: 100%;
-		height: 100%;
 		object-fit: cover;
 	}
+}
+
+.imagePlaceholder {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: $color-bg;
+	color: $color-text-lighter;
+	font-weight: 600;
+	text-align: center;
+	padding: 20px;
+	font-size: 0.8rem;
 }
 
 .itemInfo {

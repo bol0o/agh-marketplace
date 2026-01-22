@@ -1,6 +1,7 @@
 import React from 'react';
 import { OrderItem } from '@/types/order';
 import styles from './OrderDetailsItem.module.scss';
+import Image from 'next/image';
 
 interface OrderDetailsItemProps {
 	item: OrderItem;
@@ -11,9 +12,21 @@ const OrderDetailsItem: React.FC<OrderDetailsItemProps> = ({ item }) => {
 
 	return (
 		<div className={styles.item}>
-			<div className={styles.imageContainer}>
-				<img src={item.snapshot.image} alt={item.snapshot.title} className={styles.image} />
-			</div>
+			{item.snapshot.image ? (
+				<div className={styles.imageContainer}>
+					<Image
+						src={item.snapshot.image}
+						alt={item.snapshot.title}
+						fill
+						sizes="(max-width: 768px) 100vw, 100px"
+						className={styles.img}
+					/>
+				</div>
+			) : (
+				<div className={styles.imageContainer}>
+					<div className={styles.imagePlaceholder}>{item.snapshot.title}</div>
+				</div>
+			)}
 
 			<div className={styles.details}>
 				<h4 className={styles.title}>{item.snapshot.title}</h4>

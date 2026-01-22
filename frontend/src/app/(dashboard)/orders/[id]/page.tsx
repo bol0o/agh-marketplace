@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import {
 	ArrowLeft,
@@ -21,6 +21,7 @@ import { PageLoading } from '@/components/shared/PageLoading';
 const OrderDetailsPage: React.FC = () => {
 	const { id } = useParams<{ id: string }>();
 	const router = useRouter();
+	const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
 	const { order, loading, error, cancelOrder } = useOrder({
 		id: id as string,
@@ -100,11 +101,13 @@ const OrderDetailsPage: React.FC = () => {
 	const statusInfo = getStatusInfo(order.status);
 	const formattedDate = formatDate(order.createdAt);
 
-	const handleCancel = async () => {
-		if (confirm('Czy na pewno chcesz anulować to zamówienie?')) {
-			try {
-				await cancelOrder();
-			} catch (err) {}
+	const confirmCancelOrder = async () => {
+		try {
+			await cancelOrder();
+			setShowCancelConfirm(false);
+		} catch (err) {
+			console.error(err);
+			setShowCancelConfirm(false);
 		}
 	};
 
@@ -210,7 +213,7 @@ const OrderDetailsPage: React.FC = () => {
 							</h3>
 							<div className={styles.actionsGrid}>
 								<button
-									onClick={handleCancel}
+									onClick={() => setShowCancelConfirm(true)}
 									className={`${styles.actionButton} ${styles.cancelButton}`}
 									disabled={loading}
 								>
@@ -222,6 +225,33 @@ const OrderDetailsPage: React.FC = () => {
 					)}
 				</div>
 			</div>
+
+			{showCancelConfirm && (
+				<div className={styles.modalOverlay}>
+					<div className={styles.modal}>
+						<h3>Anulowanie zamówienia</h3>
+						<p>
+							Czy na pewno chcesz anulować zamówienie #{order.id.slice(-8)}? Tej
+							operacji nie można cofnąć.
+						</p>
+						<div className={styles.modalActions}>
+							<button
+								onClick={() => setShowCancelConfirm(false)}
+								className={styles.modalCancel}
+							>
+								Wróć
+							</button>
+							<button
+								onClick={confirmCancelOrder}
+								className={styles.modalDelete}
+								disabled={loading}
+							>
+								{loading ? 'Anulowanie...' : 'Tak, anuluj'}
+							</button>
+						</div>
+					</div>
+				</div>
+			)}
 		</div>
 	);
 };

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import {
 	AlertCircle,
@@ -11,6 +11,7 @@ import {
 	ShoppingCart,
 	MessageSquare,
 } from 'lucide-react';
+import { isAxiosError } from 'axios';
 import api from '@/lib/axios';
 import { useNotifications } from '@/hooks/useNotifications';
 import { NotificationHeader } from '@/components/notifications/NotificationHeader';
@@ -86,7 +87,6 @@ export default function NotificationsPage() {
 		fetchUnreadCount: fetchStoreCount,
 		markAsRead: markStoreAsRead,
 		markAllAsRead: markAllStoreAsRead,
-		setUnreadCount,
 	} = useNotifications();
 
 	const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -103,12 +103,7 @@ export default function NotificationsPage() {
 	const [markingAll, setMarkingAll] = useState(false);
 	const [deletingAll, setDeletingAll] = useState(false);
 
-	useEffect(() => {
-		fetchNotifications();
-		fetchStoreCount();
-	}, [page, selectedType, showOnlyUnread]);
-
-	const fetchNotifications = async () => {
+	const fetchNotifications = useCallback(async () => {
 		try {
 			setLoading(true);
 			setError(null);
@@ -134,21 +129,30 @@ export default function NotificationsPage() {
 
 			if (selectedType === 'ALL' && !showOnlyUnread) {
 				const localUnread = data.notifications.filter((n) => !n.isRead).length;
-				console.log('Local unread count from notifications:', localUnread);
 
 				if (Math.abs(localUnread - storeUnreadCount) > 5) {
-					console.log('Large difference, fetching from API...');
 					await fetchStoreCount();
 				}
 			}
-		} catch (err: any) {
+		} catch (err: unknown) {
 			console.error('Error fetching notifications:', err);
-			setError('Nie udało się pobrać powiadomień');
+
+			if (isAxiosError(err)) {
+				setError('Nie udało się pobrać powiadomień');
+			} else {
+				setError('Wystąpił nieoczekiwany błąd');
+			}
+
 			setNotifications([]);
 		} finally {
 			setLoading(false);
 		}
-	};
+	}, [page, limit, selectedType, showOnlyUnread, storeUnreadCount, fetchStoreCount]);
+
+	useEffect(() => {
+		fetchNotifications();
+		fetchStoreCount();
+	}, [fetchNotifications, fetchStoreCount]);
 
 	const handleMarkAsRead = async (id: string) => {
 		try {
@@ -161,7 +165,7 @@ export default function NotificationsPage() {
 			);
 
 			markStoreAsRead();
-		} catch (err) {
+		} catch (err: unknown) {
 			console.error('Error marking as read:', err);
 		}
 	};
@@ -178,7 +182,7 @@ export default function NotificationsPage() {
 			markAllStoreAsRead();
 
 			await fetchNotifications();
-		} catch (err) {
+		} catch (err: unknown) {
 			console.error('Error marking all as read:', err);
 		} finally {
 			setMarkingAll(false);
@@ -198,14 +202,14 @@ export default function NotificationsPage() {
 			for (const notification of readNotifications) {
 				try {
 					await api.delete(`/notifications/${notification.id}`);
-				} catch (deleteErr) {
-					console.error(`Error deleting notification ${notification.id}:`, deleteErr);
+				} catch {
+					console.error(`Error deleting notification ${notification.id}`);
 				}
 			}
 
 			await fetchNotifications();
 			await fetchStoreCount();
-		} catch (err) {
+		} catch (err: unknown) {
 			console.error('Error deleting read notifications:', err);
 		} finally {
 			setDeletingAll(false);
@@ -238,7 +242,7 @@ export default function NotificationsPage() {
 					year: 'numeric',
 				});
 			}
-		} catch (err) {
+		} catch {
 			return dateString;
 		}
 	};

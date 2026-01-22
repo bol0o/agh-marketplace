@@ -151,7 +151,7 @@ export function MobileNav({ isOpen, onClose, isAnimating }: MobileNavProps) {
 									)}
 								</MobileLink>
 								<MobileLink
-									href="/user/orders"
+									href="/orders"
 									icon={<Package size={20} />}
 									onClick={onClose}
 								>

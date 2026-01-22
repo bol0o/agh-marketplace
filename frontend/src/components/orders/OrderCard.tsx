@@ -3,6 +3,7 @@ import { Package, Truck, CheckCircle, XCircle, Clock, MapPin, ChevronRight } fro
 import { Order } from '@/types/order';
 import { formatDate } from '@/lib/utils';
 import styles from './OrderCard.module.scss';
+import Image from 'next/image';
 
 interface OrderCardProps {
 	order: Order;
@@ -70,9 +71,24 @@ const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
 				<div className={styles.itemsList}>
 					{order.items.slice(0, 2).map((item, index) => (
 						<div key={index} className={styles.item}>
-							<div className={styles.itemImage}>
-								<img src={item.snapshot.image} alt={item.snapshot.title} />
-							</div>
+							{item.snapshot.image ? (
+								<div className={styles.itemImage}>
+									<Image
+										src={item.snapshot.image}
+										alt={item.snapshot.title}
+										fill
+										sizes="(max-width: 768px) 100px, 50px"
+										className={styles.img}
+									/>
+								</div>
+							) : (
+								<div className={styles.itemImage}>
+									<div className={styles.imagePlaceholder}>
+										{item.snapshot.title}
+									</div>
+								</div>
+							)}
+
 							<div className={styles.itemInfo}>
 								<h4 className={styles.itemTitle}>{item.snapshot.title}</h4>
 								<div className={styles.itemDetails}>

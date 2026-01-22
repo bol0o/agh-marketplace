@@ -2,6 +2,7 @@
 
 import { ShoppingBag, Gavel, MessageCircle, Clock } from 'lucide-react';
 import styles from './ProductActions.module.scss';
+import { PageLoading } from '../shared/PageLoading';
 
 interface ProductActionsProps {
 	isAuction: boolean;
@@ -29,6 +30,10 @@ export function ProductActions({
 	onContact,
 }: ProductActionsProps) {
 	if (!isActive) return null;
+
+	if (isLoading) {
+		<PageLoading text={'Ładowanie...'} />;
+	}
 
 	return (
 		<div className={styles.mainActions}>

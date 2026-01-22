@@ -29,7 +29,6 @@ export function Header() {
 		<>
 			<header className={styles.header}>
 				<div className={styles.container}>
-					{/* Left Section */}
 					<div className={styles.leftSection}>
 						<button
 							className={styles.hamburgerBtn}
@@ -48,14 +47,11 @@ export function Header() {
 						</Link>
 					</div>
 
-					{/* Desktop Search */}
 					<SearchBar />
 
-					{/* Right Section */}
 					<div className={styles.rightSection}>
 						<DesktopNav pathname={pathname} />
 
-						{/* Mobile Actions */}
 						<div className={styles.mobileActions}>
 							<button
 								onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
@@ -88,13 +84,11 @@ export function Header() {
 					</div>
 				</div>
 
-				{/* Mobile Search Bar */}
 				{isMobileSearchOpen && (
 					<MobileSearchBar onClose={() => setIsMobileSearchOpen(false)} />
 				)}
 			</header>
 
-			{/* Mobile Menu */}
 			{(isMobileMenuOpen || isMobileMenuAnimating) && (
 				<MobileNav
 					isOpen={isMobileMenuOpen}

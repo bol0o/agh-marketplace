@@ -1,3 +1,5 @@
+type Category = 'BOOKS' | 'ELECTRONICS' | 'ACCESSORIES' | 'CLOTHING' | 'OTHER';
+
 export interface CartItem {
 	id: string;
 	quantity: number;
@@ -6,7 +8,7 @@ export interface CartItem {
 		title: string;
 		price: number;
 		image: string;
-		category: string;
+		category: Category;
 		condition: string;
 		location: string;
 		seller: {

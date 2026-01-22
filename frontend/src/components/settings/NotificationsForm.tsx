@@ -19,12 +19,21 @@ export function NotificationsForm({ user, onSubmit, isSubmitting }: Notification
 	});
 
 	useEffect(() => {
-		setFormData({
-			email: user.settings.notifications.email,
-			push: user.settings.notifications.push,
-			marketing: user.settings.notifications.marketing,
-		});
-	}, [user.settings]);
+		const { email, push, marketing } = user.settings.notifications;
+
+		if (
+			formData.email !== email ||
+			formData.push !== push ||
+			formData.marketing !== marketing
+		) {
+			setFormData({
+				email,
+				push,
+				marketing,
+			});
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [user.settings.notifications]);
 
 	const handleToggle = (field: keyof typeof formData) => {
 		setFormData((prev) => ({ ...prev, [field]: !prev[field] }));

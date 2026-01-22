@@ -8,13 +8,16 @@ import styles from './SearchBar.module.scss';
 export function SearchBar() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
-	const [searchValue, setSearchValue] = useState('');
+	const [searchValue, setSearchValue] = useState(searchParams.get('search') || '');
 
 	useEffect(() => {
-		const searchQuery = searchParams.get('search');
-		if (searchQuery) {
-			setSearchValue(searchQuery);
+		const queryInUrl = searchParams.get('search') || '';
+
+		if (searchValue !== queryInUrl) {
+			setSearchValue(queryInUrl);
 		}
+
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [searchParams]);
 
 	const handleSubmit = (e: React.FormEvent) => {
