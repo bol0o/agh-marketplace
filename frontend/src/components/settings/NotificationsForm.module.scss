@@ -1,0 +1,275 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.container {
+	background: $color-white;
+	border-radius: $radius-lg;
+	padding: $spacing-xl;
+	box-shadow: $shadow-md;
+	border: 1px solid $color-border;
+
+	@include max-sm {
+		padding: $spacing-lg;
+	}
+}
+
+.sectionTitle {
+	font-size: 1.5rem;
+	font-weight: 700;
+	color: $color-dark;
+	margin: 0 0 $spacing-md 0;
+
+	@include max-sm {
+		font-size: 1.25rem;
+	}
+}
+
+.description {
+	color: $color-text-light;
+	font-size: 0.95rem;
+	line-height: 1.6;
+	margin: 0 0 $spacing-xl 0;
+
+	@include max-sm {
+		font-size: 0.9rem;
+		margin-bottom: $spacing-lg;
+	}
+}
+
+.notificationsList {
+	display: flex;
+	flex-direction: column;
+	gap: $spacing-lg;
+	margin-bottom: $spacing-xl;
+
+	@include max-sm {
+		gap: $spacing-md;
+		margin-bottom: $spacing-lg;
+	}
+}
+
+.notificationItem {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: $spacing-lg;
+	padding: $spacing-lg;
+	background: $color-bg;
+	border-radius: $radius-lg;
+	border: 1px solid $color-border;
+
+	@include max-sm {
+		flex-direction: column;
+		gap: $spacing-md;
+		padding: $spacing-md;
+	}
+}
+
+.notificationHeader {
+	display: flex;
+	align-items: flex-start;
+	gap: $spacing-lg;
+	flex: 1;
+
+	@include max-sm {
+		gap: $spacing-md;
+	}
+}
+
+.notificationIcon {
+	@include flex-center;
+	@include size(48px);
+	background: rgba($color-primary, 0.1);
+	border-radius: $radius-md;
+	color: $color-primary;
+	flex-shrink: 0;
+
+	.icon {
+		width: 24px;
+		height: 24px;
+	}
+
+	@include max-sm {
+		@include size(40px);
+
+		.icon {
+			width: 20px;
+			height: 20px;
+		}
+	}
+}
+
+.notificationInfo {
+	flex: 1;
+}
+
+.notificationTitle {
+	display: flex;
+	align-items: center;
+	gap: $spacing-sm;
+	margin-bottom: $spacing-xs;
+	flex-wrap: wrap;
+}
+
+.notificationLabel {
+	font-size: 1.1rem;
+	font-weight: 600;
+	color: $color-dark;
+	margin: 0;
+
+	@include max-sm {
+		font-size: 1rem;
+	}
+}
+
+.recommendedBadge {
+	background: rgba($color-primary, 0.1);
+	color: $color-primary;
+	padding: 2px 8px;
+	border-radius: $radius-sm;
+	font-size: 0.75rem;
+	font-weight: 600;
+	white-space: nowrap;
+}
+
+.notificationDescription {
+	color: $color-text;
+	font-size: 0.9rem;
+	line-height: 1.6;
+	margin: 0;
+
+	@include max-sm {
+		font-size: 0.85rem;
+	}
+}
+
+.toggleButton {
+	background: none;
+	border: none;
+	padding: $spacing-xs;
+	cursor: pointer;
+	flex-shrink: 0;
+
+	&:focus-visible {
+		outline: 2px solid $color-primary;
+		outline-offset: 4px;
+		border-radius: $radius-md;
+	}
+
+	@include max-sm {
+		align-self: flex-end;
+	}
+}
+
+.toggleTrack {
+	width: 52px;
+	height: 28px;
+	background: $color-border;
+	border-radius: 14px;
+	position: relative;
+	transition: background-color 0.2s ease;
+}
+
+.toggleThumb {
+	position: absolute;
+	top: 2px;
+	left: 2px;
+	width: 24px;
+	height: 24px;
+	background: $color-white;
+	border-radius: $radius-circle;
+	box-shadow: $shadow-sm;
+	transition: transform 0.2s ease;
+}
+
+.toggleOn {
+	.toggleTrack {
+		background: $color-primary;
+	}
+
+	.toggleThumb {
+		transform: translateX(24px);
+	}
+}
+
+.actions {
+	display: flex;
+	justify-content: flex-end;
+}
+
+.submitButton {
+	display: inline-flex;
+	align-items: center;
+	gap: $spacing-sm;
+	padding: $spacing-md $spacing-xl;
+	background: $color-primary;
+	color: $color-white;
+	border: none;
+	border-radius: $radius-md;
+	font-weight: 600;
+	font-size: 1rem;
+	cursor: pointer;
+	transition: background-color 0.2s ease;
+
+	&:hover:not(:disabled) {
+		background: rgba($color-primary, 0.9);
+	}
+
+	&:focus-visible {
+		outline: 2px solid $color-primary;
+		outline-offset: 2px;
+	}
+
+	&:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+
+	@include max-sm {
+		width: 100%;
+		justify-content: center;
+		padding: $spacing-md;
+	}
+}
+
+.spinner {
+	animation: spin 1s linear infinite;
+
+	@keyframes spin {
+		to {
+			transform: rotate(360deg);
+		}
+	}
+}
+
+@include max-xs {
+	.container {
+		padding: $spacing-md;
+		margin-left: -$spacing-md;
+		margin-right: -$spacing-md;
+		border-radius: 0;
+		border-left: none;
+		border-right: none;
+	}
+
+	.sectionTitle {
+		font-size: 1.1rem;
+	}
+
+	.notificationItem {
+		padding: $spacing-sm;
+	}
+
+	.notificationIcon {
+		@include size(36px);
+
+		.icon {
+			width: 18px;
+			height: 18px;
+		}
+	}
+
+	.notificationLabel {
+		font-size: 0.95rem;
+	}
+}

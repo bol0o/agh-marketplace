@@ -1,0 +1,127 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.container {
+	max-width: 1000px;
+	margin: 0 auto;
+	padding: 20px 16px 60px;
+	animation: fadeIn 0.3s ease-out;
+}
+
+.header {
+	display: flex;
+	align-items: center;
+	gap: 20px;
+	margin-bottom: 40px;
+	padding-bottom: 20px;
+	border-bottom: 1px solid $color-border;
+}
+
+.backButton {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 10px 16px;
+	background-color: transparent;
+	border: 1px solid $color-border;
+	border-radius: 8px;
+	color: $color-text;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s;
+
+	&:hover {
+		border-color: $color-primary;
+		color: $color-primary;
+	}
+}
+
+.title {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	font-size: 2rem;
+	font-weight: 800;
+	color: $color-dark;
+	margin: 0;
+
+	svg {
+		color: $color-primary;
+	}
+}
+
+.loadingWrapper {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	min-height: 400px;
+	padding: 40px 20px;
+}
+
+.spinner {
+	color: $color-primary;
+	animation: spin 1s linear infinite;
+	margin-bottom: 20px;
+}
+
+@keyframes spin {
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+.loadingText {
+	color: $color-text;
+	font-size: 1rem;
+	font-weight: 500;
+}
+
+.errorWrapper {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	min-height: 400px;
+	text-align: center;
+	gap: 20px;
+
+	h3 {
+		font-size: 1.5rem;
+		color: $color-dark;
+	}
+
+	p {
+		color: $color-text;
+	}
+}
+
+@keyframes spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(10px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@include sm {
+	.container {
+		padding: 32px 24px 80px;
+	}
+
+	.title {
+		font-size: 2.25rem;
+	}
+}

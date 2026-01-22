@@ -1,0 +1,1074 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.container {
+	max-width: 1400px;
+	margin: 0 auto;
+	padding: 20px 16px 60px;
+	animation: fadeIn 0.5s ease-out;
+	overflow-x: hidden;
+
+	@include md {
+		padding: 32px 24px 80px;
+	}
+
+	@include lg {
+		padding: 40px 32px 100px;
+	}
+}
+
+.loadingWrapper {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	min-height: 400px;
+	padding: 40px 20px;
+}
+
+.spinner {
+	color: $color-primary;
+	animation: spin 1s linear infinite;
+	margin-bottom: 20px;
+}
+
+@keyframes spin {
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+.loadingText {
+	color: $color-text;
+	font-size: 1rem;
+	font-weight: 500;
+}
+
+.errorWrapper {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	min-height: 400px;
+	text-align: center;
+	gap: 20px;
+
+	svg {
+		color: #ef4444;
+	}
+
+	h3 {
+		font-size: 1.5rem;
+		color: $color-dark;
+	}
+
+	p {
+		color: $color-text;
+	}
+}
+
+.backButton {
+	padding: 12px 24px;
+	background-color: $color-primary;
+	color: white;
+	border-radius: 8px;
+	text-decoration: none;
+	font-weight: 600;
+	transition: all 0.2s;
+
+	&:hover {
+		background-color: $color-primary-hover;
+		transform: translateY(-2px);
+	}
+}
+
+.header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 32px;
+	padding-bottom: 20px;
+	border-bottom: 1px solid $color-border;
+}
+
+.backLink {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	color: $color-primary;
+	text-decoration: none;
+	font-weight: 600;
+	transition: all 0.2s;
+
+	&:hover {
+		gap: 12px;
+	}
+}
+
+.ownerActions {
+	display: flex;
+	gap: 12px;
+}
+
+.editButton,
+.deleteButton {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 10px 16px;
+	border-radius: 8px;
+	font-weight: 600;
+	font-size: 0.9rem;
+	border: none;
+	cursor: pointer;
+	transition: all 0.2s;
+
+	&:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+}
+
+.editButton {
+	background-color: rgba($color-primary, 0.1);
+	color: $color-primary;
+	border: 1px solid rgba($color-primary, 0.2);
+
+	&:hover:not(:disabled) {
+		background-color: rgba($color-primary, 0.2);
+	}
+}
+
+.deleteButton {
+	background-color: rgba(#ef4444, 0.1);
+	color: #ef4444;
+	border: 1px solid rgba(#ef4444, 0.2);
+
+	&:hover:not(:disabled) {
+		background-color: rgba(#ef4444, 0.2);
+	}
+}
+
+.mainContent {
+	display: flex;
+	flex-direction: column;
+	gap: 40px;
+
+	@include lg {
+		flex-direction: row;
+		gap: 60px;
+		align-items: flex-start;
+	}
+}
+
+.leftColumn {
+	flex: 1;
+
+	@include lg {
+		flex: 0 0 40%;
+		position: sticky;
+		top: 100px;
+	}
+}
+
+.rightColumn {
+	flex: 1;
+
+	@include lg {
+		flex: 0 0 60%;
+	}
+}
+
+.imageContainer {
+	position: relative;
+	aspect-ratio: 4/3;
+	border-radius: 20px;
+	overflow: hidden;
+	background-color: $color-bg;
+	margin-bottom: 24px;
+	box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+
+	@include lg {
+		margin-bottom: 32px;
+	}
+}
+
+.productImage {
+	object-fit: cover;
+	transition: transform 0.7s cubic-bezier(0.25, 0.8, 0.25, 1);
+
+	&:hover {
+		transform: scale(1.05);
+	}
+}
+
+.statusBadge {
+	position: absolute;
+	top: 20px;
+	left: 20px;
+	padding: 10px 20px;
+	background-color: rgba(0, 0, 0, 0.85);
+	backdrop-filter: blur(10px);
+	color: white;
+	border-radius: 10px;
+	font-weight: 700;
+	font-size: 0.9rem;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	z-index: 2;
+
+	&.sold {
+		background-color: rgba(#16a34a, 0.9);
+	}
+
+	&.ended {
+		background-color: rgba(#6b7280, 0.9);
+	}
+
+	&.reserved {
+		background-color: rgba(#f59e0b, 0.9);
+	}
+}
+
+.typeBadge {
+	position: absolute;
+	top: 20px;
+	right: 20px;
+	padding: 10px 18px;
+	border-radius: 10px;
+	font-weight: 700;
+	font-size: 0.85rem;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	z-index: 2;
+	backdrop-filter: blur(10px);
+
+	&.auction {
+		background-color: rgba(#7c3aed, 0.9);
+		color: white;
+	}
+
+	&.buy_now {
+		background-color: rgba(#16a34a, 0.9);
+		color: white;
+	}
+}
+
+.infoBoxes {
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+
+	@include md {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 24px;
+	}
+
+	@include lg {
+		display: flex;
+		grid-template-columns: 1fr;
+	}
+}
+
+.sellerBox,
+.detailsBox,
+.featuresBox {
+	background-color: white;
+	border-radius: 16px;
+	border: 1px solid $color-border;
+	padding: 24px;
+	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+	transition: all 0.3s;
+
+	&:hover {
+		box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+	}
+}
+
+.boxHeader {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin-bottom: 20px;
+	padding-bottom: 16px;
+	border-bottom: 2px solid $color-bg;
+
+	h3 {
+		font-size: 1.1rem;
+		font-weight: 700;
+		color: $color-dark;
+		margin: 0;
+	}
+
+	svg {
+		color: $color-primary;
+	}
+}
+
+.sellerCard {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+}
+
+.sellerAvatar {
+	flex-shrink: 0;
+}
+
+.avatar {
+	width: 48px;
+	height: 48px;
+	border-radius: 50%;
+	object-fit: cover;
+	border: 2px solid $color-border;
+}
+
+.avatarPlaceholder {
+	width: 48px;
+	height: 48px;
+	border-radius: 50%;
+	background: linear-gradient(135deg, $color-primary, $color-secondary);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: white;
+	font-weight: 700;
+	font-size: 1rem;
+	border: 2px solid white;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.sellerInfo {
+	flex: 1;
+	min-width: 0;
+}
+
+.sellerName {
+	font-size: 1rem;
+	font-weight: 700;
+	color: $color-dark;
+	margin-bottom: 6px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.sellerRating {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin-bottom: 12px;
+
+	svg {
+		color: #f59e0b;
+	}
+
+	span {
+		font-weight: 600;
+		color: $color-text;
+		font-size: 0.9rem;
+	}
+}
+
+.ratingLabel {
+	color: $color-text-light !important;
+	font-weight: 400 !important;
+	margin-left: 4px;
+	font-size: 0.8rem !important;
+}
+
+.sellerActions {
+	display: flex;
+	gap: 8px;
+}
+
+.followButton,
+.messageButton {
+	padding: 8px 12px;
+	border-radius: 8px;
+	font-size: 0.85rem;
+	font-weight: 600;
+	transition: all 0.2s;
+	border: none;
+	cursor: pointer;
+}
+
+.followButton {
+	background-color: $color-primary;
+	color: white;
+
+	&:hover {
+		background-color: $color-primary-hover;
+	}
+}
+
+.messageButton {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	background-color: transparent;
+	color: $color-primary;
+	border: 1px solid $color-primary;
+
+	&:hover {
+		background-color: rgba($color-primary, 0.05);
+	}
+}
+
+.detailsGrid {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 16px;
+
+	@include sm {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+.detailItem {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.detailLabel {
+	font-size: 0.8rem;
+	color: $color-text-light;
+	font-weight: 500;
+}
+
+.detailValue {
+	font-size: 0.95rem;
+	color: $color-text;
+	font-weight: 600;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+
+	svg {
+		color: $color-text-light;
+	}
+}
+
+.condition-new {
+	color: #16a34a;
+	background-color: rgba(#16a34a, 0.1);
+	padding: 4px 10px;
+	border-radius: 6px;
+	display: inline-block;
+	font-size: 0.85rem;
+}
+
+.condition-used {
+	color: #f59e0b;
+	background-color: rgba(#f59e0b, 0.1);
+	padding: 4px 10px;
+	border-radius: 6px;
+	display: inline-block;
+	font-size: 0.85rem;
+}
+
+.condition-damaged {
+	color: #dc2626;
+	background-color: rgba(#dc2626, 0.1);
+	padding: 4px 10px;
+	border-radius: 6px;
+	display: inline-block;
+	font-size: 0.85rem;
+}
+
+.featuresList {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.feature {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+
+	svg {
+		color: #16a34a;
+		flex-shrink: 0;
+	}
+
+	span {
+		font-size: 0.9rem;
+		color: $color-text;
+	}
+}
+
+.productHeader {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	width: 80%;
+	margin-bottom: 32px;
+	padding-bottom: 24px;
+	border-bottom: 1px solid $color-border;
+}
+
+.categorySection {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-bottom: 20px;
+
+	svg {
+		color: $color-text-light;
+	}
+}
+
+.category {
+	font-weight: 700;
+	color: $color-primary;
+	font-size: 0.95rem;
+	background-color: rgba($color-primary, 0.1);
+	padding: 6px 12px;
+	border-radius: 8px;
+}
+
+.productTitle {
+	font-size: 1.8rem;
+	font-weight: 800;
+	color: $color-dark;
+	line-height: 1.2;
+	margin-bottom: 24px;
+
+	@include md {
+		font-size: 2.8rem;
+	}
+}
+
+.priceSection {
+	background-color: $color-bg;
+	border-radius: 16px;
+	padding: 24px;
+	margin-bottom: 32px;
+}
+
+.priceInfo {
+	margin-bottom: 20px;
+}
+
+.priceLabel {
+	display: block;
+	font-size: 0.9rem;
+	color: $color-text-light;
+	margin-bottom: 4px;
+}
+
+.price {
+	font-size: 1.8rem;
+	font-weight: 800;
+	color: $color-dark;
+	line-height: 1;
+	display: block;
+
+	@include md {
+		font-size: 3.5rem;
+	}
+}
+
+.auctionTimer {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	padding: 20px;
+	background: linear-gradient(135deg, rgba(#7c3aed, 0.1), rgba(#6d28d9, 0.1));
+	border-radius: 12px;
+	border: 1px solid rgba(#7c3aed, 0.2);
+
+	svg {
+		color: #7c3aed;
+	}
+}
+
+.timerInfo {
+	display: flex;
+	flex-direction: column;
+}
+
+.timerLabel {
+	font-size: 0.85rem;
+	color: $color-text-light;
+}
+
+.timerCountdown {
+	font-weight: 700;
+	color: #7c3aed;
+	font-size: 1.1rem;
+}
+
+.mainActions {
+	margin-bottom: 40px;
+}
+
+.auctionActions,
+.buyActions {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	margin-bottom: 24px;
+}
+
+.bidButton,
+.buyButton {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 12px;
+	padding: 20px 32px;
+	border-radius: 14px;
+	font-weight: 700;
+	font-size: 1.1rem;
+	border: none;
+	cursor: pointer;
+	transition: all 0.3s;
+	width: 100%;
+
+	&:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+}
+
+.bidButton {
+	background: linear-gradient(135deg, #7c3aed, #6d28d9);
+	color: white;
+
+	&:hover:not(:disabled) {
+		transform: translateY(-3px);
+		box-shadow: 0 12px 30px rgba(124, 58, 237, 0.4);
+	}
+}
+
+.buyButton {
+	background: linear-gradient(135deg, $color-primary, $color-primary-hover);
+	color: white;
+
+	&:hover:not(:disabled) {
+		transform: translateY(-3px);
+		box-shadow: 0 12px 30px rgba(220, 38, 38, 0.4);
+	}
+}
+
+.bidInfo,
+.stockInfo {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	color: $color-text-light;
+	font-size: 0.9rem;
+
+	svg {
+		color: $color-primary;
+	}
+}
+
+.secondaryActions {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+
+	@include sm {
+		flex-direction: row;
+	}
+}
+
+.contactButton {
+	flex: 2;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 12px;
+	padding: 18px 24px;
+	background-color: white;
+	color: $color-primary;
+	border: 2px solid $color-primary;
+	border-radius: 12px;
+	font-weight: 700;
+	font-size: 1rem;
+	cursor: pointer;
+	transition: all 0.3s;
+
+	&:hover {
+		background-color: rgba($color-primary, 0.05);
+		transform: translateY(-2px);
+		box-shadow: 0 8px 20px rgba($color-primary, 0.1);
+	}
+}
+
+.socialActions {
+	flex: 1;
+	display: flex;
+	gap: 12px;
+
+	@include sm {
+		gap: 8px;
+	}
+}
+
+.favoriteButton,
+.shareButton {
+	flex: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	padding: 18px;
+	border: 2px solid $color-border;
+	background: white;
+	color: $color-text;
+	border-radius: 12px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s;
+
+	&:hover {
+		border-color: $color-primary;
+		color: $color-primary;
+	}
+
+	@include sm {
+		padding: 18px 12px;
+
+		span {
+			display: none;
+		}
+	}
+
+	@include md {
+		span {
+			display: inline;
+		}
+	}
+}
+
+.descriptionSection {
+	margin-bottom: 40px;
+	width: 85%;
+
+	h3 {
+		font-size: 1.5rem;
+		font-weight: 700;
+		color: $color-dark;
+		margin-bottom: 20px;
+		padding-bottom: 12px;
+		border-bottom: 2px solid $color-bg;
+	}
+}
+
+.descriptionContent {
+	background-color: white;
+	border-radius: 16px;
+	padding: 28px;
+	border: 1px solid $color-border;
+
+	p {
+		line-height: 1.7;
+		color: $color-text;
+		font-size: 1.05rem;
+		margin-bottom: 20px;
+	}
+}
+
+.readMore {
+	background: none;
+	border: none;
+	color: $color-primary;
+	font-weight: 600;
+	cursor: pointer;
+	padding: 8px 0;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+
+	&:hover {
+		text-decoration: underline;
+	}
+}
+
+.additionalInfo {
+	margin-bottom: 40px;
+}
+
+.infoCard {
+	display: flex;
+	align-items: flex-start;
+	gap: 20px;
+	padding: 24px;
+	background-color: white;
+	border-radius: 16px;
+	border: 1px solid $color-border;
+
+	svg {
+		color: $color-primary;
+		flex-shrink: 0;
+		margin-top: 4px;
+	}
+
+	h4 {
+		font-size: 1.1rem;
+		font-weight: 700;
+		color: $color-dark;
+		margin-bottom: 8px;
+	}
+
+	p {
+		color: $color-text;
+		line-height: 1.6;
+	}
+}
+
+.modalOverlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: rgba(0, 0, 0, 0.5);
+	backdrop-filter: blur(4px);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 1000;
+	animation: fadeIn 0.2s ease-out;
+}
+
+.modal {
+	background-color: white;
+	border-radius: 20px;
+	padding: 32px;
+	max-width: 400px;
+	width: 90%;
+	animation: slideUp 0.3s ease-out;
+
+	h3 {
+		font-size: 1.5rem;
+		margin-bottom: 12px;
+		color: $color-dark;
+	}
+
+	p {
+		color: $color-text;
+		margin-bottom: 24px;
+		line-height: 1.5;
+	}
+}
+
+.modalActions {
+	display: flex;
+	gap: 12px;
+	justify-content: flex-end;
+}
+
+.modalCancel,
+.modalDelete {
+	padding: 10px 24px;
+	border-radius: 8px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s;
+	border: none;
+}
+
+.modalCancel {
+	background-color: $color-bg;
+	color: $color-text;
+
+	&:hover {
+		background-color: rgba($color-bg, 0.95);
+	}
+}
+
+.modalDelete {
+	background-color: #ef4444;
+	color: white;
+
+	&:hover:not(:disabled) {
+		background-color: rgba(#ef4444, 0.9);
+	}
+
+	&:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+}
+
+.bidFormSection {
+	margin-top: 32px;
+	padding-top: 32px;
+	border-top: 1px solid $color-border;
+}
+
+.loginPrompt {
+	margin-top: 24px;
+	padding: 20px;
+	background-color: rgba($color-primary, 0.05);
+	border-radius: 12px;
+	text-align: center;
+
+	p {
+		color: $color-text;
+		margin: 0;
+	}
+
+	a {
+		color: $color-primary;
+		font-weight: 600;
+		text-decoration: none;
+
+		&:hover {
+			text-decoration: underline;
+		}
+	}
+}
+
+.ownerNote {
+	margin-top: 24px;
+	padding: 20px;
+	background-color: rgba(#f59e0b, 0.05);
+	border-radius: 12px;
+	text-align: center;
+
+	p {
+		color: $color-text;
+		margin: 0;
+	}
+}
+
+.auctionEnded {
+	margin-top: 32px;
+	padding: 24px;
+	background-color: rgba(#6b7280, 0.05);
+	border-radius: 12px;
+	text-align: center;
+
+	h3 {
+		font-size: 1.2rem;
+		color: $color-dark;
+		margin-bottom: 8px;
+	}
+
+	p {
+		color: $color-text-light;
+		margin: 0;
+	}
+}
+
+.infoBoxes {
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+
+	@include md {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 24px;
+	}
+
+	@include lg {
+		display: flex;
+		grid-template-columns: 1fr;
+	}
+
+	.auctionTimerSection {
+		@include md {
+			grid-column: span 2;
+		}
+
+		@include lg {
+			grid-column: unset;
+		}
+	}
+}
+
+.auctionTimerSection {
+	background-color: white;
+	border-radius: 16px;
+	border: 1px solid $color-border;
+	padding: 24px;
+	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+	transition: all 0.3s;
+
+	&:hover {
+		box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+	}
+}
+
+.auctionSection {
+	margin-top: 40px;
+	padding-top: 32px;
+	border-top: 1px solid $color-border;
+	width: 85%;
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes slideUp {
+	from {
+		opacity: 0;
+		transform: translateY(20px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@include sm {
+	.infoBoxes {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	.mainActions {
+		.secondaryActions {
+			flex-direction: row;
+		}
+
+		.socialActions {
+			flex-direction: row;
+		}
+	}
+}
+
+@include md {
+	.productTitle {
+		font-size: 2.8rem;
+	}
+
+	.price {
+		font-size: 3.5rem;
+	}
+
+	.detailsGrid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+@include lg {
+	.infoBoxes {
+		display: flex;
+		grid-template-columns: 1fr;
+	}
+
+	.leftColumn {
+		position: sticky;
+		top: 100px;
+	}
+}

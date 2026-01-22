@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, NotificationType } from "@prisma/client";
 import { AuthRequest } from "../middleware/auth.middleware";
 
 const prisma = new PrismaClient();
@@ -15,7 +15,7 @@ const mapNotification = (n: any) => ({
   link: n.link,
 });
 
-// GET /api/notifications (List)
+// GET /api/notifications (List with Pagination & Filtering)
 export const getNotifications = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
@@ -23,12 +23,51 @@ export const getNotifications = async (req: AuthRequest, res: Response) => {
       return res.status(401).json({ error: "Brak autoryzacji" });
     }
 
-    const notifications = await prisma.notification.findMany({
-      where: { userId },
-      orderBy: { createdAt: "desc" },
-    });
+    // 1. Parse Query Params for Pagination
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 12;
+    const skip = (page - 1) * limit;
 
-    res.json(notifications.map(mapNotification));
+    // 2. Parse Query Params for Filtering
+    const { type, unread } = req.query;
+
+    // 3. Build Filter Object (Where clause)
+    const where: any = { userId };
+
+    // Filter by Type (ensure it matches the Enum)
+    if (
+      type &&
+      Object.values(NotificationType).includes(type as NotificationType)
+    ) {
+      where.type = type as NotificationType;
+    }
+
+    // Filter by Read Status (if unread=true, show only unread messages)
+    if (unread === "true") {
+      where.isRead = false;
+    }
+
+    // 4. Database Transaction: Fetch Data + Count Total
+    const [notifications, total] = await prisma.$transaction([
+      prisma.notification.findMany({
+        where,
+        orderBy: { createdAt: "desc" },
+        take: limit,
+        skip,
+      }),
+      prisma.notification.count({ where }),
+    ]);
+
+    // 5. Return Response with Pagination Metadata
+    res.json({
+      pagination: {
+        totalItems: total,
+        totalPages: Math.ceil(total / limit),
+        currentPage: page,
+        itemsPerPage: limit,
+      },
+      notifications: notifications.map(mapNotification),
+    });
   } catch (error) {
     console.error(error);
     res
@@ -94,7 +133,7 @@ export const deleteNotification = async (req: AuthRequest, res: Response) => {
     const result = await prisma.notification.deleteMany({
       where: {
         id: id,
-        userId: userId, // Ensure user can only delete their own
+        userId: userId,
       },
     });
 

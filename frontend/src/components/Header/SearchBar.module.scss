@@ -1,0 +1,62 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.searchSection {
+	display: none;
+	flex: 1;
+	max-width: 672px;
+	padding: 0 $spacing-xl;
+
+	@include lg {
+		display: flex;
+	}
+}
+
+.searchWrapper {
+	position: relative;
+	width: 100%;
+
+	form {
+		width: 100%;
+	}
+
+	input {
+		width: 100%;
+		border-radius: 9999px;
+		border: 1px solid $color-border;
+		background-color: $color-bg-alt;
+		padding: $spacing-sm $spacing-xl $spacing-sm $spacing-lg;
+		font-size: 0.875rem;
+		transition: all 0.2s;
+		outline: none;
+
+		&:focus {
+			border-color: $color-primary;
+			background-color: $color-white;
+			box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
+		}
+
+		&::placeholder {
+			color: $color-text-lighter;
+		}
+	}
+
+	button {
+		position: absolute;
+		right: $spacing-sm;
+		top: 50%;
+		transform: translateY(-50%);
+		padding: $spacing-xs;
+		border-radius: $radius-circle;
+		color: $color-text-lighter;
+		transition: all 0.2s;
+		background: none;
+		border: none;
+		cursor: pointer;
+
+		&:hover {
+			background-color: rgba($color-primary, 0.1);
+			color: $color-primary;
+		}
+	}
+}

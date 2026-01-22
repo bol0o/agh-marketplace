@@ -1,0 +1,62 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.iconBtn {
+	position: relative;
+	width: 40px;
+	height: 40px;
+	border-radius: $radius-circle;
+	@include flex-center;
+	color: $color-text-secondary;
+	transition: all 0.2s;
+	background-color: transparent;
+	text-decoration: none;
+
+	&:hover {
+		background-color: $color-bg-alt;
+		color: $color-primary;
+	}
+
+	&.active {
+		background-color: $color-status-red-bg;
+		color: $color-primary;
+	}
+
+	.badge {
+		position: absolute;
+		top: -4px;
+		right: -4px;
+		background-color: $color-primary;
+		color: $color-white;
+		font-size: 0.625rem;
+		font-weight: 700;
+		line-height: 1;
+		min-width: 18px;
+		height: 18px;
+		padding: 0 $spacing-xs;
+		border-radius: 99px;
+		@include flex-center;
+		box-shadow: 0 2px 4px rgba($color-primary, 0.3);
+	}
+}
+
+.addOfferBtn {
+	display: flex;
+	align-items: center;
+	gap: $spacing-sm;
+	background-color: $color-primary;
+	color: $color-white;
+	padding: $spacing-sm $spacing-lg;
+	border-radius: 9999px;
+	font-weight: 600;
+	font-size: 0.9rem;
+	text-decoration: none;
+	transition: all 0.2s;
+	white-space: nowrap;
+
+	&:hover {
+		background-color: $color-primary-hover;
+		transform: translateY(-1px);
+		box-shadow: 0 4px 12px rgba($color-primary, 0.2);
+	}
+}

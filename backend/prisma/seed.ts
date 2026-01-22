@@ -1,5 +1,5 @@
 import "dotenv/config"; // 1. Load env vars first
-import { PrismaClient, Role, Category } from "@prisma/client";
+import { PrismaClient, Role, Category, NotificationType } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { fakerPL as faker } from "@faker-js/faker";
 
@@ -42,9 +42,7 @@ async function main() {
   console.log("Database cleared.");
 
   //HASH PASSWORDS FROM ENV
-  //Password for regular students
   const studentPassword = await bcrypt.hash(rawStudentPass, 10);
-  //Password for Admins/Team
   const adminPassword = await bcrypt.hash(rawAdminPass, 10);
 
   //Create Lecturer Account (Admin)
@@ -143,6 +141,48 @@ async function main() {
         imageUrl: `https://placehold.co/600x400/png?text=${imageText}+${i}`,
         sellerId: randomUser.id,
         createdAt: faker.date.past(),
+        views: faker.number.int({ min: 0, max: 500 }),
+      },
+    });
+  }
+
+  //notifications
+  console.log("Seeding notifications...");
+
+  for (const user of users) {
+    // 1. SYSTEM
+    await prisma.notification.create({
+      data: {
+        userId: user.id,
+        type: NotificationType.SYSTEM,
+        title: "Witaj w AGH Marketplace!",
+        message: "Cieszymy się, że dołączyłeś do naszej społeczności.",
+        isRead: true,
+        createdAt: faker.date.past({ years: 1 }),
+      },
+    });
+
+    // 2. FOLLOW
+    await prisma.notification.create({
+      data: {
+        userId: user.id,
+        type: NotificationType.FOLLOW,
+        title: "Ktoś Cię obserwuje!",
+        message: "Użytkownik z Twojego wydziału zaczął obserwować Twój profil.",
+        isRead: false,
+        createdAt: faker.date.recent({ days: 2 }),
+      },
+    });
+
+    // 3. OFFER
+    await prisma.notification.create({
+      data: {
+        userId: user.id,
+        type: NotificationType.OFFER,
+        title: "Nowa oferta w kategorii Elektronika",
+        message: "Sprawdź nowe laptopy dodane przez studentów WIEiT.",
+        isRead: Math.random() > 0.5,
+        createdAt: faker.date.recent({ days: 5 }),
       },
     });
   }

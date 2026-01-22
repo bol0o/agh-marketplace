@@ -1,0 +1,206 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.container {
+	background: $color-white;
+	border-radius: $radius-lg;
+	padding: $spacing-xl;
+	border: 1px solid $color-border;
+	box-shadow: $shadow-md;
+	position: sticky;
+	top: $spacing-xl;
+
+	@include max-sm {
+		position: static;
+		padding: $spacing-lg;
+		margin-top: $spacing-xl;
+	}
+}
+
+.title {
+	font-size: 1.5rem;
+	font-weight: 700;
+	color: $color-dark;
+	margin: 0 0 $spacing-xl 0;
+
+	@include max-sm {
+		font-size: 1.25rem;
+		margin-bottom: $spacing-lg;
+	}
+}
+
+.summaryGrid {
+	display: flex;
+	flex-direction: column;
+	gap: $spacing-md;
+	margin-bottom: $spacing-xl;
+
+	@include max-sm {
+		margin-bottom: $spacing-lg;
+	}
+}
+
+.summaryItem {
+	@include flex-between;
+	padding: $spacing-sm 0;
+}
+
+.summaryLabel {
+	font-size: 0.95rem;
+	color: $color-text;
+	display: flex;
+	align-items: center;
+	gap: $spacing-xs;
+}
+
+.freeShippingBadge {
+	font-size: 0.8rem;
+	background: $color-primary;
+	color: $color-white;
+	padding: 2px 6px;
+	border-radius: $radius-sm;
+	font-weight: 600;
+}
+
+.summaryValue {
+	font-weight: 600;
+	color: $color-dark;
+	font-size: 1rem;
+}
+
+.freeShipping {
+	color: $color-primary;
+	font-weight: 700;
+}
+
+.freeShippingInfo {
+	display: flex;
+	align-items: center;
+	gap: $spacing-sm;
+	padding: $spacing-sm $spacing-md;
+	background: rgba($color-primary, 0.1);
+	border-radius: $radius-md;
+	color: $color-primary;
+	font-size: 0.9rem;
+	margin-top: $spacing-sm;
+
+	strong {
+		font-weight: 700;
+	}
+}
+
+.freeShippingIcon {
+	flex-shrink: 0;
+}
+
+.divider {
+	height: 1px;
+	background: $color-border;
+	margin: $spacing-md 0;
+}
+
+.total {
+	border-top: 2px solid $color-border;
+	padding-top: $spacing-md;
+	margin-top: $spacing-sm;
+
+	.summaryLabel {
+		font-size: 1.1rem;
+		font-weight: 700;
+		color: $color-dark;
+	}
+
+	.summaryValue {
+		font-size: 1.5rem;
+		font-weight: 700;
+		color: $color-primary;
+	}
+}
+
+.checkoutButton {
+	@include flex-center;
+	gap: $spacing-sm;
+	width: 100%;
+	padding: $spacing-lg;
+	background: $color-primary;
+	color: $color-white;
+	border: none;
+	border-radius: $radius-md;
+	font-size: 1.1rem;
+	font-weight: 700;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	margin-bottom: $spacing-xl;
+
+	&:hover:not(:disabled) {
+		background: rgba($color-primary, 0.1);
+		transform: translateY(-2px);
+		box-shadow: $shadow-lg;
+	}
+
+	&:focus-visible {
+		outline: 2px solid $color-primary;
+		outline-offset: 4px;
+	}
+
+	&:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+
+	@include max-sm {
+		padding: $spacing-md;
+		font-size: 1rem;
+		margin-bottom: $spacing-lg;
+	}
+}
+
+.checkoutIcon {
+	width: 24px;
+	height: 24px;
+}
+
+.securityInfo {
+	display: flex;
+	align-items: center;
+	gap: $spacing-sm;
+	padding: $spacing-md;
+	background: $color-bg;
+	border-radius: $radius-md;
+	border: 1px solid $color-border;
+}
+
+.securityIcon {
+	width: 20px;
+	height: 20px;
+	color: $color-primary;
+	flex-shrink: 0;
+}
+
+.securityText {
+	font-size: 0.8rem;
+	color: $color-text-light;
+	line-height: 1.4;
+}
+
+@include max-xs {
+	.container {
+		padding: $spacing-md;
+	}
+
+	.title {
+		font-size: 1.1rem;
+	}
+
+	.total {
+		.summaryValue {
+			font-size: 1.25rem;
+		}
+	}
+
+	.securityInfo {
+		flex-direction: column;
+		text-align: center;
+		gap: $spacing-xs;
+	}
+}

@@ -1,0 +1,130 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.categorySection {
+	margin-bottom: 32px;
+}
+
+.sectionTitle {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 0.75rem;
+	font-weight: 700;
+	color: $color-text-lighter;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	padding-bottom: 12px;
+	margin-bottom: 16px;
+	border-bottom: 1px solid $color-border;
+
+	svg {
+		color: $color-text-lighter;
+	}
+}
+
+.categoryList {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 12px;
+	margin-bottom: 16px;
+
+	@include sm {
+		grid-template-columns: repeat(3, 1fr);
+	}
+
+	@include md {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+.categoryItem {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
+	padding: 12px 8px;
+	background: transparent;
+	border: 1px solid $color-border;
+	border-radius: 10px;
+	cursor: pointer;
+	transition: all 0.2s;
+
+	&:hover {
+		border-color: $color-primary;
+		background-color: rgba($color-primary, 0.03);
+		transform: translateY(-2px);
+		box-shadow: $shadow-sm;
+
+		.categoryIcon {
+			transform: scale(1.1);
+		}
+	}
+
+	&.active {
+		border-color: $color-primary;
+		background-color: rgba($color-primary, 0.05);
+		box-shadow: 0 2px 8px rgba($color-primary, 0.1);
+
+		.categoryLabel {
+			color: $color-primary;
+			font-weight: 600;
+		}
+	}
+}
+
+.categoryIcon {
+	width: 40px;
+	height: 40px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 10px;
+	transition: all 0.2s;
+}
+
+.categoryLabel {
+	font-size: 0.75rem;
+	font-weight: 500;
+	color: $color-text;
+	text-align: center;
+	line-height: 1.2;
+}
+
+.activeCategoryInfo {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 12px;
+	background-color: rgba($color-primary, 0.05);
+	border: 1px solid rgba($color-primary, 0.2);
+	border-radius: 8px;
+	margin-top: 8px;
+}
+
+.activeCategoryLabel {
+	font-size: 0.85rem;
+	color: $color-text;
+
+	strong {
+		color: $color-primary;
+	}
+}
+
+.clearCategoryBtn {
+	padding: 6px 12px;
+	background-color: transparent;
+	border: 1px solid $color-border;
+	border-radius: 6px;
+	font-size: 0.75rem;
+	font-weight: 600;
+	color: $color-text-lighter;
+	cursor: pointer;
+	transition: all 0.2s;
+
+	&:hover {
+		border-color: $color-primary;
+		color: $color-primary;
+		background-color: rgba($color-primary, 0.05);
+	}
+}

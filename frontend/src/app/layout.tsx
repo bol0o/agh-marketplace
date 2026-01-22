@@ -1,0 +1,31 @@
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import './globals.scss';
+import { ToastContainer } from '@/components/shared/ToastContainer';
+import Footer from '@/components/shared/Footer';
+
+const inter = Inter({
+	subsets: ['latin'],
+	variable: '--font-inter',
+	display: 'swap',
+});
+
+export const metadata: Metadata = {
+	title: 'AGH Connect',
+	description: 'Studencki Marketplace AGH',
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+	return (
+		<html lang="pl">
+			<body className={inter.variable}>
+				{/* <QueryProvider> */}
+				{children}
+				{/* </QueryProvider> */}
+
+				<ToastContainer />
+				<Footer />
+			</body>
+		</html>
+	);
+}

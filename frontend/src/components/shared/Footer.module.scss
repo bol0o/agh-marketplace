@@ -1,0 +1,123 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.footer {
+	background-color: $color-bg;
+	border-top: 1px solid $color-border;
+	padding: $spacing-2xl $spacing-lg;
+
+	.container {
+		max-width: 1200px;
+		margin: 0 auto;
+	}
+}
+
+.topSection {
+	display: flex;
+	flex-direction: column;
+	gap: $spacing-xl;
+	margin-bottom: $spacing-2xl;
+
+	@include lg {
+		flex-direction: row;
+		justify-content: space-between;
+		gap: 64px;
+	}
+}
+
+.brandColumn {
+	max-width: 300px;
+
+	.logo {
+		@include flex-center;
+		justify-content: flex-start;
+		gap: $spacing-sm;
+		margin-bottom: $spacing-md;
+
+		.logoIcon {
+			background-color: $color-primary;
+			color: white;
+			width: 32px;
+			height: 32px;
+			border-radius: $radius-sm;
+			@include flex-center;
+			font-weight: bold;
+		}
+
+		.logoText {
+			font-weight: 700;
+			font-size: 1.125rem;
+			color: $color-dark;
+		}
+	}
+
+	.description {
+		font-size: 0.875rem;
+		color: $color-text-light;
+		line-height: 1.5;
+	}
+}
+
+.linksGrid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: $spacing-xl;
+
+	@include md {
+		grid-template-columns: repeat(3, 1fr);
+		gap: 48px;
+	}
+}
+
+.linkGroup {
+	display: flex;
+	flex-direction: column;
+	gap: $spacing-sm;
+
+	h3 {
+		font-size: 0.875rem;
+		font-weight: 600;
+		color: $color-dark;
+		margin-bottom: $spacing-xs;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	a {
+		font-size: 0.875rem;
+		color: $color-text-light;
+		text-decoration: none;
+		transition: color 0.2s ease;
+
+		&:hover {
+			color: $color-primary;
+		}
+	}
+}
+
+.bottomSection {
+	border-top: 1px solid $color-border;
+	padding-top: $spacing-lg;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: $spacing-md;
+	text-align: center;
+
+	@include md {
+		flex-direction: row;
+		justify-content: space-between;
+		text-align: left;
+	}
+
+	.copy {
+		font-size: 0.875rem;
+		color: $color-text-lighter;
+	}
+
+	.legalLine {
+		font-size: 0.75rem;
+		color: $color-text-lighter;
+		font-weight: 500;
+	}
+}

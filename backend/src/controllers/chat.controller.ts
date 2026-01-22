@@ -1,7 +1,7 @@
 import { Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, NotificationType } from "@prisma/client";
 import { AuthRequest } from "../middleware/auth.middleware";
-import { getIO } from "../socket"; // Import Socket.io helper
+import { getIO } from "../socket";
 
 const prisma = new PrismaClient();
 
@@ -96,6 +96,7 @@ export const createChat = async (req: AuthRequest, res: Response) => {
           buyerId: userId,
         },
       },
+      include: { product: true },
     });
 
     // If not, create it
@@ -113,6 +114,7 @@ export const createChat = async (req: AuthRequest, res: Response) => {
           productId,
           buyerId: userId,
         },
+        include: { product: true },
       });
     }
 
@@ -123,6 +125,21 @@ export const createChat = async (req: AuthRequest, res: Response) => {
           chatId: chat.id,
           senderId: userId,
           text: initialMessage,
+        },
+      });
+
+      const sender = await prisma.user.findUnique({ where: { id: userId } });
+
+      await prisma.notification.create({
+        data: {
+          userId: chat.product.sellerId, // Notify the Seller
+          type: NotificationType.MESSAGE, // ENUM
+          title: `Nowe zapytanie: ${chat.product.title}`,
+          message: `${
+            sender?.firstName || "Kupujący"
+          }: ${initialMessage.substring(0, 50)}...`,
+          link: `/messages/${chat.id}`,
+          isRead: false,
         },
       });
     }
@@ -198,13 +215,13 @@ export const sendMessage = async (req: AuthRequest, res: Response) => {
       }, // Include relations to find recipient
     });
 
+    // Determine recipient: if I am buyer -> recipient is seller
+    const recipientId =
+      userId === chat.buyerId ? chat.product.sellerId : chat.buyerId;
+
     // 3. Real-time Notification (Socket.io)
     try {
       const io = getIO();
-
-      // Determine recipient: if I am buyer -> recipient is seller
-      const recipientId =
-        userId === chat.buyerId ? chat.product.sellerId : chat.buyerId;
 
       // Emit to recipient's room
       io.to(recipientId).emit("new_message", {
@@ -216,6 +233,22 @@ export const sendMessage = async (req: AuthRequest, res: Response) => {
     } catch (socketError) {
       console.error("Socket emit failed", socketError);
     }
+
+    const sender = await prisma.user.findUnique({ where: { id: userId } });
+
+    await prisma.notification.create({
+      data: {
+        userId: recipientId, // Notify the Recipient
+        type: NotificationType.MESSAGE,
+        title: `Nowa wiadomość: ${chat.product.title}`,
+        message: `${sender?.firstName || "Użytkownik"}: ${text.substring(
+          0,
+          50
+        )}${text.length > 50 ? "..." : ""}`,
+        link: `/messages/${chat.id}`,
+        isRead: false,
+      },
+    });
 
     res.status(201).json({
       id: message.id,

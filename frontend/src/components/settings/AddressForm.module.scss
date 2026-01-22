@@ -1,0 +1,200 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.container {
+	background: $color-white;
+	border-radius: $radius-lg;
+	padding: $spacing-xl;
+	box-shadow: $shadow-md;
+	border: 1px solid $color-border;
+
+	@include max-sm {
+		padding: $spacing-lg;
+	}
+}
+
+.sectionTitle {
+	font-size: 1.5rem;
+	font-weight: 700;
+	color: $color-dark;
+	margin: 0 0 $spacing-xl 0;
+
+	@include max-sm {
+		font-size: 1.25rem;
+		margin-bottom: $spacing-lg;
+	}
+}
+
+.formGrid {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: $spacing-lg;
+	margin-bottom: $spacing-xl;
+
+	@include sm {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	@include max-sm {
+		gap: $spacing-md;
+		margin-bottom: $spacing-lg;
+	}
+}
+
+.formGroup {
+	display: flex;
+	flex-direction: column;
+	gap: $spacing-xs;
+	min-width: 0;
+
+	&:nth-child(3) {
+		// apartmentNumber
+		@include sm {
+			grid-column: span 2;
+		}
+	}
+
+	&:nth-child(5), // zipCode
+	&:nth-child(6) {
+		@include sm {
+			grid-column: span 1;
+		}
+	}
+}
+
+.label {
+	font-weight: 600;
+	color: $color-dark;
+	font-size: 0.95rem;
+}
+
+.input {
+	padding: $spacing-md;
+	border: 1px solid $color-border;
+	border-radius: $radius-md;
+	font-family: inherit;
+	font-size: 0.95rem;
+	transition: border-color 0.2s ease;
+
+	&:focus {
+		outline: none;
+		border-color: $color-primary;
+		box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
+	}
+
+	&.inputError {
+		border-color: #ef4444;
+
+		&:focus {
+			box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+		}
+	}
+
+	&::placeholder {
+		color: $color-text-lighter;
+	}
+}
+
+.error {
+	color: #ef4444;
+	font-size: 0.85rem;
+	margin: 0;
+}
+
+.note {
+	margin-bottom: $spacing-xl;
+	padding: $spacing-lg;
+	background: rgba($color-primary, 0.05);
+	border-radius: $radius-md;
+	border: 1px solid rgba($color-primary, 0.2);
+
+	@include max-sm {
+		padding: $spacing-md;
+		margin-bottom: $spacing-lg;
+	}
+}
+
+.noteText {
+	margin: 0;
+	color: $color-text;
+	font-size: 0.9rem;
+	line-height: 1.6;
+
+	strong {
+		color: $color-dark;
+	}
+}
+
+.actions {
+	display: flex;
+	justify-content: flex-end;
+}
+
+.submitButton {
+	display: inline-flex;
+	align-items: center;
+	gap: $spacing-sm;
+	padding: $spacing-md $spacing-xl;
+	background: $color-primary;
+	color: $color-white;
+	border: none;
+	border-radius: $radius-md;
+	font-weight: 600;
+	font-size: 1rem;
+	cursor: pointer;
+	transition: background-color 0.2s ease;
+
+	&:hover:not(:disabled) {
+		background: rgba($color-primary, 0.9);
+	}
+
+	&:focus-visible {
+		outline: 2px solid $color-primary;
+		outline-offset: 2px;
+	}
+
+	&:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+
+	@include max-sm {
+		width: 100%;
+		justify-content: center;
+		padding: $spacing-md;
+	}
+}
+
+.spinner {
+	animation: spin 1s linear infinite;
+
+	@keyframes spin {
+		to {
+			transform: rotate(360deg);
+		}
+	}
+}
+
+// Dla bardzo małych ekranów
+@include max-xs {
+	.container {
+		padding: $spacing-md;
+		margin-left: -$spacing-md;
+		margin-right: -$spacing-md;
+		border-radius: 0;
+		border-left: none;
+		border-right: none;
+	}
+
+	.sectionTitle {
+		font-size: 1.1rem;
+	}
+
+	.formGrid {
+		grid-template-columns: 1fr;
+	}
+
+	.formGroup:nth-child(3) {
+		grid-column: span 1;
+	}
+}

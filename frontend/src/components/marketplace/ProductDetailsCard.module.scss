@@ -1,0 +1,97 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.detailsBox {
+	background-color: white;
+	border-radius: 16px;
+	border: 1px solid $color-border;
+	padding: 24px;
+	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+	transition: all 0.3s;
+
+	&:hover {
+		box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+	}
+}
+
+.boxHeader {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin-bottom: 20px;
+	padding-bottom: 16px;
+	border-bottom: 2px solid $color-bg;
+
+	h3 {
+		font-size: 1.1rem;
+		font-weight: 700;
+		color: $color-dark;
+		margin: 0;
+	}
+
+	svg {
+		color: $color-primary;
+	}
+}
+
+.detailsGrid {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 16px;
+
+	@include sm {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+.detailItem {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.detailLabel {
+	font-size: 0.8rem;
+	color: $color-text-light;
+	font-weight: 500;
+}
+
+.detailValue {
+	font-size: 0.95rem;
+	color: $color-text;
+	font-weight: 600;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+
+	svg {
+		color: $color-text-light;
+	}
+}
+
+.condition-new {
+	color: #16a34a;
+	background-color: rgba(#16a34a, 0.1);
+	padding: 4px 10px;
+	border-radius: 6px;
+	display: inline-block;
+	font-size: 0.85rem;
+}
+
+.condition-used {
+	color: #f59e0b;
+	background-color: rgba(#f59e0b, 0.1);
+	padding: 4px 10px;
+	border-radius: 6px;
+	display: inline-block;
+	font-size: 0.85rem;
+}
+
+.condition-damaged {
+	color: #dc2626;
+	background-color: rgba(#dc2626, 0.1);
+	padding: 4px 10px;
+	border-radius: 6px;
+	display: inline-block;
+	font-size: 0.85rem;
+}

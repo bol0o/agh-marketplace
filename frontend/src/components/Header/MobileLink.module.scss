@@ -1,0 +1,103 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.mobileLink {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	border-radius: $radius-md;
+	padding: $spacing-md;
+	font-size: 0.9rem;
+	font-weight: 500;
+	color: $color-text;
+	transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+	text-decoration: none;
+	margin-bottom: $spacing-xs;
+	animation: fadeInUp 0.3s ease-out backwards;
+
+	@for $i from 1 through 10 {
+		&:nth-child(#{$i}) {
+			animation-delay: 0.05s * $i;
+		}
+	}
+
+	&:hover {
+		background-color: $color-bg;
+		color: $color-primary;
+		transform: translateX(4px);
+
+		.icon {
+			color: $color-primary;
+		}
+
+		.chevron {
+			transform: translateX(2px);
+		}
+	}
+
+	&.active {
+		background-color: $color-status-red-bg;
+		color: $color-primary;
+		font-weight: 600;
+
+		.icon {
+			color: $color-primary;
+		}
+
+		.chevron {
+			color: $color-primary;
+			opacity: 1;
+		}
+	}
+
+	.left {
+		display: flex;
+		align-items: center;
+		gap: $spacing-sm;
+
+		.icon {
+			color: $color-text-lighter;
+			transition: color 0.2s;
+		}
+	}
+
+	.right {
+		display: flex;
+		align-items: center;
+		gap: $spacing-sm;
+
+		.badge {
+			background-color: $color-primary;
+			color: $color-white;
+			font-size: 0.75rem;
+			font-weight: 700;
+			line-height: 1;
+			min-width: 20px;
+			height: 20px;
+			padding: 0 $spacing-xs;
+			border-radius: 99px;
+			@include flex-center;
+			animation: badgePulse 0.5s ease-out;
+		}
+
+		.chevron {
+			color: $color-text-lighter;
+			opacity: 0.7;
+			transition: all 0.2s;
+		}
+	}
+}
+
+@keyframes badgePulse {
+	0% {
+		transform: scale(0.8);
+		opacity: 0;
+	}
+	70% {
+		transform: scale(1.1);
+	}
+	100% {
+		transform: scale(1);
+		opacity: 1;
+	}
+}

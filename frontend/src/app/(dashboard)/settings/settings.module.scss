@@ -1,0 +1,84 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.container {
+	max-width: 800px;
+	margin: 0 auto;
+	padding: $spacing-md;
+	width: 100%;
+	overflow: hidden;
+
+	@include sm {
+		padding: $spacing-lg;
+	}
+
+	@include lg {
+		padding: $spacing-xl;
+	}
+}
+
+.alert {
+	margin-bottom: $spacing-xl;
+}
+
+.loadingContainer,
+.errorContainer {
+	@include flex-center;
+	flex-direction: column;
+	min-height: 60vh;
+	text-align: center;
+	padding: $spacing-xl;
+}
+
+.spinner {
+	animation: spin 1s linear infinite;
+	color: $color-primary;
+	margin-bottom: $spacing-lg;
+}
+
+.errorIcon {
+	color: #ef4444;
+	margin-bottom: $spacing-lg;
+}
+
+.errorContainer {
+	h2 {
+		font-size: 1.5rem;
+		font-weight: 600;
+		color: $color-dark;
+		margin-bottom: $spacing-sm;
+	}
+
+	p {
+		color: $color-text-light;
+		max-width: 400px;
+		line-height: 1.6;
+	}
+}
+
+@keyframes spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+@include max-xs {
+	.container {
+		padding: $spacing-sm;
+	}
+
+	.loadingContainer,
+	.errorContainer {
+		padding: $spacing-lg;
+	}
+
+	.errorContainer {
+		h2 {
+			font-size: 1.25rem;
+		}
+
+		p {
+			font-size: 0.9rem;
+		}
+	}
+}

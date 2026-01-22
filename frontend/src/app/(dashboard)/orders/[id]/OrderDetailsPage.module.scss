@@ -1,0 +1,569 @@
+@use '@/styles/variables' as *;
+
+.container {
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: $spacing-md;
+
+	@media (min-width: 640px) {
+		padding: $spacing-lg;
+	}
+
+	@media (min-width: 1024px) {
+		padding: $spacing-xl;
+	}
+}
+
+.flexCenter {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.flexBetween {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.loadingContainer,
+.errorContainer {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	min-height: 60vh;
+	text-align: center;
+	padding: $spacing-xl;
+}
+
+.loadingText {
+	margin-top: $spacing-lg;
+	color: $color-text;
+	font-size: 1.1rem;
+}
+
+.errorContainer {
+	.errorIcon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 64px;
+		height: 64px;
+		border-radius: 50%;
+		background: rgba(239, 68, 68, 0.1);
+		color: $color-primary;
+		margin-bottom: $spacing-lg;
+	}
+
+	.errorTitle {
+		font-size: 1.75rem;
+		font-weight: 700;
+		color: $color-dark;
+		margin-bottom: $spacing-md;
+	}
+
+	.errorMessage {
+		color: $color-text-light;
+		max-width: 400px;
+		line-height: 1.6;
+		margin-bottom: $spacing-xl;
+	}
+
+	.backButton {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: $spacing-sm;
+		padding: $spacing-md $spacing-xl;
+		background: $color-primary;
+		color: $color-white;
+		border-radius: $radius-md;
+		text-decoration: none;
+		font-weight: 600;
+		transition: background-color 0.2s ease;
+		border: none;
+		cursor: pointer;
+
+		&:hover {
+			background: $color-primary-hover;
+		}
+
+		&:focus-visible {
+			outline: 2px solid $color-primary;
+			outline-offset: 2px;
+		}
+	}
+}
+
+.header {
+	margin-bottom: $spacing-xl;
+}
+
+.backLink {
+	display: inline-flex;
+	align-items: center;
+	gap: $spacing-xs;
+	color: $color-primary;
+	text-decoration: none;
+	font-weight: 600;
+	margin-bottom: $spacing-lg;
+	transition: color 0.2s ease;
+	background: none;
+	border: none;
+	cursor: pointer;
+	font-size: 1rem;
+	padding: 0;
+
+	&:hover {
+		color: $color-primary-hover;
+		text-decoration: underline;
+	}
+
+	&:focus-visible {
+		outline: 2px solid $color-primary;
+		outline-offset: 2px;
+		border-radius: $radius-sm;
+	}
+}
+
+.title {
+	font-size: 2rem;
+	font-weight: 700;
+	color: $color-dark;
+	margin: 0 0 $spacing-xs 0;
+
+	@media (max-width: 639px) {
+		font-size: 1.5rem;
+	}
+}
+
+.orderId {
+	font-size: 1rem;
+	color: $color-text-light;
+	font-family: monospace;
+	background: $color-bg;
+	padding: $spacing-xs $spacing-sm;
+	border-radius: $radius-sm;
+	display: inline-block;
+}
+
+.statusSection {
+	background: $color-white;
+	border-radius: $radius-lg;
+	padding: $spacing-lg;
+	margin-bottom: $spacing-xl;
+	border: 1px solid $color-border;
+	box-shadow: $shadow-sm;
+
+	@media (max-width: 639px) {
+		padding: $spacing-md;
+		margin-bottom: $spacing-lg;
+	}
+}
+
+.statusBadge {
+	display: flex;
+	align-items: center;
+	gap: $spacing-sm;
+	padding: $spacing-sm $spacing-md;
+	border-radius: $radius-md;
+	font-weight: 600;
+	margin-bottom: $spacing-md;
+}
+
+.statusIcon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.statusText {
+	font-size: 1.1rem;
+}
+
+.statusDescription {
+	color: $color-text;
+	margin: 0;
+	line-height: 1.6;
+}
+
+.statusPending {
+	background: rgba(245, 158, 11, 0.1);
+	color: #f59e0b;
+	border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.statusProcessing {
+	background: rgba(59, 130, 246, 0.1);
+	color: $color-status-blue;
+	border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.statusShipped {
+	background: rgba(139, 92, 246, 0.1);
+	color: $color-secondary;
+	border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.statusDelivered {
+	background: rgba(34, 197, 94, 0.1);
+	color: $color-status-green;
+	border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.statusCancelled {
+	background: rgba(239, 68, 68, 0.1);
+	color: $color-primary;
+	border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.content {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: $spacing-xl;
+
+	@media (min-width: 1024px) {
+		grid-template-columns: 2fr 1fr;
+		gap: $spacing-2xl;
+	}
+}
+
+.mainSection {
+	width: 100%;
+}
+
+.section {
+	background: $color-white;
+	border-radius: $radius-lg;
+	padding: $spacing-xl;
+	border: 1px solid $color-border;
+	box-shadow: $shadow-sm;
+	margin-bottom: $spacing-xl;
+
+	&:last-child {
+		margin-bottom: 0;
+	}
+
+	@media (max-width: 639px) {
+		padding: $spacing-lg;
+		margin-bottom: $spacing-lg;
+	}
+}
+
+.sectionTitle {
+	font-size: 1.5rem;
+	font-weight: 700;
+	color: $color-dark;
+	margin: 0 0 $spacing-lg 0;
+	display: flex;
+	align-items: center;
+	gap: $spacing-sm;
+
+	@media (max-width: 639px) {
+		font-size: 1.25rem;
+		margin-bottom: $spacing-md;
+	}
+}
+
+.itemsList {
+	display: flex;
+	flex-direction: column;
+	gap: $spacing-md;
+}
+
+.sidebar {
+	width: 100%;
+}
+
+.infoCard,
+.actionsCard {
+	background: $color-white;
+	border-radius: $radius-lg;
+	padding: $spacing-xl;
+	border: 1px solid $color-border;
+	box-shadow: $shadow-sm;
+	margin-bottom: $spacing-lg;
+
+	&:last-child {
+		margin-bottom: 0;
+	}
+
+	@media (max-width: 639px) {
+		padding: $spacing-lg;
+	}
+}
+
+.infoTitle,
+.actionsTitle {
+	font-size: 1.25rem;
+	font-weight: 700;
+	color: $color-dark;
+	margin: 0 0 $spacing-lg 0;
+	display: flex;
+	align-items: center;
+	gap: $spacing-sm;
+
+	@media (max-width: 639px) {
+		font-size: 1.1rem;
+		margin-bottom: $spacing-md;
+	}
+}
+
+.infoGroup {
+	margin-bottom: $spacing-lg;
+
+	&:last-child {
+		margin-bottom: 0;
+	}
+}
+
+.infoRow {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: $spacing-sm 0;
+	border-bottom: 1px solid $color-border;
+
+	&:last-child {
+		border-bottom: none;
+	}
+}
+
+.infoLabel {
+	font-size: 0.9rem;
+	color: $color-text;
+	flex: 1;
+}
+
+.infoValue {
+	font-weight: 600;
+	color: $color-dark;
+	text-align: right;
+	display: flex;
+	align-items: center;
+	gap: $spacing-xs;
+}
+
+.infoSubtitle {
+	font-size: 1rem;
+	font-weight: 600;
+	color: $color-dark;
+	margin: 0 0 $spacing-md 0;
+}
+
+.address {
+	display: flex;
+	flex-direction: column;
+	gap: $spacing-xs;
+}
+
+.addressLine {
+	color: $color-text;
+	font-size: 0.95rem;
+	line-height: 1.5;
+}
+
+.divider {
+	height: 1px;
+	background: $color-border;
+	margin: $spacing-lg 0;
+}
+
+.summaryRow {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: $spacing-sm 0;
+	border-bottom: 1px solid $color-border;
+	color: $color-text;
+	font-size: 0.95rem;
+
+	&:last-child {
+		border-bottom: none;
+	}
+
+	&.total {
+		font-weight: 700;
+		color: $color-dark;
+		font-size: 1.1rem;
+		padding-top: $spacing-md;
+		margin-top: $spacing-sm;
+		border-top: 2px solid $color-border;
+	}
+}
+
+.actionsGrid {
+	display: flex;
+	flex-direction: column;
+	gap: $spacing-md;
+}
+
+.actionButton {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: $spacing-sm;
+	width: 100%;
+	padding: $spacing-md;
+	background: $color-white;
+	border: 1px solid $color-border;
+	color: $color-text;
+	border-radius: $radius-md;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	text-align: left;
+
+	&:hover:not(:disabled) {
+		background: $color-bg;
+		border-color: $color-primary;
+		color: $color-primary;
+		transform: translateY(-1px);
+		box-shadow: $shadow-sm;
+	}
+
+	&:focus-visible {
+		outline: 2px solid $color-primary;
+		outline-offset: 2px;
+	}
+
+	&:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+
+	&.cancelButton {
+		color: $color-primary;
+		border-color: $color-primary;
+
+		&:hover:not(:disabled) {
+			background: rgba(239, 68, 68, 0.1);
+			border-color: $color-primary-hover;
+			color: $color-primary-hover;
+		}
+	}
+}
+
+.actionText {
+	flex: 1;
+	text-align: center;
+}
+
+.modalOverlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: rgba(0, 0, 0, 0.5);
+	backdrop-filter: blur(4px);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 1000;
+	animation: fadeIn 0.2s ease-out;
+}
+
+.modal {
+	background-color: white;
+	border-radius: 20px;
+	padding: 32px;
+	max-width: 400px;
+	width: 90%;
+	animation: slideUp 0.3s ease-out;
+
+	h3 {
+		font-size: 1.5rem;
+		margin-bottom: 12px;
+		color: $color-dark;
+	}
+
+	p {
+		color: $color-text;
+		margin-bottom: 24px;
+		line-height: 1.5;
+	}
+}
+
+.modalActions {
+	display: flex;
+	gap: 12px;
+	justify-content: flex-end;
+}
+
+.modalCancel,
+.modalDelete {
+	padding: 10px 24px;
+	border-radius: 8px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s;
+	border: none;
+}
+
+.modalCancel {
+	background-color: $color-bg;
+	color: $color-text;
+
+	&:hover {
+		background-color: rgba($color-bg, 0.95);
+	}
+}
+
+.modalDelete {
+	background-color: #ef4444;
+	color: white;
+
+	&:hover:not(:disabled) {
+		background-color: rgba(#ef4444, 0.9);
+	}
+
+	&:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+}
+
+@media (max-width: 374px) {
+	.container {
+		padding: $spacing-sm;
+	}
+
+	.title {
+		font-size: 1.25rem;
+	}
+
+	.section,
+	.infoCard,
+	.actionsCard {
+		padding: $spacing-md;
+	}
+
+	.sectionTitle {
+		font-size: 1.1rem;
+	}
+
+	.infoTitle,
+	.actionsTitle {
+		font-size: 1rem;
+	}
+
+	.summaryRow.total {
+		font-size: 1rem;
+	}
+
+	.actionButton {
+		padding: $spacing-sm $spacing-md;
+	}
+
+	.errorTitle {
+		font-size: 1.25rem;
+	}
+
+	.backButton {
+		padding: $spacing-md;
+		width: 100%;
+		max-width: 300px;
+	}
+}

@@ -1,0 +1,55 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.mobileSearchBar {
+	display: block;
+	border-top: 1px solid $color-border;
+	padding: $spacing-md;
+	background-color: $color-white;
+	animation: slideDown 0.2s ease-out;
+
+	@include lg {
+		display: none;
+	}
+
+	.searchForm {
+		position: relative;
+		display: flex;
+		align-items: center;
+
+		svg {
+			position: absolute;
+			left: $spacing-md;
+			top: 50%;
+			transform: translateY(-50%);
+			color: $color-text-lighter;
+			pointer-events: none;
+		}
+
+		input {
+			width: 100%;
+			background-color: $color-bg-alt;
+			border-radius: $radius-md;
+			padding: $spacing-sm $spacing-sm $spacing-sm $spacing-2xl;
+			font-size: 0.875rem;
+			border: 1px solid transparent;
+			outline: none;
+
+			&:focus {
+				border-color: $color-primary;
+				box-shadow: 0 0 0 2px rgba($color-primary, 0.5);
+			}
+		}
+	}
+}
+
+@keyframes slideDown {
+	from {
+		opacity: 0;
+		transform: translateY(-10px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}

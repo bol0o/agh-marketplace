@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, NotificationType } from "@prisma/client";
 import { AuthRequest } from "../middleware/auth.middleware";
 
 const prisma = new PrismaClient();
@@ -33,12 +33,10 @@ export const toggleFollow = async (req: AuthRequest, res: Response) => {
     if (existingFollow) {
       //unfollow
       await prisma.follow.delete({ where: { id: existingFollow.id } });
-      return res
-        .status(200)
-        .json({
-          message: "Przestałeś obserwować użytkownika",
-          isFollowing: false,
-        });
+      return res.status(200).json({
+        message: "Przestałeś obserwować użytkownika",
+        isFollowing: false,
+      });
     } else {
       //follow
       await prisma.follow.create({
@@ -47,12 +45,29 @@ export const toggleFollow = async (req: AuthRequest, res: Response) => {
           followingId,
         },
       });
-      return res
-        .status(200)
-        .json({
-          message: "Zacząłeś obserwować użytkownika",
-          isFollowing: true,
+
+      // Fetch follower details to create a notification message
+      const followerUser = await prisma.user.findUnique({
+        where: { id: followerId },
+      });
+
+      // Create notification for the user being followed
+      if (followerUser) {
+        await prisma.notification.create({
+          data: {
+            userId: followingId, // The user who receives the notification
+            type: NotificationType.FOLLOW, // Using the Enum
+            title: "Nowy obserwujący",
+            message: `Użytkownik ${followerUser.firstName} ${followerUser.lastName} zaczął Cię obserwować.`,
+            isRead: false,
+          },
         });
+      }
+
+      return res.status(200).json({
+        message: "Zacząłeś obserwować użytkownika",
+        isFollowing: true,
+      });
     }
   } catch (error) {
     console.error(error);

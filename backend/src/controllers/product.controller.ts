@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import { AuthRequest } from "../middleware/auth.middleware";
+import { deleteImageFromCloudinary } from "./upload.controller";
 
 const prisma = new PrismaClient();
 
@@ -14,6 +15,7 @@ const mapProduct = (p: any) => ({
 
   category: p.category,
   condition: p.condition,
+
   type: p.isAuction ? "auction" : "buy_now",
 
   location: p.location,
@@ -30,6 +32,7 @@ const mapProduct = (p: any) => ({
 
   views: p.views,
   createdAt: p.createdAt,
+
   endsAt: p.auctionEnd,
 });
 
@@ -47,13 +50,14 @@ export const getProducts = async (req: AuthRequest, res: Response) => {
       minPrice,
       maxPrice,
       sort,
-      status,
+      type,
       location,
-      onlyFollowed, //social feed
+      condition,
+      onlyFollowed,
     } = req.query;
 
     const where: any = {
-      status: "active", // Default: show only active products
+      status: "active",
     };
 
     // 2. Build Search Filters
@@ -66,15 +70,22 @@ export const getProducts = async (req: AuthRequest, res: Response) => {
     if (cat) {
       where.category = String(cat).toUpperCase();
     }
+    // Filter by Condition (e.g., 'new', 'used')
+    if (condition) {
+      where.condition = String(condition);
+    }
+
     if (minPrice || maxPrice) {
       where.price = {};
       if (minPrice) where.price.gte = Number(minPrice);
       if (maxPrice) where.price.lte = Number(maxPrice);
     }
-    if (status) {
-      if (status === "auction") where.isAuction = true;
-      if (status === "buy_now") where.isAuction = false;
+
+    if (type) {
+      if (type === "auction") where.isAuction = true;
+      if (type === "buy_now") where.isAuction = false;
     }
+
     if (location) {
       where.location = { contains: String(location), mode: "insensitive" };
     }
@@ -85,7 +96,7 @@ export const getProducts = async (req: AuthRequest, res: Response) => {
 
       if (!userId) {
         return res.status(401).json({
-          error: "Musisz być zalogowany, aby filtrować po obserwowanych",
+          error: "Musisz być zalogowany, aby filtrować po obserwowanych.",
         });
       }
 
@@ -117,6 +128,17 @@ export const getProducts = async (req: AuthRequest, res: Response) => {
         break;
       case "name_desc":
         orderBy = { title: "desc" };
+        break;
+      case "createdAt_asc":
+        orderBy = { createdAt: "asc" };
+        break;
+      case "createdAt_desc":
+        orderBy = { createdAt: "desc" };
+        break;
+      case "ending_soon":
+        orderBy = { auctionEnd: "asc" };
+        where.isAuction = true;
+        where.auctionEnd = { gt: new Date() };
         break;
       default:
         orderBy = { createdAt: "desc" };
@@ -155,7 +177,7 @@ export const getProducts = async (req: AuthRequest, res: Response) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Błąd podczas pobierania produktów" });
+    res.status(500).json({ error: "Błąd pobierania produktów" });
   }
 };
 
@@ -182,7 +204,7 @@ export const getProductById = async (req: Request, res: Response) => {
 
     res.json(mapProduct(product));
   } catch (error) {
-    res.status(404).json({ error: "Produkt nie został znaleziony" });
+    res.status(404).json({ error: "Produkt nie znaleziony" });
   }
 };
 
@@ -199,11 +221,24 @@ export const createProduct = async (req: AuthRequest, res: Response) => {
       category,
       condition,
       location,
-      isAuction,
-      auctionEnd,
       imageUrl,
       stock,
+      type,
+      endsAt,
     } = req.body;
+
+    const isAuctionBool = type === "auction";
+
+    let finalAuctionEnd = null;
+
+    if (isAuctionBool) {
+      if (!endsAt) {
+        return res
+          .status(400)
+          .json({ error: "Aukcje muszą posiadać datę zakończenia" });
+      }
+      finalAuctionEnd = new Date(endsAt);
+    }
 
     const product = await prisma.product.create({
       data: {
@@ -219,8 +254,9 @@ export const createProduct = async (req: AuthRequest, res: Response) => {
         stock: stock ? Number(stock) : 1,
         status: "active",
 
-        isAuction: Boolean(isAuction),
-        auctionEnd: auctionEnd ? new Date(auctionEnd) : null,
+        // Mapped values for DB
+        isAuction: isAuctionBool,
+        auctionEnd: finalAuctionEnd,
       },
       include: {
         seller: {
@@ -237,7 +273,7 @@ export const createProduct = async (req: AuthRequest, res: Response) => {
     res.status(201).json(mapProduct(product));
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Nie udało się utworzyć produktu" });
+    res.status(500).json({ error: "Błąd podczas tworzenia produktu" });
   }
 };
 
@@ -247,17 +283,61 @@ export const updateProduct = async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     const userId = req.user?.userId;
 
-    // Check ownership
-    const existing = await prisma.product.findUnique({ where: { id } });
+    const {
+      title,
+      description,
+      price,
+      category,
+      condition,
+      location,
+      imageUrl,
+      stock,
+      type,
+      endsAt,
+    } = req.body;
+
+    // Check ownership and current bids
+    const existing = await prisma.product.findUnique({
+      where: { id },
+      include: { bids: true }, // Need to check bids
+    });
+
     if (!existing || existing.sellerId !== userId) {
       return res
         .status(403)
-        .json({ error: "Możesz edytować tylko własne produkty" });
+        .json({ error: "Możesz edytować tylko swoje produkty" });
     }
+
+    // Prevent price editing if auction has bids
+    if (existing.isAuction && existing.bids.length > 0) {
+      // If user tries to change price
+      if (price && Number(price) !== existing.price) {
+        return res.status(400).json({
+          error: "Nie można zmienić ceny aukcji, w której są już oferty",
+        });
+      }
+    }
+
+    // Mapping logic for updates
+    const isAuctionBool = type ? type === "auction" : undefined;
+    const auctionEndDate = endsAt ? new Date(endsAt) : undefined;
 
     const updated = await prisma.product.update({
       where: { id },
-      data: req.body,
+      data: {
+        title,
+        description,
+        category,
+        condition,
+        location,
+        imageUrl,
+
+        price: price ? Number(price) : undefined,
+        stock: stock ? Number(stock) : undefined,
+
+        isAuction: isAuctionBool,
+        auctionEnd: auctionEndDate,
+      },
       include: {
         seller: {
           select: {
@@ -272,7 +352,8 @@ export const updateProduct = async (req: AuthRequest, res: Response) => {
 
     res.json(mapProduct(updated));
   } catch (error) {
-    res.status(500).json({ error: "Nie udało się zaktualizować produktu" });
+    console.error("Update error:", error);
+    res.status(500).json({ error: "Błąd aktualizacji produktu" });
   }
 };
 
@@ -294,10 +375,16 @@ export const deleteProduct = async (req: AuthRequest, res: Response) => {
         .json({ error: "Brak uprawnień do usunięcia tego produktu" });
     }
 
+    // Logic: Delete image from Cloudinary
+    if (product.imageUrl) {
+      await deleteImageFromCloudinary(product.imageUrl);
+    }
+
     await prisma.product.delete({ where: { id } });
 
     res.json({ message: "Produkt został usunięty" });
   } catch (error) {
-    res.status(500).json({ error: "Nie udało się usunąć produktu" });
+    console.error(error);
+    res.status(500).json({ error: "Błąd podczas usuwania produktu" });
   }
 };
