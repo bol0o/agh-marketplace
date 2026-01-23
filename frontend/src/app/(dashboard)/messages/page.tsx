@@ -3,8 +3,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { useChat } from '@/hooks/useChat';
 import { useAuth } from '@/store/useAuth';
-import { Send, User as UserIcon, Package } from 'lucide-react';
+import { Send, User as UserIcon, Package, ArrowLeft } from 'lucide-react';
 import styles from './Messages.module.scss';
+import Image from 'next/image';
 
 export default function MessagesPage() {
 	const { user } = useAuth();
@@ -16,6 +17,8 @@ export default function MessagesPage() {
 		selectedId || undefined
 	);
 
+	const activeChat = chats.find((c) => c.id === selectedId);
+
 	// Pobieranie listy rozmów przy wejściu
 	useEffect(() => {
 		fetchChats();
@@ -26,6 +29,7 @@ export default function MessagesPage() {
 		if (selectedId) fetchMessages(selectedId);
 	}, [selectedId, fetchMessages]);
 
+	// Scrollowanie do dołu
 	useEffect(() => {
 		scrollRef.current?.scrollIntoView({
 			behavior: 'smooth',
@@ -43,7 +47,7 @@ export default function MessagesPage() {
 		<div className={styles.container}>
 			<div className={styles.wrapper}>
 				{/* LISTA ROZMÓW (SIDEBAR) */}
-				<aside className={styles.sidebar}>
+				<aside className={`${styles.sidebar} ${selectedId ? styles.hiddenOnMobile : ''}`}>
 					<h2 className={styles.sidebarTitle}>Twoje rozmowy</h2>
 					<div className={styles.chatList}>
 						{chats.map((chat) => (
@@ -54,7 +58,7 @@ export default function MessagesPage() {
 							>
 								<div className={styles.avatar}>
 									{chat.user.avatar ? (
-										<img src={chat.user.avatar} alt="" />
+										<img src={chat.user.avatar} alt="avatar" />
 									) : (
 										<UserIcon />
 									)}
@@ -73,13 +77,35 @@ export default function MessagesPage() {
 								</div>
 							</div>
 						))}
+						{chats.length === 0 && (
+							<p className={styles.noChats}>Brak rozpoczętych rozmów.</p>
+						)}
 					</div>
 				</aside>
 
 				{/* OKNO CZATU */}
-				<main className={styles.chatWindow}>
-					{selectedId ? (
+				<main
+					className={`${styles.chatWindow} ${!selectedId ? styles.hiddenOnMobile : ''}`}
+				>
+					{selectedId && activeChat ? (
 						<>
+							<div className={styles.chatHeader}>
+								<button
+									className={styles.backButton}
+									onClick={() => setSelectedId(null)}
+								>
+									<ArrowLeft size={24} />
+								</button>
+								<div className={styles.headerInfo}>
+									<span className={styles.headerName}>
+										{activeChat.user.name}
+									</span>
+									<span className={styles.headerProduct}>
+										{activeChat.product.title}
+									</span>
+								</div>
+							</div>
+
 							<div className={styles.messagesArea}>
 								{messages.map((m) => (
 									<div
@@ -91,10 +117,17 @@ export default function MessagesPage() {
 										}
 									>
 										<div className={styles.bubble}>{m.text}</div>
+										<span className={styles.timestamp}>
+											{new Date(m.timestamp).toLocaleTimeString([], {
+												hour: '2-digit',
+												minute: '2-digit',
+											})}
+										</span>
 									</div>
 								))}
 								<div ref={scrollRef} />
 							</div>
+
 							<div className={styles.inputArea}>
 								<input
 									value={text}
@@ -108,7 +141,8 @@ export default function MessagesPage() {
 							</div>
 						</>
 					) : (
-						<div className={styles.empty}>
+						<div className={`${styles.empty} ${styles.desktopOnly}`}>
+							<Package size={48} style={{ marginBottom: '1rem', opacity: 0.5 }} />
 							<p>Wybierz rozmowę z listy, aby zacząć pisać.</p>
 						</div>
 					)}

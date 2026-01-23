@@ -65,7 +65,7 @@ export const useChat = (activeChatId?: string) => {
 		setSocket(newSocket);
 
 		newSocket.on('connect', () => {
-			console.log('✅ Połączono z socketem');
+			console.log('Połączono z socketem');
 			newSocket.emit('join_user_room', user.id);
 		});
 
