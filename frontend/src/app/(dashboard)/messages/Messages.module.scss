@@ -2,75 +2,73 @@
 @use '@/styles/mixins' as *;
 
 .container {
-	height: calc(100vh - 80px);
-	background-color: $color-bg;
-	padding: $spacing-md;
-	display: flex;
-	justify-content: center;
+	height: calc(100vh - 80px); // Dostosuj 80px do wysokości twojego Navbara
+	width: 100%;
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 1rem;
 
-	@include md {
-		padding: $spacing-xl;
+	@media (max-width: 768px) {
+		padding: 0;
+		height: calc(100vh - 60px); // Mobile navbar height
 	}
 }
 
 .wrapper {
-	width: 100%;
-	max-width: 1200px;
-	background: $color-white;
-	border-radius: $radius-lg;
-	box-shadow: $shadow-md;
 	display: flex;
+	height: 100%;
+	background: #fff;
+	border-radius: 12px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 	overflow: hidden;
-	border: 1px solid $color-border;
+	border: 1px solid #e5e7eb;
 }
 
 // --- SIDEBAR ---
 .sidebar {
-	width: 80px;
-	border-right: 1px solid $color-border;
+	width: 320px;
+	border-right: 1px solid #e5e7eb;
 	display: flex;
 	flex-direction: column;
-	background-color: $color-white;
+	background: #f9fafb;
 
-	@include md {
-		width: 350px;
+	@media (max-width: 768px) {
+		width: 100%; // Na mobile sidebar zajmuje całą szerokość
+		border-right: none;
+
+		&.hiddenOnMobile {
+			display: none; // Ukrywamy, gdy jesteśmy w czacie
+		}
 	}
 }
 
 .sidebarTitle {
-	padding: $spacing-lg;
-	font-size: 18px;
-	font-weight: 700;
-	color: $color-dark;
-	border-bottom: 1px solid $color-border;
-	display: none;
-
-	@include md {
-		display: block;
-	}
+	padding: 1rem;
+	font-size: 1.1rem;
+	font-weight: 600;
+	border-bottom: 1px solid #e5e7eb;
+	margin: 0;
 }
 
 .chatList {
-	flex: 1;
 	overflow-y: auto;
+	flex: 1;
 }
 
 .chatItem {
-	padding: $spacing-md;
 	display: flex;
 	align-items: center;
-	gap: $spacing-md;
+	padding: 0.75rem 1rem;
 	cursor: pointer;
 	transition: background 0.2s;
-	border-bottom: 1px solid rgba($color-border, 0.5);
+	border-bottom: 1px solid #f3f4f6;
 
 	&:hover {
-		background-color: rgba($color-bg, 0.8);
+		background: #f3f4f6;
 	}
 
 	&.active {
-		background-color: rgba($color-primary, 0.05);
-		border-left: 4px solid $color-primary;
+		background: #e5e7eb;
 	}
 }
 
@@ -82,166 +80,236 @@
 	@include flex-center;
 	color: $color-text-light;
 	flex-shrink: 0;
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	background: #ddd;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-right: 0.75rem;
 	overflow: hidden;
+	flex-shrink: 0;
 
 	img {
-		@include size(100%);
+		width: 100%;
+		height: 100%;
 		object-fit: cover;
 	}
 }
 
 .info {
 	flex: 1;
-	display: none;
-	min-width: 0;
-
-	@include md {
-		display: block;
-	}
+	min-width: 0; // Ważne dla text-overflow
 }
 
 .infoTop {
-	@include flex-between;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 	margin-bottom: 2px;
 }
 
 .name {
 	font-weight: 600;
-	color: $color-dark;
-	font-size: 15px;
+	font-size: 0.9rem;
+	color: #1f2937;
 }
 
 .badge {
-	background-color: $color-primary;
-	color: $color-white;
-	font-size: 11px;
+	background: #ef4444;
+	color: white;
+	font-size: 0.7rem;
 	padding: 2px 6px;
-	border-radius: 10px;
-	font-weight: 700;
+	border-radius: 999px;
+	font-weight: bold;
 }
 
 .productTitle {
 	display: flex;
 	align-items: center;
 	gap: 4px;
-	font-size: 12px;
-	color: $color-primary;
-	font-weight: 500;
+	font-size: 0.75rem;
+	color: #6b7280;
+	background: #e5e7eb;
+	padding: 2px 6px;
+	border-radius: 4px;
+	width: fit-content;
 	margin-bottom: 4px;
 }
 
 .lastMsg {
-	font-size: 13px;
-	color: $color-text-light;
+	font-size: 0.85rem;
+	color: #6b7280;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
+	margin: 0;
 }
 
+// --- CHAT WINDOW ---
 .chatWindow {
 	flex: 1;
 	display: flex;
 	flex-direction: column;
-	background-color: $color-white;
+	background: #fff;
+
+	@media (max-width: 768px) {
+		width: 100%;
+
+		&.hiddenOnMobile {
+			display: none; // Ukrywamy okno, gdy jesteśmy na liście
+		}
+	}
+}
+
+.chatHeader {
+	padding: 0.75rem 1rem;
+	border-bottom: 1px solid #e5e7eb;
+	display: flex;
+	align-items: center;
+	background: #fff;
+	gap: 0.5rem;
+
+	// Przycisk powrotu tylko na mobile
+	.backButton {
+		display: none;
+		background: none;
+		border: none;
+		cursor: pointer;
+		padding: 0;
+
+		@media (max-width: 768px) {
+			display: block;
+		}
+	}
+}
+
+.headerInfo {
+	display: flex;
+	flex-direction: column;
+}
+
+.headerName {
+	font-weight: 600;
+	font-size: 1rem;
+	line-height: 1.2;
+}
+
+.headerProduct {
+	font-size: 0.75rem;
+	color: #6b7280;
 }
 
 .messagesArea {
 	flex: 1;
-	padding: $spacing-lg;
+	padding: 1rem;
 	overflow-y: auto;
 	display: flex;
 	flex-direction: column;
-	gap: $spacing-md;
-	background-image: radial-gradient($color-border 0.5px, transparent 0.5px);
-	background-size: 20px 20px;
+	gap: 0.5rem;
+	background: #f9fafb;
 }
 
 .msgLeft,
 .msgRight {
+	max-width: 70%;
 	display: flex;
-	max-width: 80%;
+	flex-direction: column;
 }
 
 .msgLeft {
 	align-self: flex-start;
+
 	.bubble {
-		background-color: $color-bg-alt;
-		color: $color-dark;
-		border-bottom-left-radius: 4px;
+		background: #e5e7eb;
+		color: #1f2937;
+		border-radius: 12px 12px 12px 0;
 	}
 }
 
 .msgRight {
 	align-self: flex-end;
+
 	.bubble {
-		background-color: $color-primary;
-		color: $color-white;
-		border-bottom-right-radius: 4px;
+		background: #2563eb; // Niebieski kolor (dostosuj do brandu)
+		color: #fff;
+		border-radius: 12px 12px 0 12px;
+	}
+
+	.timestamp {
+		text-align: right;
 	}
 }
 
 .bubble {
-	padding: $spacing-sm $spacing-md;
-	border-radius: $radius-md;
-	font-size: 15px;
-	line-height: 1.5;
-	box-shadow: $shadow-sm;
+	padding: 0.75rem 1rem;
+	font-size: 0.95rem;
+	line-height: 1.4;
+	word-wrap: break-word;
 }
 
-// --- INPUT AREA ---
+.timestamp {
+	font-size: 0.65rem;
+	color: #9ca3af;
+	margin-top: 2px;
+	margin-left: 4px;
+	margin-right: 4px;
+}
+
 .inputArea {
-	padding: $spacing-lg;
-	border-top: 1px solid $color-border;
+	padding: 1rem;
+	border-top: 1px solid #e5e7eb;
 	display: flex;
-	gap: $spacing-md;
-	align-items: center;
+	gap: 0.5rem;
+	background: #fff;
 
 	input {
 		flex: 1;
-		padding: $spacing-md;
-		border: 1px solid $color-border;
-		border-radius: $radius-md;
+		padding: 0.75rem 1rem;
+		border: 1px solid #d1d5db;
+		border-radius: 999px;
 		outline: none;
-		transition: border-color 0.2s;
 
 		&:focus {
-			border-color: $color-primary;
+			border-color: #2563eb;
 		}
 	}
 }
 
 .sendBtn {
-	@include size(42px);
-	background-color: $color-primary;
-	color: $color-white;
+	background: #2563eb;
+	color: white;
 	border: none;
-	border-radius: $radius-md;
-	@include flex-center;
+	width: 44px;
+	height: 44px;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	cursor: pointer;
-	transition:
-		transform 0.2s,
-		background 0.2s;
+	transition: background 0.2s;
 
 	&:hover {
-		background-color: $color-primary-hover;
-		transform: scale(1.05);
-	}
-
-	&:active {
-		transform: scale(0.95);
+		background: #1d4ed8;
 	}
 }
 
 .empty {
-	@include flex-center;
+	flex: 1;
+	display: flex;
 	flex-direction: column;
-	height: 100%;
-	color: $color-text-light;
-	text-align: center;
-	padding: $spacing-2xl;
+	align-items: center;
+	justify-content: center;
+	color: #6b7280;
 
-	p {
-		font-size: 16px;
-		margin-top: $spacing-md;
+	@media (max-width: 768px) {
+		display: none; // Na mobile pusty stan nie jest potrzebny, bo widzimy listę
+	}
+}
+
+.desktopOnly {
+	@media (max-width: 768px) {
+		display: none !important;
 	}
 }
