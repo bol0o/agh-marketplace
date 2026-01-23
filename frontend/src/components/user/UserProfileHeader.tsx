@@ -18,10 +18,6 @@ export function UserProfileHeader({ user, isCurrentUser = false }: UserProfileHe
 		});
 	};
 
-	useEffect(() => {
-		console.log(user);
-	}, []);
-
 	return (
 		<div className={styles.container}>
 			<div className={styles.avatarSection}>

@@ -12,6 +12,7 @@ export const useUser = ({ userId }: UseUserProps = {}) => {
 	const [reviews, setReviews] = useState<Review[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
+	const [deletingReviewId, setDeletingReviewId] = useState<string | null>(null);
 
 	useEffect(() => {
 		fetchUserData();
@@ -80,12 +81,65 @@ export const useUser = ({ userId }: UseUserProps = {}) => {
 		}
 	};
 
+	const deleteReview = async (reviewId: string) => {
+		try {
+			setDeletingReviewId(reviewId);
+
+			const reviewToDelete = reviews.find((review) => review.id === reviewId);
+			if (!reviewToDelete) {
+				throw new Error('Opinie nie znaleziono');
+			}
+
+			await api.delete(`/reviews/${reviewId}`);
+
+			setReviews((prev) => prev.filter((review) => review.id !== reviewId));
+
+			if (user && user.ratingCount > 1) {
+				const newTotalRating = user.rating * user.ratingCount - reviewToDelete.rating;
+				const newRatingCount = user.ratingCount - 1;
+				const newAverageRating = newTotalRating / newRatingCount;
+
+				setUser((prev) =>
+					prev
+						? {
+								...prev,
+								rating: newAverageRating,
+								ratingCount: newRatingCount,
+							}
+						: null
+				);
+			} else if (user && user.ratingCount === 1) {
+				setUser((prev) =>
+					prev
+						? {
+								...prev,
+								rating: 0,
+								ratingCount: 0,
+							}
+						: null
+				);
+			}
+
+			return true;
+		} catch (err: any) {
+			console.error('Error deleting review:', err);
+
+			const errorMessage =
+				err.response?.data?.message || err.message || 'Nie udało się usunąć opinii';
+			throw new Error(errorMessage);
+		} finally {
+			setDeletingReviewId(null);
+		}
+	};
+
 	return {
 		user,
 		reviews,
 		loading,
 		error,
+		deletingReviewId,
 		refresh: fetchUserData,
 		createReview,
+		deleteReview,
 	};
 };

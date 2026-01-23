@@ -29,6 +29,7 @@ export interface Review {
 	reviewer?: {
 		firstName: string;
 		lastName: string;
+		avatarUrl?: string;
 	};
 }
 

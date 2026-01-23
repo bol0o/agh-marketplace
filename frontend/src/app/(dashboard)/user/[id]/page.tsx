@@ -1,25 +1,27 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { UserProfileHeader } from '@/components/user/UserProfileHeader';
 import { UserStats } from '@/components/user/UserStats';
 import { ReviewList } from '@/components/user/ReviewList';
 import { AddReviewForm } from '@/components/user/AddReviewForm';
 import { AlertCircle } from 'lucide-react';
+import { isAxiosError } from 'axios';
 import { useUser } from '@/hooks/useUser';
 import { useAuth } from '@/store/useAuth';
 import styles from '../user.module.scss';
 import { PageLoading } from '@/components/shared/PageLoading';
+import { useUIStore } from '@/store/uiStore';
 
 export default function UserProfilePage() {
 	const params = useParams();
 	const userId = params.id as string;
 	const { user: currentUser } = useAuth();
-
-	const { user, reviews, loading, error, createReview } = useUser({ userId });
+	const { user, reviews, loading, error, createReview, deleteReview } = useUser({ userId });
 	const [showAddReview, setShowAddReview] = useState(false);
 	const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+	const { addToast } = useUIStore();
 
 	const isOwnProfile = currentUser?.id === userId;
 
@@ -27,9 +29,22 @@ export default function UserProfilePage() {
 		try {
 			setIsSubmittingReview(true);
 			await createReview({ rating, comment });
+
 			setShowAddReview(false);
-		} catch (err) {
+			addToast('Opinia została dodana pomyślnie!', 'success');
+		} catch (err: unknown) {
 			console.error('Error adding review:', err);
+
+			let errorMessage = 'Nie udało się dodać opinii';
+
+			if (isAxiosError(err)) {
+				errorMessage =
+					err.response?.data?.error || err.response?.data?.message || errorMessage;
+			} else if (err instanceof Error) {
+				errorMessage = err.message;
+			}
+
+			addToast(`Błąd: ${errorMessage}`, 'error');
 		} finally {
 			setIsSubmittingReview(false);
 		}
@@ -67,6 +82,8 @@ export default function UserProfilePage() {
 				showAddReview={!isOwnProfile}
 				onAddReview={() => setShowAddReview(true)}
 				currentUserId={currentUser?.id}
+				onDeleteReview={deleteReview}
+				currentUserRole={currentUser?.role}
 			/>
 		</div>
 	);

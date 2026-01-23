@@ -49,17 +49,24 @@
 	border-radius: $radius-md;
 	font-weight: 600;
 	cursor: pointer;
-	transition: background-color 0.2s ease;
+	transition: all 0.2s ease;
 	font-size: 0.9rem;
 	white-space: nowrap;
 
 	&:hover {
 		background: rgba($color-primary, 0.9);
+		transform: translateY(-1px);
 	}
 
 	&:focus-visible {
 		outline: 2px solid $color-primary;
 		outline-offset: 2px;
+	}
+
+	&:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+		transform: none;
 	}
 
 	@include sm {
@@ -85,6 +92,7 @@
 	border: 1px solid $color-border;
 	width: 100%;
 	overflow: hidden;
+	position: relative;
 
 	@include md {
 		padding: $spacing-lg;
@@ -92,10 +100,22 @@
 }
 
 .reviewHeader {
-	@include flex-between;
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
 	margin-bottom: $spacing-md;
 	flex-wrap: wrap;
 	gap: $spacing-md;
+}
+
+.reviewerSection {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	flex: 1;
+	min-width: 0;
+	gap: $spacing-md;
+	flex-wrap: wrap;
 }
 
 .reviewerLink {
@@ -112,8 +132,9 @@
 			text-underline-offset: 2px;
 		}
 
-		.reviewerIcon {
-			color: $color-primary;
+		.reviewerIcon,
+		.avatarContainer {
+			opacity: 0.9;
 		}
 	}
 
@@ -131,17 +152,33 @@
 	min-width: 0;
 }
 
+.avatarContainer {
+	width: 40px;
+	height: 40px;
+	flex-shrink: 0;
+	border-radius: 50%;
+	overflow: hidden;
+	border: 2px solid $color-border;
+	transition: opacity 0.2s ease;
+}
+
+.avatar {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
 .reviewerIcon {
-	width: 32px;
-	height: 32px;
+	width: 40px;
+	height: 40px;
 	color: $color-text-light;
 	flex-shrink: 0;
-	transition: color 0.2s ease;
+	transition: opacity 0.2s ease;
+}
 
-	@include sm {
-		width: 40px;
-		height: 40px;
-	}
+.reviewerDetails {
+	min-width: 0;
+	flex: 1;
 }
 
 .reviewerName {
@@ -209,6 +246,55 @@
 	@include sm {
 		width: 16px;
 		height: 16px;
+	}
+}
+
+.deleteButton {
+	background: transparent;
+	border: none;
+	color: $color-status-red;
+	cursor: pointer;
+	padding: $spacing-xs;
+	border-radius: $radius-sm;
+	transition: all 0.2s ease;
+	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	height: 36px;
+
+	&:hover {
+		background: rgba($color-status-red, 0.1);
+		color: rgba($color-status-red, 0.1);
+		transform: scale(1.1);
+	}
+
+	&:focus-visible {
+		outline: 2px solid $color-status-red;
+		outline-offset: 2px;
+	}
+
+	&:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+		transform: none;
+	}
+}
+
+.deleteSpinner {
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	border: 2px solid rgba($color-status-red, 0.3);
+	border-radius: 50%;
+	border-top-color: $color-status-red;
+	animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+	to {
+		transform: rotate(360deg);
 	}
 }
 
@@ -307,10 +393,23 @@
 	.reviewHeader {
 		flex-direction: column;
 		align-items: flex-start;
+		gap: $spacing-sm;
+	}
+
+	.reviewerSection {
+		width: 100%;
+		flex-direction: column;
+		gap: $spacing-sm;
 	}
 
 	.reviewerInfo {
 		width: 100%;
+	}
+
+	.avatarContainer,
+	.reviewerIcon {
+		width: 32px;
+		height: 32px;
 	}
 
 	.reviewerName {
@@ -318,7 +417,14 @@
 	}
 
 	.reviewRating {
-		align-self: center;
+		align-self: flex-start;
+	}
+
+	.deleteButton {
+		align-self: flex-end;
+		position: absolute;
+		top: $spacing-md;
+		right: $spacing-md;
 	}
 
 	.reviewComment {

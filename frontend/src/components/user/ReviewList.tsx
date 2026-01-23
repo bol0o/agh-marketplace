@@ -1,23 +1,33 @@
 'use client';
 
 import { Review } from '@/types/user';
-import { Star, UserCircle, Calendar } from 'lucide-react';
+import { Star, UserCircle, Calendar, Trash2 } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import styles from './ReviewList.module.scss';
+import { useState } from 'react';
+import { useUIStore } from '@/store/uiStore';
 
 interface ReviewListProps {
 	reviews: Review[];
 	showAddReview?: boolean;
 	onAddReview?: () => void;
+	onDeleteReview?: (reviewId: string) => Promise<boolean>;
 	currentUserId?: string;
+	currentUserRole?: string;
 }
 
 export function ReviewList({
 	reviews,
 	showAddReview = false,
 	onAddReview,
+	onDeleteReview,
 	currentUserId,
+	currentUserRole = 'user',
 }: ReviewListProps) {
+	const [deletingReviewId, setDeletingReviewId] = useState<string | null>(null);
+	const { addToast } = useUIStore();
+
 	const formatDate = (dateString: string) => {
 		return new Date(dateString).toLocaleDateString('pl-PL', {
 			day: 'numeric',
@@ -34,6 +44,45 @@ export function ReviewList({
 				size={16}
 			/>
 		));
+	};
+
+	const renderAvatar = (review: Review) => {
+		if (review.reviewer?.avatarUrl) {
+			return (
+				<div className={styles.avatarContainer}>
+					<Image
+						src={review.reviewer.avatarUrl}
+						alt={`Avatar użytkownika ${review.reviewer.firstName} ${review.reviewer.lastName}`}
+						width={40}
+						height={40}
+						className={styles.avatar}
+					/>
+				</div>
+			);
+		}
+
+		return <UserCircle className={styles.reviewerIcon} />;
+	};
+
+	const handleDeleteReview = async (reviewId: string) => {
+		if (!onDeleteReview) return;
+
+		try {
+			setDeletingReviewId(reviewId);
+			await onDeleteReview(reviewId);
+		} catch (error) {
+			addToast('Błąd podczas usuwania opinii', 'error');
+			console.error('Błąd podczas usuwania opinii:', error);
+		} finally {
+			setDeletingReviewId(null);
+			addToast('Pomyślnie usunięto opinie', 'success');
+		}
+	};
+
+	const canDeleteReview = (review: Review) => {
+		if (!onDeleteReview) return false;
+		if (currentUserRole === 'admin') return true;
+		return review.reviewerId === currentUserId;
 	};
 
 	if (reviews.length === 0) {
@@ -69,36 +118,65 @@ export function ReviewList({
 			<div className={styles.reviewsList}>
 				{reviews.map((review) => {
 					const isCurrentUserReview = review.reviewerId === currentUserId;
+					const showDeleteButton = canDeleteReview(review);
+					const isDeleting = deletingReviewId === review.id;
 
 					return (
 						<div key={review.id} className={styles.reviewCard}>
 							<div className={styles.reviewHeader}>
-								<Link
-									href={`/user/${review.reviewerId}`}
-									className={styles.reviewerLink}
-									aria-label={`Profil użytkownika ${review.reviewer?.firstName || 'Anonim'}`}
-								>
-									<div className={styles.reviewerInfo}>
-										<UserCircle className={styles.reviewerIcon} />
-										<div>
-											<div className={styles.reviewerName}>
-												{review.reviewer
-													? `${review.reviewer.firstName} ${review.reviewer.lastName}`
-													: 'Anonimowy użytkownik'}
-												{isCurrentUserReview && (
-													<span className={styles.youBadge}>(Ty)</span>
-												)}
-											</div>
-											<div className={styles.reviewDate}>
-												<Calendar className={styles.dateIcon} size={14} />
-												{formatDate(review.createdAt)}
+								<div className={styles.reviewerSection}>
+									<Link
+										href={`/user/${review.reviewerId}`}
+										className={styles.reviewerLink}
+										aria-label={`Profil użytkownika ${review.reviewer?.firstName || 'Anonim'}`}
+									>
+										<div className={styles.reviewerInfo}>
+											{renderAvatar(review)}
+											<div className={styles.reviewerDetails}>
+												<div className={styles.reviewerName}>
+													{review.reviewer
+														? `${review.reviewer.firstName} ${review.reviewer.lastName}`
+														: 'Anonimowy użytkownik'}
+													{isCurrentUserReview && (
+														<span className={styles.youBadge}>
+															(Ty)
+														</span>
+													)}
+												</div>
+												<div className={styles.reviewDate}>
+													<Calendar
+														className={styles.dateIcon}
+														size={14}
+													/>
+													{formatDate(review.createdAt)}
+												</div>
 											</div>
 										</div>
+									</Link>
+									<div className={styles.reviewRating}>
+										{renderStars(review.rating)}
 									</div>
-								</Link>
-								<div className={styles.reviewRating}>
-									{renderStars(review.rating)}
 								</div>
+
+								{showDeleteButton && (
+									<button
+										className={styles.deleteButton}
+										onClick={() => handleDeleteReview(review.id)}
+										disabled={isDeleting}
+										aria-label="Usuń opinię"
+										title={
+											currentUserRole === 'admin'
+												? 'Usuń opinię (admin)'
+												: 'Usuń swoją opinię'
+										}
+									>
+										{isDeleting ? (
+											<span className={styles.deleteSpinner}></span>
+										) : (
+											<Trash2 size={18} />
+										)}
+									</button>
+								)}
 							</div>
 
 							{review.comment && (
