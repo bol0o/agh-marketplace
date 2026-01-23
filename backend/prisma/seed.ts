@@ -15,7 +15,7 @@ async function main() {
   //Validation: Ensure passwords exist in .env
   if (!rawAdminPass || !rawStudentPass) {
     throw new Error(
-      "Error: ADMIN_PASSWORD or STUDENT_PASSWORD missing in .env file"
+      "Error: ADMIN_PASSWORD or STUDENT_PASSWORD missing in .env file",
     );
   }
 
@@ -185,6 +185,28 @@ async function main() {
         createdAt: faker.date.recent({ days: 5 }),
       },
     });
+  }
+
+  //6 reviews per user
+  console.log("Seeding reviews (6 per user)...");
+  for (const user of users) {
+    const potentialReviewers = users.filter((u) => u.id !== user.id);
+    const selectedReviewers = faker.helpers.arrayElements(
+      potentialReviewers,
+      6,
+    );
+
+    for (const reviewer of selectedReviewers) {
+      await prisma.review.create({
+        data: {
+          reviewerId: reviewer.id,
+          revieweeId: user.id,
+          rating: faker.number.int({ min: 2, max: 5 }),
+          comment: faker.lorem.sentences(2),
+          createdAt: faker.date.past(),
+        },
+      });
+    }
   }
 
   console.log("Seeding finished successfully!");

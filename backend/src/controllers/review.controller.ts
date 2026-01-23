@@ -45,7 +45,7 @@ export const addReview = async (req: AuthRequest, res: Response) => {
       include: {
         reviewer: {
           select: {
-            id: true, // ZMIANA: Dodano ID
+            id: true,
             firstName: true,
             lastName: true,
             avatarUrl: true,
@@ -57,7 +57,7 @@ export const addReview = async (req: AuthRequest, res: Response) => {
     const formattedReview = {
       ...review,
       reviewer: {
-        id: review.reviewer.id, // ZMIANA: Przekazujemy ID
+        id: review.reviewer.id,
         name: `${review.reviewer.firstName} ${review.reviewer.lastName}`,
         avatarUrl: review.reviewer.avatarUrl,
       },
