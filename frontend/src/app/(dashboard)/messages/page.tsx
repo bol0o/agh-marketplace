@@ -27,7 +27,6 @@ export default function MessagesPage() {
 		if (selectedId) fetchMessages(selectedId);
 	}, [selectedId, fetchMessages]);
 
-	// Scrollowanie do dołu
 	useEffect(() => {
 		scrollRef.current?.scrollIntoView({
 			behavior: 'smooth',
@@ -44,8 +43,7 @@ export default function MessagesPage() {
 	return (
 		<div className={styles.container}>
 			<div className={styles.wrapper}>
-				{/* LISTA ROZMÓW (SIDEBAR) */}
-				<aside className={`${styles.sidebar} ${selectedId ? styles.hiddenOnMobile : ''}`}>
+				<aside className={`${styles.sidebar} ${selectedId ? styles.hiddenOnMobile : ''}`} />
 				<aside className={styles.sidebar}>
 					<h2 className={styles.sidebarTitle}>Twoje rozmowy</h2>
 					<div className={styles.chatList}>

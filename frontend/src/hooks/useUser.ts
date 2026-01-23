@@ -3,9 +3,20 @@ import { isAxiosError } from 'axios';
 import api from '@/lib/axios';
 import { User, Review } from '@/types/user';
 import { CreateReviewData } from '@/types/user';
+import { useSearchParams } from 'next/navigation';
 
 interface UseUserProps {
 	userId?: string;
+}
+
+interface PaginatedResponse {
+	pagination: {
+		totalItems: number;
+		totalPages: number;
+		currentPage: number;
+		itemsPerPage: number;
+	};
+	reviews: Review[];
 }
 
 export const useUser = ({ userId }: UseUserProps = {}) => {
@@ -14,6 +25,16 @@ export const useUser = ({ userId }: UseUserProps = {}) => {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 	const [deletingReviewId, setDeletingReviewId] = useState<string | null>(null);
+	const [pagination, setPagination] = useState({
+		totalItems: 0,
+		totalPages: 0,
+		currentPage: 1,
+		itemsPerPage: 10
+	});
+
+	const searchParams = useSearchParams();
+	const page = searchParams.get('page') || '1';
+	const limit = searchParams.get('limit') || '10';
 
 	const fetchUserData = useCallback(async () => {
 		try {
@@ -32,21 +53,54 @@ export const useUser = ({ userId }: UseUserProps = {}) => {
 
 			setUser(userData);
 
-			const reviewsResponse = await api.get(`/reviews/${userData.id}`);
-			setReviews(reviewsResponse.data || []);
+			// Pobierz opinie z paginacją
+			const reviewsResponse = await api.get<PaginatedResponse>(`/reviews/${userData.id}`, {
+				params: { 
+					page: parseInt(page), 
+					limit: parseInt(limit) 
+				}
+			});
+			
+			setReviews(reviewsResponse.data.reviews || []);
+			setPagination(reviewsResponse.data.pagination);
 		} catch (err: unknown) {
 			console.error('Error fetching user data:', err);
 			setError('Nie udało się pobrać danych użytkownika');
 			setUser(null);
 			setReviews([]);
+			setPagination({
+				totalItems: 0,
+				totalPages: 0,
+				currentPage: 1,
+				itemsPerPage: 10
+			});
 		} finally {
 			setLoading(false);
 		}
-	}, [userId]);
+	}, [userId, page, limit]);
 
 	useEffect(() => {
 		fetchUserData();
 	}, [fetchUserData]);
+
+	const fetchReviewsPage = async (pageNum: number, pageLimit: number = 10) => {
+		try {
+			if (!user) return;
+
+			const response = await api.get<PaginatedResponse>(`/reviews/${user.id}`, {
+				params: { 
+					page: pageNum, 
+					limit: pageLimit 
+				}
+			});
+			
+			setReviews(response.data.reviews || []);
+			setPagination(response.data.pagination);
+		} catch (err: unknown) {
+			console.error('Error fetching reviews page:', err);
+			throw err;
+		}
+	};
 
 	const createReview = async (reviewData: Omit<CreateReviewData, 'revieweeId'>) => {
 		if (!user) throw new Error('No user selected');
@@ -57,7 +111,8 @@ export const useUser = ({ userId }: UseUserProps = {}) => {
 				revieweeId: user.id,
 			});
 
-			setReviews((prev) => [response.data, ...prev]);
+			// Po dodaniu nowej opinii, przeładuj dane (w tym paginację)
+			await fetchUserData();
 
 			if (user) {
 				const newTotalRating = user.rating * user.ratingCount + reviewData.rating;
@@ -93,7 +148,8 @@ export const useUser = ({ userId }: UseUserProps = {}) => {
 
 			await api.delete(`/reviews/${reviewId}`);
 
-			setReviews((prev) => prev.filter((review) => review.id !== reviewId));
+			// Po usunięciu opinii, przeładuj dane
+			await fetchUserData();
 
 			if (user && user.ratingCount > 1) {
 				const newTotalRating = user.rating * user.ratingCount - reviewToDelete.rating;
@@ -142,6 +198,7 @@ export const useUser = ({ userId }: UseUserProps = {}) => {
 	return {
 		user,
 		reviews,
+		pagination,
 		loading,
 		error,
 		deletingReviewId,

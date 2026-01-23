@@ -15,6 +15,11 @@ interface ReviewListProps {
 	onDeleteReview?: (reviewId: string) => Promise<boolean>;
 	currentUserId?: string;
 	currentUserRole?: string;
+    paginationInfo?: {
+		totalItems: number;
+		currentPage: number;
+		totalPages: number;
+	};
 }
 
 export function ReviewList({
@@ -24,6 +29,7 @@ export function ReviewList({
 	onDeleteReview,
 	currentUserId,
 	currentUserRole = 'user',
+    paginationInfo,
 }: ReviewListProps) {
 	const [deletingReviewId, setDeletingReviewId] = useState<string | null>(null);
 	const { addToast } = useUIStore();
@@ -52,7 +58,7 @@ export function ReviewList({
 				<div className={styles.avatarContainer}>
 					<Image
 						src={review.reviewer.avatarUrl}
-						alt={`Avatar użytkownika ${review.reviewer.firstName} ${review.reviewer.lastName}`}
+						alt={`Avatar użytkownika ${review.reviewer.name}`}
 						width={40}
 						height={40}
 						className={styles.avatar}
@@ -92,7 +98,9 @@ export function ReviewList({
 					<Star className={styles.emptyIcon} />
 					<h3 className={styles.emptyTitle}>Brak opinii</h3>
 					<p className={styles.emptyText}>
-						Ten użytkownik nie ma jeszcze żadnych opinii.
+						{paginationInfo?.currentPage && paginationInfo.currentPage > 1 
+							? 'Brak opinii na tej stronie.' 
+							: 'Ten użytkownik nie ma jeszcze żadnych opinii.'}
 					</p>
 					{showAddReview && onAddReview && (
 						<button className={styles.addReviewButton} onClick={onAddReview}>
@@ -107,7 +115,14 @@ export function ReviewList({
 	return (
 		<div className={styles.container}>
 			<div className={styles.header}>
-				<h2 className={styles.title}>Opinie ({reviews.length})</h2>
+				<h2 className={styles.title}>
+					Opinie ({paginationInfo?.totalItems || reviews.length})
+					{paginationInfo && paginationInfo.totalPages > 1 && (
+						<span className={styles.pageInfo}>
+							{' '}· Strona {paginationInfo.currentPage} z {paginationInfo.totalPages}
+						</span>
+					)}
+				</h2>
 				{showAddReview && onAddReview && (
 					<button className={styles.addReviewButton} onClick={onAddReview}>
 						Dodaj opinię
@@ -128,14 +143,14 @@ export function ReviewList({
 									<Link
 										href={`/user/${review.reviewerId}`}
 										className={styles.reviewerLink}
-										aria-label={`Profil użytkownika ${review.reviewer?.firstName || 'Anonim'}`}
+										aria-label={`Profil użytkownika ${review.reviewer?.name || 'Anonim'}`}
 									>
 										<div className={styles.reviewerInfo}>
 											{renderAvatar(review)}
 											<div className={styles.reviewerDetails}>
 												<div className={styles.reviewerName}>
 													{review.reviewer
-														? `${review.reviewer.firstName} ${review.reviewer.lastName}`
+														? `${review.reviewer.name}`
 														: 'Anonimowy użytkownik'}
 													{isCurrentUserReview && (
 														<span className={styles.youBadge}>

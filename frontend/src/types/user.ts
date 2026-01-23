@@ -17,6 +17,16 @@ export interface User {
 	soldItemsCount: number;
 }
 
+export interface PaginatedResponse<T = Review> {
+	pagination: {
+		totalItems: number;
+		totalPages: number;
+		currentPage: number;
+		itemsPerPage: number;
+	};
+	reviews: T[];
+}
+
 export interface Review {
 	id: string;
 	rating: number;
@@ -25,11 +35,11 @@ export interface Review {
 	revieweeId: string;
 	createdAt: string;
 	reviewer?: {
-		firstName: string;
-		lastName: string;
+		name: string;
 		avatarUrl?: string;
 	};
 }
+
 
 export interface CreateReviewData {
 	revieweeId: string;
