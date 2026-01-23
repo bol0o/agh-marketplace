@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import { io, Socket } from 'socket.io-client';
 import axios from '@/lib/axios';
 import { useAuth } from '@/store/useAuth';
@@ -28,7 +28,6 @@ export const useChat = (activeChatId?: string) => {
 
 	const fetchChats = useCallback(async () => {
 		try {
-			// ZMIANA: Powrót do /chat
 			const { data } = await axios.get('/chat');
 			setChats(data);
 		} catch (err) {
@@ -38,7 +37,6 @@ export const useChat = (activeChatId?: string) => {
 
 	const fetchMessages = useCallback(async (id: string) => {
 		try {
-			// ZMIANA: Powrót do /chat
 			const { data } = await axios.get(`/chat/${id}/messages`);
 			setMessages(data);
 		} catch (err) {
@@ -67,7 +65,7 @@ export const useChat = (activeChatId?: string) => {
 		setSocket(newSocket);
 
 		newSocket.on('connect', () => {
-			console.log('Połączono z socketem');
+			console.log('✅ Połączono z socketem');
 			newSocket.emit('join_user_room', user.id);
 		});
 
@@ -107,5 +105,17 @@ export const useChat = (activeChatId?: string) => {
 		}
 	};
 
-	return { chats, messages, sendMessage, fetchChats, fetchMessages, socket };
+	const totalUnreadMessages = useMemo(() => {
+		return chats.reduce((sum, chat) => sum + (chat.unreadCount || 0), 0);
+	}, [chats]);
+
+	return {
+		chats,
+		messages,
+		sendMessage,
+		fetchChats,
+		fetchMessages,
+		socket,
+		totalUnreadMessages,
+	};
 };
