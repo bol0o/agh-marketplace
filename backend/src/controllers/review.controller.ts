@@ -57,32 +57,76 @@ export const addReview = async (req: AuthRequest, res: Response) => {
       },
     });
 
-    res.status(201).json(review);
+    // Map response to match frontend expectations (name instead of first/last)
+    const formattedReview = {
+      ...review,
+      reviewer: {
+        name: `${review.reviewer.firstName} ${review.reviewer.lastName}`,
+        avatarUrl: review.reviewer.avatarUrl,
+      },
+    };
+
+    res.status(201).json(formattedReview);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Błąd dodawania opinii" });
   }
 };
 
-// Get reviews for specific user
+// Get reviews for specific user (With Pagination)
 export const getReviewsForUser = async (req: AuthRequest, res: Response) => {
   try {
     const { userId } = req.params;
 
-    const reviews = await prisma.review.findMany({
-      where: { revieweeId: userId },
-      include: {
-        reviewer: {
-          select: {
-            firstName: true,
-            lastName: true,
-            avatarUrl: true,
+    // 1. Pagination Params
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10; // Domyślnie 10 opinii na stronę
+    const skip = (page - 1) * limit;
+
+    const where = { revieweeId: userId };
+
+    // 2. Database Transaction: Fetch Reviews + Count Total
+    const [reviews, total] = await prisma.$transaction([
+      prisma.review.findMany({
+        where,
+        take: limit,
+        skip,
+        include: {
+          reviewer: {
+            select: {
+              firstName: true,
+              lastName: true,
+              avatarUrl: true,
+            },
           },
         },
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.review.count({ where }),
+    ]);
+
+    // 3. Format response (Map firstName/lastName -> name)
+    const formattedReviews = reviews.map((review) => ({
+      id: review.id,
+      rating: review.rating,
+      comment: review.comment,
+      createdAt: review.createdAt,
+      reviewer: {
+        name: `${review.reviewer.firstName} ${review.reviewer.lastName}`,
+        avatarUrl: review.reviewer.avatarUrl,
       },
-      orderBy: { createdAt: "desc" },
+    }));
+
+    // 4. Return Data with Pagination Metadata
+    res.json({
+      pagination: {
+        totalItems: total,
+        totalPages: Math.ceil(total / limit),
+        currentPage: page,
+        itemsPerPage: limit,
+      },
+      reviews: formattedReviews,
     });
-    res.json(reviews);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Błąd pobierania opinii" });
