@@ -43,9 +43,9 @@ export function SellerInfoCard({
 						/>
 					) : (
 						<div className={styles.avatarPlaceholder}>
-							{seller.name
+							{(seller?.name || 'Użytkownik')
 								.split(' ')
-								.map((n) => n.charAt(0))
+								.map((n: string) => n.charAt(0))
 								.join('')}
 						</div>
 					)}

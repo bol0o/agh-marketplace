@@ -36,6 +36,14 @@ const mapProduct = (p: any) => ({
   endsAt: p.auctionEnd,
 });
 
+// Helper do liczenia średniej (dodaj to na górze pliku lub przed funkcjami)
+const calculateSellerRating = (seller: any) => {
+  const reviews = seller.reviewsReceived || [];
+  if (reviews.length === 0) return 0;
+  const sum = reviews.reduce((acc: number, rev: any) => acc + rev.rating, 0);
+  return Number((sum / reviews.length).toFixed(1));
+};
+
 // GET /api/products (With Pagination, Filtering & Social Feed logic)
 export const getProducts = async (req: AuthRequest, res: Response) => {
   try {
@@ -158,12 +166,25 @@ export const getProducts = async (req: AuthRequest, res: Response) => {
               firstName: true,
               lastName: true,
               avatarUrl: true,
+              reviewsReceived: { select: { rating: true } },
             },
           },
         },
       }),
       prisma.product.count({ where }),
     ]);
+
+    const productsWithRating = products.map((product) => ({
+      ...product,
+      seller: {
+        id: product.seller.id,
+        firstName: product.seller.firstName,
+        lastName: product.seller.lastName,
+        avatarUrl: product.seller.avatarUrl,
+        rating: calculateSellerRating(product.seller), // Wyliczamy średnią
+        reviewsCount: product.seller.reviewsReceived.length,
+      },
+    }));
 
     // 6. Return Data with Pagination Metadata
     res.json({
@@ -173,7 +194,7 @@ export const getProducts = async (req: AuthRequest, res: Response) => {
         currentPage: page,
         itemsPerPage: limit,
       },
-      products: products.map(mapProduct),
+      products: productsWithRating,
     });
   } catch (error) {
     console.error(error);
@@ -186,7 +207,7 @@ export const getProductById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    // Increment view counter
+    // Increment view counter & Fetch details
     const product = await prisma.product.update({
       where: { id },
       data: { views: { increment: 1 } },
@@ -197,12 +218,29 @@ export const getProductById = async (req: Request, res: Response) => {
             firstName: true,
             lastName: true,
             avatarUrl: true,
+            reviewsReceived: { select: { rating: true } },
           },
+        },
+        bids: {
+          orderBy: { amount: "desc" },
+          take: 5,
         },
       },
     });
 
-    res.json(mapProduct(product));
+    const formattedProduct = {
+      ...product,
+      seller: {
+        id: product.seller.id,
+        firstName: product.seller.firstName,
+        lastName: product.seller.lastName,
+        avatarUrl: product.seller.avatarUrl,
+        rating: calculateSellerRating(product.seller),
+        reviewsCount: product.seller.reviewsReceived.length,
+      },
+    };
+
+    res.json(formattedProduct);
   } catch (error) {
     res.status(404).json({ error: "Produkt nie znaleziony" });
   }

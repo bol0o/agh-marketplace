@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { PrismaClient, NotificationType } from "@prisma/client"; // <--- Added NotificationType
+import { PrismaClient, NotificationType } from "@prisma/client";
 import { AuthRequest } from "../middleware/auth.middleware";
 
 const prisma = new PrismaClient();
@@ -238,7 +238,19 @@ export const getOrderById = async (req: AuthRequest, res: Response) => {
 
     const order = await prisma.order.findUnique({
       where: { id },
-      include: { items: true },
+      include: {
+        items: {
+          include: {
+            product: {
+              include: {
+                seller: {
+                  include: { reviewsReceived: true },
+                },
+              },
+            },
+          },
+        },
+      },
     });
 
     if (!order)
@@ -255,7 +267,7 @@ export const getOrderById = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// POST /api/orders/:id/pay (Simulate Payment)
+// POST /api/orders/:id/pay
 export const payOrder = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
@@ -277,7 +289,19 @@ export const payOrder = async (req: AuthRequest, res: Response) => {
     const updatedOrder = await prisma.order.update({
       where: { id },
       data: { status: "COMPLETED" },
-      include: { items: true },
+      include: {
+        items: {
+          include: {
+            product: {
+              include: {
+                seller: {
+                  include: { reviewsReceived: true },
+                },
+              },
+            },
+          },
+        },
+      },
     });
 
     res.json(formatOrderResponse(updatedOrder));
@@ -295,7 +319,19 @@ export const updateOrderStatus = async (req: AuthRequest, res: Response) => {
     const updatedOrder = await prisma.order.update({
       where: { id },
       data: { status },
-      include: { items: true },
+      include: {
+        items: {
+          include: {
+            product: {
+              include: {
+                seller: {
+                  include: { reviewsReceived: true },
+                },
+              },
+            },
+          },
+        },
+      },
     });
 
     // Notify buyer about status change

@@ -19,11 +19,12 @@ import notificationRoutes from "./routes/notification.routes";
 import adminRoutes from "./routes/admin.routes";
 import userRoutes from "./routes/user.routes";
 import uploadRoutes from "./routes/upload.routes";
+import reportRoutes from "./routes/report.routes";
 
 // Jobs
 import { startAuctionJob } from "./jobs/auctionCloser";
 
-//Socket
+// Socket
 import { initSocket } from "./socket";
 
 dotenv.config();
@@ -41,7 +42,7 @@ const requiredEnv = [
 const missingEnv = requiredEnv.filter((key) => !process.env[key]);
 if (missingEnv.length > 0) {
   console.error(
-    `ERROR: Missing environment variables: ${missingEnv.join(", ")}`
+    `ERROR: Missing environment variables: ${missingEnv.join(", ")}`,
   );
   process.exit(1);
 }
@@ -51,14 +52,21 @@ console.log("All required environment variables are set.");
 const app = express();
 const port = process.env.PORT || 3001;
 
+const corsOptions = {
+  origin: "http://localhost:3000",
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
+app.use(cors(corsOptions));
+app.use(express.json());
+
 // Create HTTP server
 const server = http.createServer(app);
 
-// Initialize Socket.io
+// Initialize Socket.io (przekazujemy serwer HTTP)
 initSocket(server);
-
-app.use(cors());
-app.use(express.json());
 
 // Global Rate Limit
 app.use("/api/", apiLimiter);
@@ -76,6 +84,7 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/upload", uploadRoutes);
+app.use("/api/reports", reportRoutes);
 
 // Background Jobs
 startAuctionJob();
@@ -86,4 +95,7 @@ app.get("/", (req, res) => {
 
 server.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
+  console.log(
+    `WebSocket server is ready for connections from http://localhost:3000`,
+  );
 });

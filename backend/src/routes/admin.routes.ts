@@ -5,7 +5,7 @@ import {
   changeUserRole,
   getDashboardStats,
   getReports,
-  updateReportStatus,
+  resolveReport,
 } from "../controllers/admin.controller";
 import { authenticateToken, AuthRequest } from "../middleware/auth.middleware";
 
@@ -26,7 +26,7 @@ router.use(authenticateToken, requireAdmin);
 // Dashboard & Reports
 router.get("/stats", getDashboardStats); // GET /api/admin/stats
 router.get("/reports", getReports); // GET /api/admin/reports
-router.patch("/reports/:id", updateReportStatus); // PATCH /api/admin/reports/:id
+router.patch("/reports/:id/resolve", resolveReport); // PATCH /api/admin/reports/:id/resolve
 
 // User Management
 router.get("/users", getAllUsers); // GET /api/admin/users
