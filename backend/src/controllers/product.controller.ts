@@ -231,8 +231,7 @@ export const getProductById = async (req: Request, res: Response) => {
       ...product,
       seller: {
         id: product.seller.id,
-        firstName: product.seller.firstName,
-        lastName: product.seller.lastName,
+        name: `${product.seller.firstName} ${product.seller.lastName}`,
         avatarUrl: product.seller.avatarUrl,
         rating: calculateSellerRating(product.seller),
         reviewsCount: product.seller.reviewsReceived.length,
