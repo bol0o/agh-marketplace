@@ -9,8 +9,19 @@ import styles from './AdminDashboard.module.scss';
 
 type Tab = 'overview' | 'users' | 'reports';
 
+// --- TYPY POMOCNICZE DLA API ---
+interface APIReport extends Omit<Report, 'reporter'> {
+	reporter: {
+		id: string;
+		email: string;
+		firstName?: string;
+		lastName?: string;
+		name?: string;
+	};
+}
+
 const AdminDashboard = () => {
-	const [activeTab, setActiveTab] = useState<Tab>('reports'); // Domyślnie raporty
+	const [activeTab, setActiveTab] = useState<Tab>('reports');
 	const { addToast } = useUIStore();
 
 	// Data State
@@ -29,8 +40,8 @@ const AdminDashboard = () => {
 
 			const [statsRes, reportsRes, usersRes] = await Promise.all([
 				axios.get<DashboardStats>('/admin/stats'),
-				axios.get<any[]>('/admin/reports'),
-				axios.get<{ data: User[] }>('/admin/users?limit=50'), // Limit dla demo
+				axios.get<APIReport[]>('/admin/reports'),
+				axios.get<{ data: User[] }>('/admin/users?limit=50'),
 			]);
 
 			setStats(statsRes.data);
@@ -38,17 +49,19 @@ const AdminDashboard = () => {
 			const formattedReports: Report[] = reportsRes.data.map((report) => ({
 				...report,
 				reporter: {
-					id: report.reporter?.id,
-					name: report.reporter?.firstName
-						? `${report.reporter.firstName} ${report.reporter.lastName}`
-						: 'Anonim',
-					email: report.reporter?.email || '',
+					id: report.reporter.id,
+					email: report.reporter.email,
+					name:
+						report.reporter.firstName && report.reporter.lastName
+							? `${report.reporter.firstName} ${report.reporter.lastName}`
+							: report.reporter.name || 'Użytkownik',
 				},
-				targetId: report.targetId,
-				targetType: report.targetType,
+				status: (['open', 'in_progress', 'closed'].includes(report.status)
+					? report.status
+					: 'open') as Report['status'],
 			}));
-			setReports(formattedReports);
 
+			setReports(formattedReports);
 			setUsers(usersRes.data.data);
 		} catch (err) {
 			console.error('Admin fetch error:', err);
@@ -56,11 +69,11 @@ const AdminDashboard = () => {
 		} finally {
 			setLoading(false);
 		}
-	}, [refreshTrigger, addToast]);
+	}, [addToast]);
 
 	useEffect(() => {
 		fetchAllData();
-	}, [fetchAllData]);
+	}, [fetchAllData, refreshTrigger]);
 
 	// 2. Actions
 	const handleResolveReport = async (reportId: string, action: 'ban' | 'dismiss') => {
@@ -72,8 +85,10 @@ const AdminDashboard = () => {
 				'success'
 			);
 			setRefreshTrigger((prev) => prev + 1);
-		} catch (err: any) {
-			addToast(err.response?.data?.error || 'Błąd akcji', 'error');
+		} catch (err) {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			const error = err as any;
+			addToast(error.response?.data?.error || 'Błąd akcji', 'error');
 		}
 	};
 
@@ -85,7 +100,7 @@ const AdminDashboard = () => {
 			setUsers((prev) =>
 				prev.map((u) => (u.id === userId ? { ...u, isActive: !u.isActive } : u))
 			);
-		} catch (err) {
+		} catch {
 			addToast('Błąd zmiany statusu', 'error');
 		}
 	};

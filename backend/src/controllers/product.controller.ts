@@ -178,10 +178,9 @@ export const getProducts = async (req: AuthRequest, res: Response) => {
       ...product,
       seller: {
         id: product.seller.id,
-        firstName: product.seller.firstName,
-        lastName: product.seller.lastName,
+        name: `${product.seller.firstName} ${product.seller.lastName}`,
         avatarUrl: product.seller.avatarUrl,
-        rating: calculateSellerRating(product.seller), // Wyliczamy średnią
+        rating: calculateSellerRating(product.seller),
         reviewsCount: product.seller.reviewsReceived.length,
       },
     }));

@@ -4,7 +4,7 @@ import axios from '@/lib/axios';
 import { useAuth } from '@/store/useAuth';
 import { Message, ChatListItem } from '@/types/chat';
 
-const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL!;
+const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3001';
 
 interface NewMessagePayload {
 	chatId: string;
@@ -21,12 +21,14 @@ export const useChat = (activeChatId?: string) => {
 	const [chats, setChats] = useState<ChatListItem[]>([]);
 
 	const activeChatIdRef = useRef(activeChatId);
+
 	useEffect(() => {
 		activeChatIdRef.current = activeChatId;
 	}, [activeChatId]);
 
 	const fetchChats = useCallback(async () => {
 		try {
+			// ZMIANA: Powrót do /chat
 			const { data } = await axios.get('/chat');
 			setChats(data);
 		} catch (err) {
@@ -36,6 +38,7 @@ export const useChat = (activeChatId?: string) => {
 
 	const fetchMessages = useCallback(async (id: string) => {
 		try {
+			// ZMIANA: Powrót do /chat
 			const { data } = await axios.get(`/chat/${id}/messages`);
 			setMessages(data);
 		} catch (err) {
@@ -45,6 +48,7 @@ export const useChat = (activeChatId?: string) => {
 
 	useEffect(() => {
 		if (user) {
+			// eslint-disable-next-line @typescript-eslint/no-floating-promises
 			fetchChats();
 		}
 	}, [user, fetchChats]);
@@ -53,11 +57,13 @@ export const useChat = (activeChatId?: string) => {
 		if (!user) return;
 
 		const newSocket = io(SOCKET_URL, {
-			transports: ['websocket'],
-			path: '/socket.io',
-			autoConnect: true,
+			path: '/socket.io/',
+			withCredentials: true,
+			transports: ['polling', 'websocket'],
+			reconnectionAttempts: 5,
 		});
 
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 		setSocket(newSocket);
 
 		newSocket.on('connect', () => {
@@ -77,14 +83,17 @@ export const useChat = (activeChatId?: string) => {
 					},
 				]);
 			}
-
-			axios.get('/chat').then((res) => setChats(res.data));
+			// eslint-disable-next-line @typescript-eslint/no-floating-promises
+			axios
+				.get('/chat')
+				.then((res) => setChats(res.data))
+				.catch(console.error);
 		});
 
 		return () => {
-			newSocket.off('new_message');
-			newSocket.close();
+			newSocket.disconnect();
 		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [user]);
 
 	const sendMessage = async (id: string, text: string) => {
@@ -92,7 +101,7 @@ export const useChat = (activeChatId?: string) => {
 		try {
 			const { data } = await axios.post(`/chat/${id}/messages`, { text });
 			setMessages((prev) => [...prev, data]);
-			fetchChats();
+			await fetchChats();
 		} catch (err) {
 			console.error('Błąd wysyłania', err);
 		}
