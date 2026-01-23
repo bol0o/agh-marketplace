@@ -256,8 +256,13 @@ export const getOrderById = async (req: AuthRequest, res: Response) => {
     if (!order)
       return res.status(404).json({ error: "Zamówienie nie istnieje" });
 
-    // Security: Only buyer or admin can access details
-    if (order.userId !== userId && req.user?.role !== "ADMIN") {
+    const isBuyer = order.userId === userId;
+    const isAdmin = req.user?.role === "ADMIN";
+    const isSeller = order.items.some(
+      (item) => item.product.sellerId === userId,
+    );
+
+    if (!isBuyer && !isAdmin && !isSeller) {
       return res.status(403).json({ error: "Brak dostępu do tego zamówienia" });
     }
 
