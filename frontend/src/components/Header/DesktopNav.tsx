@@ -48,7 +48,7 @@ export function DesktopNav({ pathname }: DesktopNavProps) {
 				</Link>
 
 				<IconButton
-					href="/chats"
+					href="/messages"
 					icon={<MessageSquare size={20} />}
 					isActive={isActive('/chats')}
 					badge={MESSAGE_COUNT}

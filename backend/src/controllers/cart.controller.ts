@@ -126,11 +126,9 @@ export const addToCart = async (req: AuthRequest, res: Response) => {
     if (existingItem) {
       // Check if total quantity (existing + new) exceeds stock
       if (existingItem.quantity + quantity > product.stock) {
-        return res
-          .status(400)
-          .json({
-            error: "Nie można dodać więcej tego produktu (limit magazynowy)",
-          });
+        return res.status(400).json({
+          error: "Nie można dodać więcej tego produktu (limit magazynowy)",
+        });
       }
 
       // Update quantity
@@ -214,5 +212,33 @@ export const removeFromCart = async (req: AuthRequest, res: Response) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Nie udało się usunąć produktu" });
+  }
+};
+
+// DELETE /api/cart
+export const clearCart = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      return res.status(401).json({ error: "Brak autoryzacji" });
+    }
+
+    const cart = await prisma.cart.findUnique({
+      where: { userId },
+    });
+
+    if (!cart) {
+      return res.json({ items: [] });
+    }
+
+    await prisma.cartItem.deleteMany({
+      where: { cartId: cart.id },
+    });
+
+    res.json({ items: [] });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Nie udało się wyczyścić koszyka" });
   }
 };

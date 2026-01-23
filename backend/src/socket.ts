@@ -6,9 +6,12 @@ export let io: Server;
 export const initSocket = (httpServer: HttpServer) => {
   io = new Server(httpServer, {
     cors: {
-      origin: "*",
+      origin: "http://localhost:3000",
       methods: ["GET", "POST"],
+      credentials: true,
     },
+    allowEIO3: true,
+    transports: ["polling", "websocket"],
   });
 
   io.on("connection", (socket) => {

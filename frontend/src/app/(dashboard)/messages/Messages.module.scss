@@ -1,0 +1,246 @@
+@import '@/styles/variables';
+@import '@/styles/mixins';
+
+.container {
+	height: calc(100vh - 80px);
+	background-color: $color-bg;
+	padding: $spacing-md;
+	display: flex;
+	justify-content: center;
+
+	@include md {
+		padding: $spacing-xl;
+	}
+}
+
+.wrapper {
+	width: 100%;
+	max-width: 1200px;
+	background: $color-white;
+	border-radius: $radius-lg;
+	box-shadow: $shadow-md;
+	display: flex;
+	overflow: hidden;
+	border: 1px solid $color-border;
+}
+
+// --- SIDEBAR ---
+.sidebar {
+	width: 80px;
+	border-right: 1px solid $color-border;
+	display: flex;
+	flex-direction: column;
+	background-color: $color-white;
+
+	@include md {
+		width: 350px;
+	}
+}
+
+.sidebarTitle {
+	padding: $spacing-lg;
+	font-size: 18px;
+	font-weight: 700;
+	color: $color-dark;
+	border-bottom: 1px solid $color-border;
+	display: none;
+
+	@include md {
+		display: block;
+	}
+}
+
+.chatList {
+	flex: 1;
+	overflow-y: auto;
+}
+
+.chatItem {
+	padding: $spacing-md;
+	display: flex;
+	align-items: center;
+	gap: $spacing-md;
+	cursor: pointer;
+	transition: background 0.2s;
+	border-bottom: 1px solid rgba($color-border, 0.5);
+
+	&:hover {
+		background-color: rgba($color-bg, 0.8);
+	}
+
+	&.active {
+		background-color: rgba($color-primary, 0.05);
+		border-left: 4px solid $color-primary;
+	}
+}
+
+.avatar {
+	@include size(48px);
+	background: $color-bg-alt;
+	border-radius: $radius-circle;
+	@include flex-center;
+	color: $color-text-light;
+	flex-shrink: 0;
+	overflow: hidden;
+
+	img {
+		@include size(100%);
+		object-fit: cover;
+	}
+}
+
+.info {
+	flex: 1;
+	display: none;
+	min-width: 0;
+
+	@include md {
+		display: block;
+	}
+}
+
+.infoTop {
+	@include flex-between;
+	margin-bottom: 2px;
+}
+
+.name {
+	font-weight: 600;
+	color: $color-dark;
+	font-size: 15px;
+}
+
+.badge {
+	background-color: $color-primary;
+	color: $color-white;
+	font-size: 11px;
+	padding: 2px 6px;
+	border-radius: 10px;
+	font-weight: 700;
+}
+
+.productTitle {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	font-size: 12px;
+	color: $color-primary;
+	font-weight: 500;
+	margin-bottom: 4px;
+}
+
+.lastMsg {
+	font-size: 13px;
+	color: $color-text-light;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.chatWindow {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	background-color: $color-white;
+}
+
+.messagesArea {
+	flex: 1;
+	padding: $spacing-lg;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+	gap: $spacing-md;
+	background-image: radial-gradient($color-border 0.5px, transparent 0.5px);
+	background-size: 20px 20px;
+}
+
+.msgLeft,
+.msgRight {
+	display: flex;
+	max-width: 80%;
+}
+
+.msgLeft {
+	align-self: flex-start;
+	.bubble {
+		background-color: $color-bg-alt;
+		color: $color-dark;
+		border-bottom-left-radius: 4px;
+	}
+}
+
+.msgRight {
+	align-self: flex-end;
+	.bubble {
+		background-color: $color-primary;
+		color: $color-white;
+		border-bottom-right-radius: 4px;
+	}
+}
+
+.bubble {
+	padding: $spacing-sm $spacing-md;
+	border-radius: $radius-md;
+	font-size: 15px;
+	line-height: 1.5;
+	box-shadow: $shadow-sm;
+}
+
+// --- INPUT AREA ---
+.inputArea {
+	padding: $spacing-lg;
+	border-top: 1px solid $color-border;
+	display: flex;
+	gap: $spacing-md;
+	align-items: center;
+
+	input {
+		flex: 1;
+		padding: $spacing-md;
+		border: 1px solid $color-border;
+		border-radius: $radius-md;
+		outline: none;
+		transition: border-color 0.2s;
+
+		&:focus {
+			border-color: $color-primary;
+		}
+	}
+}
+
+.sendBtn {
+	@include size(42px);
+	background-color: $color-primary;
+	color: $color-white;
+	border: none;
+	border-radius: $radius-md;
+	@include flex-center;
+	cursor: pointer;
+	transition:
+		transform 0.2s,
+		background 0.2s;
+
+	&:hover {
+		background-color: $color-primary-hover;
+		transform: scale(1.05);
+	}
+
+	&:active {
+		transform: scale(0.95);
+	}
+}
+
+.empty {
+	@include flex-center;
+	flex-direction: column;
+	height: 100%;
+	color: $color-text-light;
+	text-align: center;
+	padding: $spacing-2xl;
+
+	p {
+		font-size: 16px;
+		margin-top: $spacing-md;
+	}
+}

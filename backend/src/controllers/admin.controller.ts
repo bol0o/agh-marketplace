@@ -51,21 +51,46 @@ export const getReports = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// PATCH /api/admin/reports/:id (Update Status)
-export const updateReportStatus = async (req: AuthRequest, res: Response) => {
+// PATCH /api/admin/reports/:id/resolve
+export const resolveReport = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const { status } = req.body; // 'resolved' | 'dismissed' | 'investigating'
+    const { action } = req.body; // Frontend wyśle: 'ban' lub 'dismiss'
 
-    const report = await prisma.report.update({
-      where: { id },
-      data: { status },
+    const report = await prisma.report.findUnique({ where: { id } });
+    if (!report) {
+      return res.status(404).json({ error: "Zgłoszenie nie istnieje" });
+    }
+
+    await prisma.$transaction(async (tx) => {
+      const newStatus = action === "ban" ? "resolved" : "dismissed";
+
+      await tx.report.update({
+        where: { id },
+        data: { status: newStatus },
+      });
+
+      if (action === "ban" && report.targetType === "user") {
+        await tx.user.update({
+          where: { id: report.targetId },
+          data: { isActive: false },
+        });
+      }
+
+      if (action === "ban" && report.targetType === "product") {
+        await tx.product.update({
+          where: { id: report.targetId },
+          data: { status: "archived" },
+        });
+      }
     });
 
-    res.json(report);
+    res.json({
+      message: `Zgłoszenie rozpatrzone: ${action === "ban" ? "Zablokowano obiekt" : "Odrzucono zgłoszenie"}`,
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Błąd aktualizacji zgłoszenia" });
+    res.status(500).json({ error: "Błąd podczas rozpatrywania zgłoszenia" });
   }
 };
 
@@ -74,7 +99,7 @@ export const getAllUsers = async (req: AuthRequest, res: Response) => {
   try {
     // 1. Pagination Params
     const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 20; // Admin sees more rows
+    const limit = parseInt(req.query.limit as string) || 20;
     const skip = (page - 1) * limit;
 
     // 2. Database Transaction: Fetch Users + Count Total

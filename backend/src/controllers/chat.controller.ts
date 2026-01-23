@@ -15,7 +15,7 @@ const mapChat = (chat: any, currentUserId: string) => {
 
   // Count unread messages (sent by the OTHER user)
   const unreadCount = chat.messages.filter(
-    (m: any) => m.senderId !== currentUserId && !m.isRead
+    (m: any) => m.senderId !== currentUserId && !m.isRead,
   ).length;
 
   // Get last message text
@@ -83,12 +83,11 @@ export const getChats = async (req: AuthRequest, res: Response) => {
 // POST /api/chats (Start new conversation)
 export const createChat = async (req: AuthRequest, res: Response) => {
   try {
-    const userId = req.user?.userId; // This is the Buyer
+    const userId = req.user?.userId;
     const { productId, initialMessage } = req.body;
 
     if (!userId) return res.status(401).json({ error: "Brak autoryzacji" });
 
-    // Check if chat already exists
     let chat = await prisma.chat.findUnique({
       where: {
         productId_buyerId: {
@@ -99,12 +98,11 @@ export const createChat = async (req: AuthRequest, res: Response) => {
       include: { product: true },
     });
 
-    // If not, create it
     if (!chat) {
-      // Validation: Cannot buy own product
       const product = await prisma.product.findUnique({
         where: { id: productId },
       });
+
       if (product?.sellerId === userId) {
         return res.status(400).json({ error: "Nie możesz pisać do siebie" });
       }
@@ -116,35 +114,33 @@ export const createChat = async (req: AuthRequest, res: Response) => {
         },
         include: { product: true },
       });
+
+      if (initialMessage) {
+        await prisma.message.create({
+          data: {
+            chatId: chat.id,
+            senderId: userId,
+            text: initialMessage,
+          },
+        });
+
+        const sender = await prisma.user.findUnique({ where: { id: userId } });
+
+        await prisma.notification.create({
+          data: {
+            userId: chat.product.sellerId,
+            type: NotificationType.MESSAGE,
+            title: `Nowe zapytanie: ${chat.product.title}`,
+            message: `${
+              sender?.firstName || "Kupujący"
+            }: ${initialMessage.substring(0, 50)}...`,
+            link: `/messages/${chat.id}`,
+            isRead: false,
+          },
+        });
+      }
     }
-
-    // If initial message provided, save it
-    if (initialMessage) {
-      await prisma.message.create({
-        data: {
-          chatId: chat.id,
-          senderId: userId,
-          text: initialMessage,
-        },
-      });
-
-      const sender = await prisma.user.findUnique({ where: { id: userId } });
-
-      await prisma.notification.create({
-        data: {
-          userId: chat.product.sellerId, // Notify the Seller
-          type: NotificationType.MESSAGE, // ENUM
-          title: `Nowe zapytanie: ${chat.product.title}`,
-          message: `${
-            sender?.firstName || "Kupujący"
-          }: ${initialMessage.substring(0, 50)}...`,
-          link: `/messages/${chat.id}`,
-          isRead: false,
-        },
-      });
-    }
-
-    res.status(201).json({ id: chat.id, message: "Rozmowa rozpoczęta" });
+    res.status(201).json({ id: chat.id, message: "Rozmowa gotowa" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Błąd tworzenia czatu" });
@@ -227,6 +223,7 @@ export const sendMessage = async (req: AuthRequest, res: Response) => {
       io.to(recipientId).emit("new_message", {
         chatId: chat.id,
         text: message.text,
+        senderId: userId,
         senderName: "Użytkownik", // Can fetch real name if needed
         productTitle: chat.product.title,
       });
@@ -243,7 +240,7 @@ export const sendMessage = async (req: AuthRequest, res: Response) => {
         title: `Nowa wiadomość: ${chat.product.title}`,
         message: `${sender?.firstName || "Użytkownik"}: ${text.substring(
           0,
-          50
+          50,
         )}${text.length > 50 ? "..." : ""}`,
         link: `/messages/${chat.id}`,
         isRead: false,

@@ -25,21 +25,18 @@ const generateAuthResponse = (
   user: any,
   accessToken: string,
   refreshToken: string,
+  soldCount: number = 0,
 ) => {
   return {
-    token: accessToken, // Frontend expects 'token'
+    token: accessToken,
     refreshToken,
     user: {
       id: user.id,
       email: user.email,
-      // Map: Combine first and last name into 'name'
       name: `${user.firstName} ${user.lastName}`,
-      // Map: avatarUrl -> avatar
       avatar: user.avatarUrl,
-      // Map: STUDENT -> student (lowercase)
       role: user.role.toLowerCase(),
 
-      // ADDED: Address fields for pre-filling orders/profile
       address: {
         street: user.street || null,
         city: user.city || null,
@@ -57,7 +54,7 @@ const generateAuthResponse = (
       ratingCount: 0,
       joinedAt: user.createdAt,
       listedProductsCount: 0,
-      soldItemsCount: 0,
+      soldItemsCount: soldCount,
     },
   };
 };
@@ -97,7 +94,7 @@ export const register = async (req: Request, res: Response) => {
       },
     });
 
-    //Auto-login after register (generate tokens immediately)
+    //Auto-login after register
     const accessToken = jwt.sign(
       { userId: user.id, role: user.role },
       JWT_SECRET,
@@ -150,6 +147,13 @@ export const login = async (req: Request, res: Response) => {
       return res.status(400).json({ error: "Nieprawidłowy email lub hasło" });
     }
 
+    const soldCount = await prisma.orderItem.count({
+      where: {
+        product: { sellerId: user.id },
+        order: { status: "COMPLETED" },
+      },
+    });
+
     //Generate Access Token (15 min)
     const accessToken = jwt.sign(
       { userId: user.id, role: user.role },
@@ -170,7 +174,8 @@ export const login = async (req: Request, res: Response) => {
       data: { refreshToken: refreshToken },
     });
 
-    res.json(generateAuthResponse(user, accessToken, refreshToken));
+    // Pass soldCount to the helper
+    res.json(generateAuthResponse(user, accessToken, refreshToken, soldCount));
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Błąd serwera podczas logowania" });
@@ -180,7 +185,7 @@ export const login = async (req: Request, res: Response) => {
 //REFRESH TOKEN (Get new Access Token)
 export const refreshToken = async (req: Request, res: Response) => {
   try {
-    const { token } = req.body; //Client sends { "token": "REFRESH_TOKEN" }
+    const { token } = req.body;
 
     if (!token) return res.sendStatus(401);
 

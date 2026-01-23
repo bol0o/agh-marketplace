@@ -46,6 +46,15 @@ export const addReview = async (req: AuthRequest, res: Response) => {
         rating: Number(rating),
         comment,
       },
+      include: {
+        reviewer: {
+          select: {
+            firstName: true,
+            lastName: true,
+            avatarUrl: true,
+          },
+        },
+      },
     });
 
     res.status(201).json(review);

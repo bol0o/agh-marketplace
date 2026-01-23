@@ -110,8 +110,38 @@ export default function ProductPage() {
 		router.push(`/marketplace/${id}/edit`);
 	};
 
-	const handleContactSeller = (): void => {
-		console.log('Otwórz chat z sprzedawcą');
+	const handleContactSeller = async (): Promise<void> => {
+		if (!isAuthenticated) {
+			addToast('Musisz być zalogowany, aby napisać do sprzedawcy', 'info');
+			router.push('/login');
+			return;
+		}
+
+		if (isOwner) {
+			addToast('Nie możesz pisać do samego siebie', 'info');
+			return;
+		}
+
+		if (!product) return;
+
+		try {
+			await api.post('/chat', {
+				productId: product.id,
+				initialMessage: `Cześć! Jestem zainteresowany Twoim ogłoszeniem: ${product.title}`,
+			});
+
+			addToast('Rozpoczęto nową rozmowę', 'success');
+			router.push('/messages');
+		} catch (err: unknown) {
+			console.error('Błąd podczas rozpoczynania czatu:', err);
+
+			let message = 'Nie udało się rozpocząć rozmowy';
+			if (isAxiosError(err)) {
+				message = err.response?.data?.error || message;
+			}
+
+			addToast(message, 'error');
+		}
 	};
 
 	const handleBuyNow = async (): Promise<void> => {

@@ -1,0 +1,379 @@
+@import '@/styles/variables';
+@import '@/styles/mixins';
+
+.dashboard {
+	background-color: $color-bg;
+	min-height: 100vh;
+	padding: $spacing-xl;
+	@include md {
+		padding: $spacing-2xl;
+	}
+}
+
+.header {
+	margin-bottom: $spacing-xl;
+	@include md {
+		@include flex-between;
+		align-items: flex-start;
+	}
+}
+
+.title {
+	color: $color-dark;
+	font-size: 24px;
+	font-weight: 700;
+	margin-bottom: $spacing-lg;
+	@include md {
+		margin-bottom: 0;
+		font-size: 32px;
+	}
+}
+
+.stats {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: $spacing-md;
+
+	@include md {
+		display: flex;
+		gap: $spacing-lg;
+	}
+}
+
+.statItem {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: $spacing-md;
+	background: $color-white;
+	border-radius: $radius-md;
+	box-shadow: $shadow-sm;
+	min-width: 140px;
+	transition: transform 0.2s;
+
+	&:hover {
+		transform: translateY(-2px);
+	}
+}
+
+.statNumber {
+	font-size: 24px;
+	font-weight: 700;
+	color: $color-primary;
+	margin-bottom: $spacing-xs;
+}
+
+.statLabel {
+	font-size: 11px;
+	color: $color-text-light;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	text-align: center;
+}
+
+.tabsContainer {
+	display: flex;
+	gap: $spacing-md;
+	margin-bottom: $spacing-lg;
+	border-bottom: 1px solid $color-border;
+}
+
+.tabButton {
+	padding: $spacing-md $spacing-lg;
+	background: none;
+	border: none;
+	border-bottom: 2px solid transparent;
+	color: $color-text-light;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s;
+
+	&:hover {
+		color: $color-primary;
+	}
+
+	&.active {
+		color: $color-primary;
+		border-bottom-color: $color-primary;
+	}
+}
+
+.content {
+	background: $color-white;
+	border-radius: $radius-lg;
+	box-shadow: $shadow-sm;
+	overflow: hidden;
+	min-height: 400px;
+}
+
+.loadingContainer,
+.errorContainer,
+.emptyState {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: $spacing-2xl;
+	min-height: 300px;
+}
+
+.spinner {
+	width: 40px;
+	height: 40px;
+	border: 3px solid $color-border;
+	border-top-color: $color-primary;
+	border-radius: 50%;
+	animation: spin 1s linear infinite;
+}
+@keyframes spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+.errorMessage {
+	color: $color-status-red;
+	font-size: 16px;
+	text-align: center;
+}
+
+.retryButton {
+	background-color: $color-primary;
+	color: $color-white;
+	border: none;
+	border-radius: $radius-md;
+	padding: $spacing-sm $spacing-lg;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background-color 0.2s ease;
+
+	&:hover {
+		background-color: $color-primary-hover;
+	}
+}
+
+.emptyMessage {
+	color: $color-text-light;
+	font-size: 16px;
+	text-align: center;
+}
+
+.tableContainer {
+	overflow-x: auto;
+}
+.table {
+	width: 100%;
+	border-collapse: collapse;
+	min-width: 800px;
+}
+
+.tableHeader {
+	background-color: $color-bg-alt;
+	border-bottom: 1px solid $color-border;
+}
+.tableHeaderCell {
+	padding: $spacing-md $spacing-lg;
+	text-align: left;
+	font-size: 12px;
+	font-weight: 600;
+	color: $color-text-light;
+	text-transform: uppercase;
+
+	&:first-child {
+		padding-left: $spacing-xl;
+	}
+	&:last-child {
+		padding-right: $spacing-xl;
+	}
+}
+
+.tableBody .tableRow,
+.tableRow {
+	border-bottom: 1px solid $color-border;
+	&:last-child {
+		border-bottom: none;
+	}
+	&:hover {
+		background-color: rgba($color-bg, 0.5);
+	}
+}
+
+.tableCell {
+	padding: $spacing-lg;
+	vertical-align: middle;
+
+	&:first-child {
+		padding-left: $spacing-xl;
+	}
+	&:last-child {
+		padding-right: $spacing-xl;
+	}
+}
+
+.reasonCell {
+	display: flex;
+	flex-direction: column;
+	gap: $spacing-xs;
+}
+
+.reasonText {
+	font-weight: 600;
+	color: $color-dark;
+	font-size: 14px;
+}
+
+.detailsText {
+	color: $color-text-light;
+	font-size: 12px;
+	line-height: 1.4;
+}
+
+.dateText {
+	font-size: 14px;
+	color: $color-text;
+}
+
+.reporterInfo {
+	display: flex;
+	flex-direction: column;
+	gap: $spacing-xs;
+}
+
+.reporterName {
+	font-weight: 600;
+	color: $color-dark;
+	font-size: 14px;
+}
+
+.reporterEmail {
+	color: $color-text-light;
+	font-size: 12px;
+}
+
+.statusBadge {
+	display: inline-block;
+	padding: $spacing-xs $spacing-md;
+	border-radius: $radius-sm;
+	font-size: 12px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+$color-status-green-bg: #d1fae5;
+$color-status-blue-bg: #dbeafe;
+$color-status-red-bg: #fee2e2;
+
+.statusOpen {
+	background-color: $color-status-red-bg;
+	color: $color-status-red;
+}
+.statusInProgress {
+	background-color: $color-status-blue-bg;
+	color: #2563eb;
+}
+.statusClosed {
+	background-color: $color-status-green-bg;
+	color: $color-status-green;
+}
+
+.userInfo {
+	display: flex;
+	flex-direction: column;
+}
+.userName {
+	font-weight: 600;
+	color: $color-dark;
+}
+.userEmail {
+	font-size: 12px;
+	color: $color-text-light;
+}
+
+.roleBadge {
+	padding: 2px 8px;
+	border-radius: 4px;
+	font-size: 11px;
+	font-weight: 700;
+	background: $color-bg-alt;
+	color: $color-text;
+
+	&.admin {
+		background: #fee2e2;
+		color: #991b1b;
+	}
+	&.student {
+		background: #dbeafe;
+		color: #1e40af;
+	}
+}
+
+.statusDot {
+	display: inline-block;
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	margin-right: 6px;
+
+	&.active {
+		background-color: green;
+	}
+	&.banned {
+		background-color: #ef4444;
+	}
+}
+
+.actions {
+	display: flex;
+	gap: $spacing-sm;
+}
+
+.actionButton {
+	padding: 6px 12px;
+	border-radius: $radius-sm;
+	font-size: 12px;
+	font-weight: 600;
+	cursor: pointer;
+	border: none;
+	transition: 0.2s;
+
+	&:hover {
+		transform: translateY(-1px);
+	}
+	&:active {
+		transform: translateY(0);
+	}
+
+	// Style dla ReportsTable
+	&.banButton {
+		background-color: $color-status-red;
+		color: $color-white;
+		&:hover {
+			filter: brightness(0.9);
+		}
+	}
+	&.closeButton {
+		background-color: $color-primary;
+		color: $color-white;
+		&:hover {
+			background-color: $color-primary-hover;
+		}
+	}
+
+	// Style dla UsersTable
+	&.ban {
+		background: $color-status-red-bg;
+		color: $color-status-red;
+		&:hover {
+			background: darken($color-status-red-bg, 5%);
+		}
+	}
+	&.unban {
+		background: $color-status-green-bg;
+		color: darken($color-status-green, 10%);
+		&:hover {
+			background: darken($color-status-green-bg, 5%);
+		}
+	}
+}
