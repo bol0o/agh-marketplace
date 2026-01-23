@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowUpDown } from 'lucide-react';
 import styles from './SortingSection.module.scss';
@@ -21,20 +21,17 @@ interface SortingSectionProps {
 }
 
 export default function SortingSection({
-	isMobile = false,
 	immediateUpdate = true,
 	onSortChange,
 }: SortingSectionProps) {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 
-	const [localSort, setLocalSort] = useState<SortOption>(
-		(searchParams.get('sort') as SortOption) || 'newest'
-	);
+	const urlSort = (searchParams.get('sort') as SortOption) || 'newest';
 
-	useEffect(() => {
-		setLocalSort((searchParams.get('sort') as SortOption) || 'newest');
-	}, [searchParams]);
+	const [internalSort, setInternalSort] = useState<SortOption>(urlSort);
+
+	const activeSort = immediateUpdate ? urlSort : internalSort;
 
 	const sortOptions: { value: SortOption; label: string }[] = [
 		{ value: 'newest', label: 'Najnowsze' },
@@ -47,7 +44,7 @@ export default function SortingSection({
 	];
 
 	const handleSortChange = (value: SortOption) => {
-		setLocalSort(value);
+		setInternalSort(value);
 
 		if (onSortChange) {
 			onSortChange(value);
@@ -77,13 +74,14 @@ export default function SortingSection({
 					<button
 						key={option.value}
 						onClick={() => handleSortChange(option.value)}
+						// Używamy activeSort zamiast localSort
 						className={`${styles.sortOption} ${
-							localSort === option.value ? styles.active : ''
+							activeSort === option.value ? styles.active : ''
 						}`}
-						aria-pressed={localSort === option.value}
+						aria-pressed={activeSort === option.value}
 					>
 						<span>{option.label}</span>
-						{localSort === option.value && <div className={styles.activeDot} />}
+						{activeSort === option.value && <div className={styles.activeDot} />}
 					</button>
 				))}
 			</div>

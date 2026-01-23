@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { isAxiosError } from 'axios';
 import { Product, ProductsResponse } from '@/types/marketplace';
 import api from '@/lib/axios';
 
@@ -78,11 +79,18 @@ export const useMarketplaceProducts = (): UseMarketplaceProductsReturn => {
 
 			setProducts(data.products || []);
 			setPagination(data.pagination);
-		} catch (err: any) {
-			const errorMessage =
-				err.response?.data?.error || err.message || 'Nie udało się pobrać produktów';
-			setError(errorMessage);
+		} catch (err: unknown) {
 			console.error('Błąd pobierania produktów:', err);
+
+			let errorMessage = 'Nie udało się pobrać produktów';
+
+			if (isAxiosError(err)) {
+				errorMessage = err.response?.data?.error || err.message || errorMessage;
+			} else if (err instanceof Error) {
+				errorMessage = err.message;
+			}
+
+			setError(errorMessage);
 		} finally {
 			setIsLoading(false);
 		}

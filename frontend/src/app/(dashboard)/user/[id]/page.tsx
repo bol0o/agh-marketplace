@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useParams } from 'next/navigation';
 import { UserProfileHeader } from '@/components/user/UserProfileHeader';
 import { UserStats } from '@/components/user/UserStats';

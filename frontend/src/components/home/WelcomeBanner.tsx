@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { Bell, MessageSquare } from 'lucide-react';
 import { useAuth } from '@/store/useAuth';
 import { useNotifications } from '@/hooks/useNotifications';
@@ -35,7 +36,13 @@ export function WelcomeBanner({ className = '' }: WelcomeBannerProps) {
 					<div className={styles.avatarSection}>
 						<div className={styles.avatar}>
 							{user.avatar ? (
-								<img src={user.avatar} alt={user.name} />
+								<Image
+									src={user.avatar}
+									alt={user.name}
+									fill
+									sizes="64px"
+									style={{ objectFit: 'cover' }}
+								/>
 							) : (
 								<span>{user.name.charAt(0)}</span>
 							)}

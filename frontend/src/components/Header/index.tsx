@@ -71,11 +71,7 @@ export function Header() {
 								<ShoppingCart size={22} />
 							</Link>
 
-							<Link
-								href="/profile"
-								className={styles.mobileAvatar}
-								aria-label="Profil"
-							>
+							<Link href="/user" className={styles.mobileAvatar} aria-label="Profil">
 								<div>
 									<User size={18} />
 								</div>

@@ -24,17 +24,24 @@ export function AddressForm({ user, onSubmit, isSubmitting }: AddressFormProps) 
 	const [errors, setErrors] = useState<Record<string, string>>({});
 
 	useEffect(() => {
-		if (user.address) {
-			setFormData({
-				street: user.address.street || '',
-				buildingNumber: user.address.buildingNumber || '',
-				apartmentNumber: user.address.apartmentNumber || '',
-				city: user.address.city || '',
-				zipCode: user.address.zipCode || '',
-				phone: user.address.phone || '',
-			});
-		}
-	}, [user.address]);
+		const incomingData = {
+			street: user.address?.street || '',
+			buildingNumber: user.address?.buildingNumber || '',
+			apartmentNumber: user.address?.apartmentNumber || '',
+			city: user.address?.city || '',
+			zipCode: user.address?.zipCode || '',
+			phone: user.address?.phone || '',
+		};
+
+		setFormData((prev) => {
+			if (JSON.stringify(prev) === JSON.stringify(incomingData)) {
+				return prev;
+			}
+			return incomingData;
+		});
+
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [JSON.stringify(user.address)]);
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target;
@@ -50,7 +57,7 @@ export function AddressForm({ user, onSubmit, isSubmitting }: AddressFormProps) 
 
 		if (value.length > 0) {
 			if (value.length <= 3) {
-				value = value;
+				// value = value;
 			} else if (value.length <= 6) {
 				value = `${value.slice(0, 3)} ${value.slice(3)}`;
 			} else if (value.length <= 9) {

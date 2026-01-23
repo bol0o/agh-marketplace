@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { isAxiosError } from 'axios';
 import { Product } from '@/types/marketplace';
 import api from '@/lib/axios';
 
@@ -12,8 +13,14 @@ export const useProduct = (id: string) => {
 			setLoading(true);
 			const response = await api.get(`/products/${id}`);
 			setProduct(response.data);
-		} catch (err: any) {
-			setError(err.response?.data?.error || 'Nie udało się pobrać produktu');
+		} catch (err: unknown) {
+			let message = 'Nie udało się pobrać produktu';
+
+			if (isAxiosError(err)) {
+				message = err.response?.data?.error || message;
+			}
+
+			setError(message);
 		} finally {
 			setLoading(false);
 		}
@@ -26,8 +33,14 @@ export const useProduct = (id: string) => {
 				const response = await api.patch(`/products/${id}`, data);
 				setProduct(response.data);
 				return response.data;
-			} catch (err: any) {
-				setError(err.response?.data?.error || 'Nie udało się zaktualizować produktu');
+			} catch (err: unknown) {
+				let message = 'Nie udało się zaktualizować produktu';
+
+				if (isAxiosError(err)) {
+					message = err.response?.data?.error || message;
+				}
+
+				setError(message);
 				throw err;
 			} finally {
 				setLoading(false);
@@ -39,8 +52,14 @@ export const useProduct = (id: string) => {
 	const deleteProduct = useCallback(async () => {
 		try {
 			await api.delete(`/products/${id}`);
-		} catch (err: any) {
-			setError(err.response?.data?.error || 'Nie udało się usunąć produktu');
+		} catch (err: unknown) {
+			let message = 'Nie udało się usunąć produktu';
+
+			if (isAxiosError(err)) {
+				message = err.response?.data?.error || message;
+			}
+
+			setError(message);
 			throw err;
 		}
 	}, [id]);

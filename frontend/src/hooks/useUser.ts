@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { isAxiosError } from 'axios';
 import api from '@/lib/axios';
 import { User, Review } from '@/types/user';
 import { CreateReviewData } from '@/types/user';
@@ -14,11 +15,7 @@ export const useUser = ({ userId }: UseUserProps = {}) => {
 	const [error, setError] = useState<string | null>(null);
 	const [deletingReviewId, setDeletingReviewId] = useState<string | null>(null);
 
-	useEffect(() => {
-		fetchUserData();
-	}, [userId]);
-
-	const fetchUserData = async () => {
+	const fetchUserData = useCallback(async () => {
 		try {
 			setLoading(true);
 			setError(null);
@@ -37,7 +34,7 @@ export const useUser = ({ userId }: UseUserProps = {}) => {
 
 			const reviewsResponse = await api.get(`/reviews/${userData.id}`);
 			setReviews(reviewsResponse.data || []);
-		} catch (err: any) {
+		} catch (err: unknown) {
 			console.error('Error fetching user data:', err);
 			setError('Nie udało się pobrać danych użytkownika');
 			setUser(null);
@@ -45,7 +42,11 @@ export const useUser = ({ userId }: UseUserProps = {}) => {
 		} finally {
 			setLoading(false);
 		}
-	};
+	}, [userId]);
+
+	useEffect(() => {
+		fetchUserData();
+	}, [fetchUserData]);
 
 	const createReview = async (reviewData: Omit<CreateReviewData, 'revieweeId'>) => {
 		if (!user) throw new Error('No user selected');
@@ -75,7 +76,7 @@ export const useUser = ({ userId }: UseUserProps = {}) => {
 			}
 
 			return response.data;
-		} catch (err: any) {
+		} catch (err: unknown) {
 			console.error('Error creating review:', err);
 			throw err;
 		}
@@ -121,11 +122,17 @@ export const useUser = ({ userId }: UseUserProps = {}) => {
 			}
 
 			return true;
-		} catch (err: any) {
+		} catch (err: unknown) {
 			console.error('Error deleting review:', err);
 
-			const errorMessage =
-				err.response?.data?.message || err.message || 'Nie udało się usunąć opinii';
+			let errorMessage = 'Nie udało się usunąć opinii';
+
+			if (isAxiosError(err)) {
+				errorMessage = err.response?.data?.message || errorMessage;
+			} else if (err instanceof Error) {
+				errorMessage = err.message;
+			}
+
 			throw new Error(errorMessage);
 		} finally {
 			setDeletingReviewId(null);

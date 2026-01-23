@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image'; // 1. Import komponentu Image
 import { Gavel, User, TrendingUp, AlertCircle } from 'lucide-react';
 import { Bid } from '@/types/marketplace';
 import api from '@/lib/axios';
@@ -17,24 +18,26 @@ export function BidHistory({ productId, currentPrice }: BidHistoryProps) {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
-	useEffect(() => {
-		fetchBids();
-	}, [productId]);
-
-	const fetchBids = async (): Promise<void> => {
+	// 2. Używamy useCallback dla fetchBids
+	const fetchBids = useCallback(async (): Promise<void> => {
 		try {
 			setLoading(true);
 			const response = await api.get<Bid[]>(`/bids/product/${productId}`);
 
 			const sortedBids = response.data.sort((a, b) => b.amount - a.amount);
 			setBids(sortedBids);
-		} catch (err: any) {
+		} catch (err: unknown) {
+			// 3. Zmiana any na unknown
 			setError('Nie udało się pobrać historii ofert');
 			console.error('Błąd pobierania ofert:', err);
 		} finally {
 			setLoading(false);
 		}
-	};
+	}, [productId]);
+
+	useEffect(() => {
+		fetchBids();
+	}, [fetchBids]);
 
 	const formatDate = (dateString: string): string => {
 		const date = new Date(dateString);
@@ -95,7 +98,13 @@ export function BidHistory({ productId, currentPrice }: BidHistoryProps) {
 						<div className={styles.bidderInfo}>
 							<div className={styles.bidderAvatar}>
 								{bid.user.avatarUrl ? (
-									<img src={bid.user.avatarUrl} alt={getUserFullName(bid.user)} />
+									<Image
+										src={bid.user.avatarUrl}
+										alt={getUserFullName(bid.user)}
+										width={32}
+										height={32}
+										className={styles.avatarImage}
+									/>
 								) : (
 									<User size={16} />
 								)}

@@ -1,5 +1,3 @@
-import { OrderAddress } from './order';
-
 export interface User {
 	id: string;
 	email: string;

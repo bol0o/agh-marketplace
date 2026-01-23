@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { isAxiosError } from 'axios';
 import { Order } from '@/types/order';
 import api from '@/lib/axios';
 import { useUIStore } from '@/store/uiStore';
@@ -10,26 +11,34 @@ export const useOrders = () => {
 
 	const addToast = useUIStore((state) => state.addToast);
 
-	useEffect(() => {
-		fetchOrders();
-	}, []);
-
-	const fetchOrders = async () => {
+	const fetchOrders = useCallback(async () => {
 		try {
 			setLoading(true);
 			setError(null);
 
 			const response = await api.get<Order[]>('/orders');
 			setOrders(response.data);
-		} catch (err: any) {
+		} catch (err: unknown) {
 			console.error('Error fetching orders:', err);
-			const message = err.response?.data?.message || 'Nie udało się pobrać zamówień';
+
+			let message = 'Nie udało się pobrać zamówień';
+
+			if (isAxiosError(err)) {
+				message = err.response?.data?.message || message;
+			} else if (err instanceof Error) {
+				message = err.message;
+			}
+
 			setError(message);
 			addToast(message, 'error');
 		} finally {
 			setLoading(false);
 		}
-	};
+	}, [addToast]);
+
+	useEffect(() => {
+		fetchOrders();
+	}, [fetchOrders]);
 
 	const cancelOrder = async (orderId: string) => {
 		try {
@@ -43,9 +52,15 @@ export const useOrders = () => {
 			);
 
 			addToast('Zamówienie zostało anulowane', 'success');
-		} catch (err: any) {
+		} catch (err: unknown) {
 			console.error('Error cancelling order:', err);
-			const message = err.response?.data?.message || 'Nie udało się anulować zamówienia';
+
+			let message = 'Nie udało się anulować zamówienia';
+
+			if (isAxiosError(err)) {
+				message = err.response?.data?.message || message;
+			}
+
 			addToast(message, 'error');
 			throw err;
 		} finally {

@@ -20,10 +20,11 @@ export function proxy(request: NextRequest) {
 	}
 
 	const isProtectedRoute =
-		pathname.startsWith('/marketplace') ||
 		pathname.startsWith('/home') ||
-		pathname.startsWith('/profile') ||
-		pathname.startsWith('/dashboard');
+		pathname.startsWith('/marketplace') ||
+		pathname.startsWith('/user') ||
+		pathname.startsWith('/notifications') ||
+		pathname.startsWith('/orders');
 
 	if (isProtectedRoute && !accessToken) {
 		const loginUrl = new URL('/login', request.url);

@@ -1,9 +1,9 @@
 'use client';
 
+import Image from 'next/image';
 import { User } from '@/types/user';
 import { Mail, Calendar, Star, GraduationCap } from 'lucide-react';
 import styles from './UserProfileHeader.module.scss';
-import { useEffect } from 'react';
 
 interface UserProfileHeaderProps {
 	user: User;
@@ -23,7 +23,13 @@ export function UserProfileHeader({ user, isCurrentUser = false }: UserProfileHe
 			<div className={styles.avatarSection}>
 				<div className={styles.avatar}>
 					{user.avatar ? (
-						<img src={user.avatar} alt={user.name} />
+						<Image
+							src={user.avatar}
+							alt={user.name}
+							fill
+							sizes="(max-width: 768px) 100px, 150px"
+							className={styles.avatarImg}
+						/>
 					) : (
 						<span className={styles.avatarFallback}>{user.name.charAt(0)}</span>
 					)}

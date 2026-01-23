@@ -1,10 +1,11 @@
 'use client';
 
-import { Swiper, SwiperSlide } from 'swiper/react';
+import { Swiper, SwiperSlide, SwiperRef } from 'swiper/react';
 import { Navigation, Autoplay } from 'swiper/modules';
+import { Swiper as SwiperType } from 'swiper/types';
 import 'swiper/css';
 import 'swiper/css/navigation';
-import { Loader, AlertCircle, ChevronLeft, ChevronRight, LucideIcon } from 'lucide-react';
+import { AlertCircle, ChevronLeft, ChevronRight, LucideIcon } from 'lucide-react';
 import { useRef, ReactNode, useState, useEffect } from 'react';
 import styles from './GenericSwiper.module.scss';
 import { PageLoading } from '../shared/PageLoading';
@@ -52,15 +53,17 @@ export function GenericSwiper<T>({
 }: GenericSwiperProps<T>) {
 	const prevRef = useRef<HTMLButtonElement>(null);
 	const nextRef = useRef<HTMLButtonElement>(null);
-	const swiperRef = useRef<any>(null);
+	const swiperRef = useRef<SwiperRef>(null);
 
 	const [activeIndex, setActiveIndex] = useState(0);
 	const [isBeginning, setIsBeginning] = useState(true);
 	const [isEnd, setIsEnd] = useState(false);
-	const [currentSlidesPerView, setCurrentSlidesPerView] = useState(slidesPerView);
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const [currentSlidesPerView, setCurrentSlidesPerView] = useState<number | any>(slidesPerView);
 
 	const calculatePaginationCount = () => {
-		if (!items.length || !currentSlidesPerView) return 0;
+		if (!items.length || !currentSlidesPerView || typeof currentSlidesPerView !== 'number')
+			return 0;
 		return Math.ceil(items.length / currentSlidesPerView);
 	};
 
@@ -71,7 +74,6 @@ export function GenericSwiper<T>({
 		const updateSlidesPerView = () => {
 			if (!swiperRef.current?.swiper) return;
 
-			const swiper = swiperRef.current.swiper;
 			const width = window.innerWidth;
 
 			let newSlidesPerView = slidesPerView;
@@ -97,13 +99,20 @@ export function GenericSwiper<T>({
 		if (swiperRef.current && swiperRef.current.swiper) {
 			const swiper = swiperRef.current.swiper;
 
-			if (prevRef.current && nextRef.current) {
+			if (
+				prevRef.current &&
+				nextRef.current &&
+				swiper.params.navigation &&
+				typeof swiper.params.navigation !== 'boolean'
+			) {
 				swiper.params.navigation.prevEl = prevRef.current;
 				swiper.params.navigation.nextEl = nextRef.current;
 				swiper.params.navigation.disabledClass = styles.navButtonDisabled;
 
-				swiper.navigation.init();
-				swiper.navigation.update();
+				if (swiper.navigation) {
+					swiper.navigation.init();
+					swiper.navigation.update();
+				}
 			}
 
 			setIsBeginning(swiper.isBeginning);
@@ -124,19 +133,20 @@ export function GenericSwiper<T>({
 	};
 
 	const goToSlide = (paginationIndex: number) => {
-		if (swiperRef.current?.swiper) {
+		if (swiperRef.current?.swiper && typeof currentSlidesPerView === 'number') {
 			swiperRef.current.swiper.slideTo(paginationIndex * currentSlidesPerView);
 		}
 	};
 
 	const getActivePaginationIndex = () => {
+		if (typeof currentSlidesPerView !== 'number') return 0;
 		return Math.floor(activeIndex / currentSlidesPerView);
 	};
 
 	if (loading) {
 		return (
 			<div className={`${styles.container} ${className}`}>
-				<PageLoading text={'Ładowanie'} />
+				<PageLoading text={loadingText} />
 			</div>
 		);
 	}
@@ -205,19 +215,19 @@ export function GenericSwiper<T>({
 						}}
 						breakpoints={breakpoints}
 						className={styles.swiper}
-						onSlideChange={(swiper) => {
+						onSlideChange={(swiper: SwiperType) => {
 							setActiveIndex(swiper.activeIndex);
 							setIsBeginning(swiper.isBeginning);
 							setIsEnd(swiper.isEnd);
 						}}
-						onInit={(swiper) => {
+						onInit={(swiper: SwiperType) => {
 							setActiveIndex(swiper.activeIndex);
 							setIsBeginning(swiper.isBeginning);
 							setIsEnd(swiper.isEnd);
 
 							setCurrentSlidesPerView(swiper.params.slidesPerView);
 						}}
-						onBreakpoint={(swiper, breakpointParams) => {
+						onBreakpoint={(swiper: SwiperType) => {
 							setCurrentSlidesPerView(swiper.params.slidesPerView);
 						}}
 					>
@@ -230,7 +240,6 @@ export function GenericSwiper<T>({
 				</div>
 			</div>
 
-			{/* Własna paginacja z poprawną liczbą kropek */}
 			{paginationCount > 1 && (
 				<div className={styles.customPagination}>
 					{paginationItems.map((index) => {

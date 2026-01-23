@@ -54,7 +54,8 @@ export default function MobileFilterDrawer({ isOpen, onClose }: MobileFilterDraw
 				onlyFollowed: searchParams.get('onlyFollowed') === 'true',
 			});
 		}
-	}, [isOpen, searchParams]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [isOpen]);
 
 	useEffect(() => {
 		const checkScreenSize = () => {
@@ -68,25 +69,29 @@ export default function MobileFilterDrawer({ isOpen, onClose }: MobileFilterDraw
 	}, []);
 
 	useEffect(() => {
-		if (isOpen) {
+		if (isOpen && !isVisible) {
 			setIsVisible(true);
 			setIsClosing(false);
 			document.body.style.overflow = 'hidden';
+		} else if (!isOpen && isVisible && !isClosing) {
 		}
 
 		return () => {
-			document.body.style.overflow = 'unset';
+			if (!isOpen) {
+				document.body.style.overflow = 'unset';
+			}
 		};
-	}, [isOpen]);
+	}, [isOpen, isVisible, isClosing]);
 
-	const handleClose = () => {
+	const handleClose = useCallback(() => {
 		setIsClosing(true);
 		setTimeout(() => {
 			setIsVisible(false);
 			onClose();
 			setIsClosing(false);
+			document.body.style.overflow = 'unset';
 		}, 250);
-	};
+	}, [onClose]);
 
 	const handleCategoryChange = useCallback((category: CategoryType | null) => {
 		setMobileFilters((prev) => ({ ...prev, category }));
@@ -168,6 +173,7 @@ export default function MobileFilterDrawer({ isOpen, onClose }: MobileFilterDraw
 		}
 	};
 
+	// 4. POPRAWKA: handleClose jest teraz stabilny dzięki useCallback
 	useEffect(() => {
 		const handleEscape = (e: KeyboardEvent) => {
 			if (e.key === 'Escape' && isOpen && !isClosing) {
@@ -177,7 +183,7 @@ export default function MobileFilterDrawer({ isOpen, onClose }: MobileFilterDraw
 
 		document.addEventListener('keydown', handleEscape);
 		return () => document.removeEventListener('keydown', handleEscape);
-	}, [isOpen, isClosing]);
+	}, [isOpen, isClosing, handleClose]);
 
 	if (!isOpen && !isVisible) return null;
 
