@@ -1,5 +1,5 @@
-@import '@/styles/variables';
-@import '@/styles/mixins';
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
 
 .container {
 	height: calc(100vh - 80px);
@@ -75,6 +75,7 @@
 }
 
 .avatar {
+    position: relative;
 	@include size(48px);
 	background: $color-bg-alt;
 	border-radius: $radius-circle;

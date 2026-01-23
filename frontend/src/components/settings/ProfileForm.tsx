@@ -165,7 +165,7 @@ export function ProfileForm({ user, onSubmit, isSubmitting }: ProfileFormProps) 
 							/>
 						) : (
 							<div className={styles.avatarPlaceholder}>
-								<User size={32} />
+								<User size={48} />
 							</div>
 						)}
 					</div>

@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { isAxiosError } from 'axios';
 import { Product } from '@/types/marketplace';
 import api from '@/lib/axios';
@@ -7,6 +7,10 @@ export const useProduct = (id: string) => {
 	const [product, setProduct] = useState<Product | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
+
+	useEffect(() => {
+		console.log(product);
+	}, [product]);
 
 	const fetchProduct = useCallback(async () => {
 		try {

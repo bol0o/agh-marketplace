@@ -1,5 +1,5 @@
-@import '@/styles/variables';
-@import '@/styles/mixins';
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
 
 .dashboard {
 	background-color: $color-bg;
@@ -366,14 +366,14 @@ $color-status-red-bg: #fee2e2;
 		background: $color-status-red-bg;
 		color: $color-status-red;
 		&:hover {
-			background: darken($color-status-red-bg, 5%);
+			background: rgba($color-status-red-bg, 0.05);
 		}
 	}
 	&.unban {
 		background: $color-status-green-bg;
-		color: darken($color-status-green, 10%);
+		color: rgba($color-status-green, 0.1);
 		&:hover {
-			background: darken($color-status-green-bg, 5%);
+			background: rgba($color-status-green-bg, 0.05);
 		}
 	}
 }

@@ -5,6 +5,7 @@ import { useChat } from '@/hooks/useChat';
 import { useAuth } from '@/store/useAuth';
 import { Send, User as UserIcon, Package } from 'lucide-react';
 import styles from './Messages.module.scss';
+import Image from 'next/image';
 
 export default function MessagesPage() {
 	const { user } = useAuth();
@@ -16,12 +17,10 @@ export default function MessagesPage() {
 		selectedId || undefined
 	);
 
-	// Pobieranie listy rozmów przy wejściu
 	useEffect(() => {
 		fetchChats();
 	}, [fetchChats]);
 
-	// Pobieranie historii po wyborze konkretnego czatu
 	useEffect(() => {
 		if (selectedId) fetchMessages(selectedId);
 	}, [selectedId, fetchMessages]);
@@ -42,7 +41,6 @@ export default function MessagesPage() {
 	return (
 		<div className={styles.container}>
 			<div className={styles.wrapper}>
-				{/* LISTA ROZMÓW (SIDEBAR) */}
 				<aside className={styles.sidebar}>
 					<h2 className={styles.sidebarTitle}>Twoje rozmowy</h2>
 					<div className={styles.chatList}>
@@ -54,7 +52,12 @@ export default function MessagesPage() {
 							>
 								<div className={styles.avatar}>
 									{chat.user.avatar ? (
-										<img src={chat.user.avatar} alt="" />
+                                        <Image 
+                                            src={chat.user.avatar} 
+                                            alt={chat.user.name} 
+                                            fill
+                                            sizes="(max-width: 768px) 100px, 150px"
+							            />
 									) : (
 										<UserIcon />
 									)}
@@ -76,7 +79,6 @@ export default function MessagesPage() {
 					</div>
 				</aside>
 
-				{/* OKNO CZATU */}
 				<main className={styles.chatWindow}>
 					{selectedId ? (
 						<>
@@ -99,7 +101,7 @@ export default function MessagesPage() {
 								<input
 									value={text}
 									onChange={(e) => setText(e.target.value)}
-									onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+									onKeyDown={(e) => e.key === 'Enter' && handleSend()}
 									placeholder="Napisz wiadomość..."
 								/>
 								<button onClick={handleSend} className={styles.sendBtn}>

@@ -120,9 +120,7 @@ export const useCart = () => {
 	const clearCart = async () => {
 		try {
 			setLoading(true);
-			for (const item of items) {
-				await api.delete(`/cart/${item.id}`);
-			}
+            api.delete('/cart');
 
 			setCart([]);
 			addToast('Koszyk został wyczyszczony', 'success');

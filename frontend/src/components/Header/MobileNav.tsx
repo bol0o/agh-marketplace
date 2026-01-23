@@ -19,6 +19,7 @@ import { useState, useCallback } from 'react';
 import { useAuth } from '@/store/useAuth';
 import Image from 'next/image';
 import { useNotifications } from '@/hooks/useNotifications';
+import { useChat } from '@/hooks/useChat';
 
 interface MobileNavProps {
 	isOpen: boolean;
@@ -30,6 +31,7 @@ export function MobileNav({ isOpen, onClose, isAnimating }: MobileNavProps) {
 	const [isLoggingOut, setIsLoggingOut] = useState(false);
 	const { user, logout } = useAuth();
 	const { unreadCount, fetchUnreadCount, startPolling } = useNotifications();
+    const {totalUnreadMessages} = useChat();
 
 	useEffect(() => {
 		fetchUnreadCount();
@@ -38,8 +40,6 @@ export function MobileNav({ isOpen, onClose, isAnimating }: MobileNavProps) {
 
 		return cleanup;
 	}, [fetchUnreadCount, startPolling]);
-
-	const hasUnreadMessages = 2;
 
 	const handleLogout = async () => {
 		if (isLoggingOut) return;
@@ -123,10 +123,10 @@ export function MobileNav({ isOpen, onClose, isAnimating }: MobileNavProps) {
 							<p>Społeczność</p>
 							<nav>
 								<MobileLink
-									href="/chats"
+									href="/messages"
 									icon={<MessageSquare size={20} />}
 									onClick={onClose}
-									badge={hasUnreadMessages}
+									badge={totalUnreadMessages}
 								>
 									Wiadomości
 								</MobileLink>

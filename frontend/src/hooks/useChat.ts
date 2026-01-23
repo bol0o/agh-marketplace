@@ -46,7 +46,7 @@ export const useChat = (activeChatId?: string) => {
 
 	useEffect(() => {
 		if (user) {
-			// eslint-disable-next-line @typescript-eslint/no-floating-promises
+            // eslint-disable-next-line react-hooks/set-state-in-effect
 			fetchChats();
 		}
 	}, [user, fetchChats]);
@@ -61,7 +61,7 @@ export const useChat = (activeChatId?: string) => {
 			reconnectionAttempts: 5,
 		});
 
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		// eslint-disable-next-line react-hooks/set-state-in-effect
 		setSocket(newSocket);
 
 		newSocket.on('connect', () => {
@@ -81,7 +81,7 @@ export const useChat = (activeChatId?: string) => {
 					},
 				]);
 			}
-			// eslint-disable-next-line @typescript-eslint/no-floating-promises
+			 
 			axios
 				.get('/chat')
 				.then((res) => setChats(res.data))
@@ -91,7 +91,7 @@ export const useChat = (activeChatId?: string) => {
 		return () => {
 			newSocket.disconnect();
 		};
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		 
 	}, [user]);
 
 	const sendMessage = async (id: string, text: string) => {
