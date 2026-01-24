@@ -323,7 +323,7 @@ export default function ProductPage() {
 			<div className={styles.mainContent}>
 				<div className={styles.leftColumn}>
 					<ProductImageSection
-						imageUrl={product.imageUrl}
+						imageUrl={product.image}
 						type={product.type}
 						status={product.status}
 						title={product.title}

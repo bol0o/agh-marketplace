@@ -77,7 +77,7 @@ export interface Product {
 	title: string;
 	description: string;
 	price: number;
-	imageUrl?: string;
+	image?: string;
 	category: ProductCategory;
 	condition: ProductCondition;
 	type: 'auction' | 'buy_now';

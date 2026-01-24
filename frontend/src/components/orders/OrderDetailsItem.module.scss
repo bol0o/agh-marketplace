@@ -1,4 +1,5 @@
 @use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
 
 .item {
 	display: flex;
@@ -11,7 +12,7 @@
 	
 	&:hover {
 		box-shadow: $shadow-sm;
-		border-color: darken($color-border, 10%);
+		border-color: rgba($color-border, 0.1);
 	}
 	
 	@media (max-width: $breakpoint-md) {

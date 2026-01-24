@@ -97,7 +97,7 @@ export function ProductForm({
 		type: 'buy_now',
 		location: '',
 		stock: 1,
-		imageUrl: undefined,
+		image: undefined,
 		endsAt: null,
 	});
 
@@ -115,14 +115,14 @@ export function ProductForm({
 				type: initialData.type || 'buy_now',
 				location: initialData.location || '',
 				stock: initialData.stock || 1,
-				imageUrl: initialData.imageUrl || undefined,
+				image: initialData.image || undefined,
 				endsAt: initialData.endsAt || null,
 			};
 
 			setFormData(transformedData);
 
-			if (initialData.imageUrl) {
-				setImagePreview(initialData.imageUrl);
+			if (initialData.image) {
+				setImagePreview(initialData.image);
 			}
 		}
 	}, [initialData]);
@@ -189,7 +189,7 @@ export function ProductForm({
 				}
 			}
 
-			let finalImage = formData.imageUrl || undefined;
+			let finalImage = formData.image || undefined;
 
 			if (selectedImage) {
 				try {
@@ -210,12 +210,6 @@ export function ProductForm({
 			if (formData.type === 'auction' && formData.endsAt) {
 				const date = new Date(formData.endsAt);
 				endsAtFormatted = date.toISOString();
-
-				console.log('EndsAt data:', {
-					original: formData.endsAt,
-					iso: endsAtFormatted,
-					dateObject: date,
-				});
 			} else if (formData.type === 'buy_now') {
 				endsAtFormatted = null;
 			}
@@ -232,8 +226,6 @@ export function ProductForm({
 				imageUrl: finalImage,
 				endsAt: endsAtFormatted,
 			};
-
-			console.log('API Payload being sent:', JSON.stringify(apiPayload, null, 2));
 
 			await onSubmit(apiPayload as unknown as ProductFormData);
 		} catch (err: unknown) {

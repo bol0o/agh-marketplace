@@ -48,9 +48,9 @@ export function ProductCard({ product }: { product: Product }) {
 	return (
 		<Link href={`/marketplace/${product.id}`} className={styles.card}>
 			<div className={styles.imageContainer}>
-				{product.imageUrl ? (
+				{product.image ? (
 					<Image
-						src={product.imageUrl}
+						src={product.image}
 						alt={product.title}
 						fill
 						sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
