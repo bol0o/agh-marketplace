@@ -15,7 +15,7 @@ The application enables trading products, real-time bidding, and communication b
 - **Framework:** Express.js
 - **Database:** PostgreSQL
 - **ORM:** Prisma
-- **Real-time:** Socket.io (bidding, chat, notifications)
+- **Real-time:** Socket.io
 - **Auth:** JWT (Access + Refresh Token)
 - **Validation:** Zod
 - **File Upload:** Cloudinary + Multer
@@ -137,87 +137,135 @@ The server should now be running at `http://localhost:3001`.
 
 ## 📡 API Endpoints
 
-### Authentication
+### Authentication (/api/auth)
 
-1. POST /api/auth/register - Register new user
+1. POST /register - Register new user (AGH email required)
 
-2. POST /api/auth/login - Login
+2. POST /login - Login (returns Access & Refresh Token)
 
-3. POST /api/auth/refresh - Refresh access token
+3. POST /refresh - Refresh access token
 
-4. POST /api/auth/logout - Logout
+4. POST /logout - Logout
 
-### Products
+### Users (/api/users)
 
-1. GET /api/products - List products with filters
+1. GET /me - Get private profile details
 
-2. GET /api/products/:id - Get product details
+2. PATCH /me - Update profile info (Name, Avatar, Faculty)
 
-3. POST /api/products - Create product (authenticated)
+3. PATCH /me/address - Update shipping address
 
-4. PATCH /api/products/:id - Update product (owner/admin)
+4. PATCH /me/settings - Update notification settings
 
-5. DELETE /api/products/:id - Delete product (owner/admin)
+5. GET /:id - Get public user profile (Ratings, Stats)
 
-### Cart
+### Products (/api/products)
 
-1. GET /api/cart - Get user's cart
+1. GET / - List products (Pagination, Filtering, Sorting)
 
-2. POST /api/cart - Add item to cart
+2. GET /:id - Get product details
 
-3. PATCH /api/cart/:itemId - Update quantity
+3. POST / - Create product (Auction or Buy Now)
 
-4. DELETE /api/cart/:itemId - Remove item
+4. PATCH /:id - Update product (Owner only)
 
-### Orders
+5. DELETE /:id - Delete product (Owner or Admin)
 
-1. GET /api/orders - Get user's orders
+### Bids / Auctions (/api/bids)
 
-2. GET /api/orders/sales - Get user's sales
+1. GET /product/:productId - Get bid history
 
-3. POST /api/orders - Create order from cart
+2. POST / - Place a bid
 
-4. GET /api/orders/:id - Get order details
+### Cart (/api/cart)
 
-### Auctions & Bids
+1. GET / - Get current user cart
 
-1. GET /api/bids/product/:productId - Get bids for product
+2. POST / - Add item to cart
 
-2. POST /api/bids - Place a bid (authenticated)
+3. PATCH /:itemId - Update item quantity
 
-### Social Features
+4. DELETE /:itemId - Remove item from cart
 
-1. GET /api/social/feed - Get feed from followed users
+5. DELETE / - Clear entire cart
 
-2. POST /api/social/follow - Follow/unfollow user
+### Orders (/api/orders)
 
-### Chat
+1. GET / - Get my purchase history
 
-1. GET /api/chat - Get user's chats
+2. GET /sales - Get my sales history
 
-2. POST /api/chat - Start new chat
+3. GET /:id - Get order details (Buyer/Seller/Admin only)
 
-3. GET /api/chat/:chatId/messages - Get chat messages
+4. POST / - Create order from cart
 
-4. POST /api/chat/:chatId/messages - Send message
+5. POST /:id/pay - Simulate payment
 
-### User Management
+6. PATCH /:id/status - Update order status (Shipped/Delivered)
 
-1. GET /api/users/me - Get current user profile
+7. PATCH /:id/cancel - Cancel pending order
 
-2. PATCH /api/users/me - Update profile
+### Chat (/api/chats)
 
-3. GET /api/users/:id - Get public profile
+1. GET / - Get list of conversations (Inbox)
 
-### Admin (Admin role required)
+2. POST / - Start new conversation
 
-1. GET /api/admin/stats - Dashboard statistics
+3. GET /:chatId/messages - Get message history (marks as read)
 
-2. GET /api/admin/users - List all users
+4. POST /:chatId/messages - Send message
 
-3. PATCH /api/admin/users/:userId/status - Ban/unban user
+### Notifications (/api/notifications)
 
-4. GET /api/admin/reports - List reports
+1. GET / - Get notifications list
+
+2. GET /unread-count - Get count of unread notifications
+
+3. PATCH /mark-all-read - Mark all as read
+
+4. PATCH /:id/read - Mark single notification as read
+
+5. DELETE /:id - Delete notification
+
+### Social (/api/social)
+
+1. POST /follow - Toggle follow user
+
+2. GET /feed - Get products from followed users
+
+3. GET /follow/status/:id - Check if following a specific user
+
+4. DELETE /unfollow/:id - Explicitly unfollow user
+
+### Reviews (/api/reviews)
+
+1. GET /:userId - Get reviews received by user
+
+2. POST / - Add review for a user (Seller)
+
+3. DELETE /:reviewId - Delete review (Author or Admin)
+
+### Reports (/api/reports)
+
+1. POST / - Create report (User or Product)
+
+2. Upload (/api/upload)
+
+3. POST / - Upload image to Cloudinary
+
+### Admin Panel (/api/admin) - Admin role required
+
+1. GET /stats - Dashboard statistics (Revenue, Users, Listings)
+
+2. GET /reports - List all reports
+
+3. PATCH /reports/:id/resolve - Resolve report (Ban target or Dismiss)
+
+4. GET /users - List all users (Pagination)
+
+5. PATCH /users/:userId/status - Ban/Unban user
+
+6. PATCH /users/:userId/role - Change user role
 
 ## 🔐 Authentication Flow
 
@@ -245,9 +293,9 @@ The server should now be running at `http://localhost:3001`.
 
 ### Extended Features
 
-✅ Auction system with real-time bidding (Socket.io)
+✅ Auction system
 
-✅ Private chat system between buyers and sellers
+✅ Private chat system between buyers and sellers (socket)
 
 ✅ User following and personalized feed
 
@@ -329,25 +377,13 @@ npm run setup:full - Complete setup for new development environment
 ## 📝 Notes
 
 1. The backend is designed to work with a separate frontend application
-2. Socket.io is used for real-time features: bidding, chat, and notifications
+2. Socket.io is used for real-time chat
 3. All user emails must end with @student.agh.edu.pl (AGH students only)
 4. Background jobs automatically close expired auctions and send notifications
 5. Admin accounts can ban users and manage reports
 
 ## 📚 API Documentation
 
-The project includes a comprehensive **Postman Collection** covering all endpoints, authentication flows, and real-time socket events.
+The project includes a comprehensive **Endpoint documentation** covering all endpoints.
 
 **Location:** `postman/AGH_marketplace.postman_collection.json`
-
-### How to use:
-
-1. Open **Postman**.
-2. Click **Import** (top left corner).
-3. Drag and drop the `.json` file from the `postman/` folder.
-4. The collection includes:
-   - Automated token management (scripts for login/refresh).
-   - Example request bodies and responses.
-   - Detailed descriptions of business logic.
-
-**Note:** Ensure your Postman environment variable `{{baseURL}}` is set to `http://localhost:3001` (or use the default configuration provided in the collection).
