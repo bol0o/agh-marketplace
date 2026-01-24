@@ -1,0 +1,323 @@
+// components/marketplace/ReportModal.module.scss
+@use '@/styles/variables' as *;
+
+.modalOverlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: rgba(0, 0, 0, 0.5);
+	backdrop-filter: blur(4px);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 1000;
+	animation: fadeIn 0.2s ease-out;
+	padding: $spacing-md;
+}
+
+.modal {
+	background-color: white;
+	border-radius: $radius-lg;
+	padding: $spacing-xl;
+	max-width: 600px;
+	width: 100%;
+	max-height: 90vh;
+	overflow-y: auto;
+	animation: slideUp 0.3s ease-out;
+	box-shadow: $shadow-lg;
+
+    overflow-x: hidden;
+	scroll-behavior: smooth;
+
+    &::-webkit-scrollbar {
+		display: none;
+	}
+	
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+}
+
+.modalHeader {
+	display: flex;
+	align-items: center;
+	gap: $spacing-md;
+	margin-bottom: $spacing-lg;
+	padding-bottom: $spacing-md;
+	border-bottom: 1px solid $color-border;
+	position: relative;
+}
+
+.warningIcon {
+	color: $color-primary;
+	flex-shrink: 0;
+}
+
+.modalTitle {
+	font-size: 1.5rem;
+	font-weight: 700;
+	color: $color-dark;
+	margin: 0;
+	flex: 1;
+}
+
+.closeButton {
+	position: absolute;
+	top: -$spacing-sm;
+	right: -$spacing-sm;
+	background: $color-white;
+	border: 1px solid $color-border;
+	border-radius: $radius-circle;
+	width: 40px;
+	height: 40px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	color: $color-text-light;
+
+	&:hover {
+		background: $color-bg-alt;
+		color: $color-dark;
+	}
+
+	&:focus-visible {
+		outline: 2px solid $color-primary;
+		outline-offset: 2px;
+	}
+}
+
+.form {
+	display: flex;
+	flex-direction: column;
+	gap: $spacing-lg;
+}
+
+.instruction {
+	color: $color-text;
+	font-size: 0.95rem;
+	line-height: 1.6;
+	margin: 0;
+	padding: $spacing-md;
+	background: $color-bg-alt;
+	border-radius: $radius-md;
+	border-left: 4px solid $color-primary;
+}
+
+.formGroup {
+	display: flex;
+	flex-direction: column;
+	gap: $spacing-sm;
+}
+
+.label {
+	font-weight: 600;
+	color: $color-dark;
+	font-size: 1rem;
+}
+
+.reasonsGrid {
+	display: grid;
+	grid-template-columns: repeat(1, 1fr);
+	gap: $spacing-xs;
+
+	@media (min-width: 640px) {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+.reasonOption {
+	display: flex;
+	align-items: center;
+	gap: $spacing-sm;
+	padding: $spacing-md;
+	border: 1px solid $color-border;
+	border-radius: $radius-md;
+	cursor: pointer;
+	transition: all 0.2s ease;
+
+	&:hover {
+		border-color: $color-primary;
+		background: rgba($color-primary, 0.02);
+	}
+
+	&:has(input:checked) {
+		border-color: $color-primary;
+		background: rgba($color-primary, 0.05);
+	}
+}
+
+.radioInput {
+	display: none;
+}
+
+.radioCustom {
+	width: 20px;
+	height: 20px;
+	border: 2px solid $color-border;
+	border-radius: $radius-circle;
+	position: relative;
+	flex-shrink: 0;
+	transition: all 0.2s ease;
+
+	.reasonOption:has(input:checked) & {
+		border-color: $color-primary;
+		background: $color-primary;
+
+		&::after {
+			content: '';
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			width: 8px;
+			height: 8px;
+			background: white;
+			border-radius: $radius-circle;
+		}
+	}
+}
+
+.reasonLabel {
+	font-size: 0.95rem;
+	color: $color-dark;
+	user-select: none;
+	flex: 1;
+}
+
+.input,
+.textarea {
+	padding: $spacing-md;
+	border: 1px solid $color-border;
+	border-radius: $radius-md;
+	font-family: inherit;
+	font-size: 0.95rem;
+	transition: border-color 0.2s ease;
+	width: 100%;
+
+	&:focus {
+		outline: none;
+		border-color: $color-primary;
+		box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
+	}
+
+	&::placeholder {
+		color: $color-text-lighter;
+	}
+}
+
+.textarea {
+	resize: vertical;
+	min-height: 120px;
+}
+
+.charCounter {
+	text-align: right;
+	font-size: 0.85rem;
+	color: $color-text-light;
+	margin-top: $spacing-xs;
+}
+
+.disclaimer {
+	display: flex;
+	gap: $spacing-sm;
+	padding: $spacing-md;
+	background: rgba($color-primary, 0.05);
+	border-radius: $radius-md;
+	border: 1px solid rgba($color-primary, 0.2);
+
+	strong {
+		color: $color-primary;
+	}
+
+	p {
+		margin: 0;
+		font-size: 0.9rem;
+		color: $color-text;
+		line-height: 1.6;
+		flex: 1;
+	}
+
+	svg {
+		color: $color-primary;
+		flex-shrink: 0;
+		margin-top: 2px;
+	}
+}
+
+.modalActions {
+	display: flex;
+	gap: $spacing-md;
+	justify-content: flex-end;
+	margin-top: $spacing-lg;
+
+	@media (max-width: 640px) {
+		flex-direction: column;
+	}
+}
+
+.cancelButton,
+.submitButton {
+	padding: $spacing-md $spacing-xl;
+	border-radius: $radius-md;
+	font-weight: 600;
+	font-size: 1rem;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	border: none;
+
+	@media (max-width: 640px) {
+		width: 100%;
+		justify-content: center;
+	}
+}
+
+.cancelButton {
+	background: $color-bg-alt;
+	color: $color-text;
+	
+	&:hover:not(:disabled) {
+		background: rgba($color-bg-alt, 0.05);
+	}
+
+	&:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+}
+
+.submitButton {
+	background: $color-primary;
+	color: $color-white;
+	
+	&:hover:not(:disabled) {
+		background: $color-primary-hover;
+	}
+
+	&:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes slideUp {
+	from {
+		transform: translateY(20px);
+		opacity: 0;
+	}
+	to {
+		transform: translateY(0);
+		opacity: 1;
+	}
+}

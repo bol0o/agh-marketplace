@@ -6,7 +6,7 @@
 	margin: 0 auto;
 	padding: 20px 16px 60px;
 	animation: fadeIn 0.5s ease-out;
-	overflow-x: hidden;
+    overflow-x: hidden;
 
 	@include md {
 		padding: 32px 24px 80px;
@@ -1044,6 +1044,69 @@
 		.socialActions {
 			flex-direction: row;
 		}
+	}
+}
+
+.header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 32px;
+	padding-bottom: 20px;
+	border-bottom: 1px solid $color-border;
+	flex-wrap: wrap;
+	gap: 16px;
+}
+
+.headerActions {
+	display: flex;
+	gap: 12px;
+	align-items: center;
+}
+
+.reportButton {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 10px 16px;
+	background: $color-white;
+	border: 1px solid $color-border;
+	color: $color-text-light;
+	border-radius: 8px;
+	font-weight: 600;
+	font-size: 0.9rem;
+	cursor: pointer;
+	transition: all 0.2s ease;
+
+	&:hover {
+		background: $color-bg-alt;
+		border-color: $color-primary;
+		color: $color-primary;
+	}
+
+	&:focus-visible {
+		outline: 2px solid $color-primary;
+		outline-offset: 2px;
+	}
+}
+
+.reportText {
+	@media (max-width: 640px) {
+		display: none;
+	}
+}
+
+@media (max-width: 640px) {
+	.header {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 16px;
+	}
+
+	.headerActions {
+		width: 100%;
+		justify-content: flex-start;
+		flex-wrap: wrap;
 	}
 }
 

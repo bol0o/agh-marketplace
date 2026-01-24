@@ -4,6 +4,7 @@ export type ProductStatus = 'active' | 'sold' | 'ended' | 'reserved';
 
 export interface Seller {
 	id: string;
+    name: string;
 	firstName: string;
 	lastName: string;
 	avatar: string | null;

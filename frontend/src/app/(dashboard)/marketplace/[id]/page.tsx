@@ -3,11 +3,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Edit, Trash2, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Edit, Trash2, AlertCircle, Flag } from 'lucide-react';
 import { isAxiosError } from 'axios';
 import { Product } from '@/types/marketplace';
 import { useAuth } from '@/store/useAuth';
 import { useCart } from '@/hooks/useCart';
+import { useReport } from '@/hooks/useReport';
 import { ProductImageSection } from '@/components/marketplace/ProductImageSection';
 import { SellerInfoCard } from '@/components/marketplace/SellerInfoCard';
 import { ProductDetailsCard } from '@/components/marketplace/ProductDetailsCard';
@@ -15,6 +16,7 @@ import { ProductActions } from '@/components/marketplace/ProductActions';
 import { BidHistory } from '@/components/marketplace/BidHistory';
 import { BidForm } from '@/components/marketplace/BidForm';
 import { AuctionTimer } from '@/components/marketplace/AuctionTimer';
+import { ReportModal } from '@/components/shared/ReportModal';
 import styles from './ProductPage.module.scss';
 import api from '@/lib/axios';
 import { useUIStore } from '@/store/uiStore';
@@ -40,6 +42,7 @@ export default function ProductPage() {
 	const { user, isLoading: authLoading, isAuthenticated } = useAuth();
 	const { addToCart } = useCart();
 	const { addToast } = useUIStore();
+	const { createReport, loading: isReporting } = useReport(); // Dodano
 
 	const [product, setProduct] = useState<Product | null>(null);
 	const [loading, setLoading] = useState(true);
@@ -50,6 +53,7 @@ export default function ProductPage() {
 	const [isAddingToCart, setIsAddingToCart] = useState(false);
 	const [isFollowingSeller, setIsFollowingSeller] = useState(false);
 	const [isFollowingLoading, setIsFollowingLoading] = useState(false);
+	const [showReportModal, setShowReportModal] = useState(false); // Dodano
 
 	const isOwner = !!(user && product && product.seller.id === user.id);
 
@@ -219,6 +223,22 @@ export default function ProductPage() {
 		}
 	};
 
+	const handleReportProduct = async (reason: string, description: string) => {
+		if (!product) return;
+
+		try {
+			await createReport({
+				targetId: product.id,
+				targetType: 'product',
+				reason,
+				description,
+			});
+			setShowReportModal(false);
+		} catch (error) {
+			console.error('Report submission error:', error);
+		}
+	};
+
 	const renderOwnerActions = () => {
 		if (authLoading) {
 			return null;
@@ -245,6 +265,23 @@ export default function ProductPage() {
 		}
 
 		return null;
+	};
+
+	const renderReportButton = () => {
+		if (isOwner || !product || !isAuthenticated) {
+			return null;
+		}
+
+		return (
+			<button
+				className={styles.reportButton}
+				onClick={() => setShowReportModal(true)}
+				aria-label="Zgłoś produkt"
+			>
+				<Flag size={18} />
+				<span className={styles.reportText}>Zgłoś produkt</span>
+			</button>
+		);
 	};
 
 	if (loading) {
@@ -277,7 +314,10 @@ export default function ProductPage() {
 					<span>Wróć do przeglądania</span>
 				</Link>
 
-				{renderOwnerActions()}
+				<div className={styles.headerActions}>
+					{renderOwnerActions()}
+					{renderReportButton()}
+				</div>
 			</header>
 
 			<div className={styles.mainContent}>
@@ -420,6 +460,15 @@ export default function ProductPage() {
 					</div>
 				</div>
 			)}
+
+			<ReportModal
+				isOpen={showReportModal}
+				onClose={() => setShowReportModal(false)}
+				onSubmit={handleReportProduct}
+				targetName={product.title}
+				targetType="product"
+				isSubmitting={isReporting}
+			/>
 		</div>
 	);
 }

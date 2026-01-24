@@ -58,24 +58,19 @@ export function GenericSwiper<T>({
 	const [activeIndex, setActiveIndex] = useState(0);
 	const [isBeginning, setIsBeginning] = useState(true);
 	const [isEnd, setIsEnd] = useState(false);
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const [currentSlidesPerView, setCurrentSlidesPerView] = useState<number | any>(slidesPerView);
+	const [currentSlidesPerView, setCurrentSlidesPerView] = useState<number>(slidesPerView);
+	const [totalSlides, setTotalSlides] = useState(0);
+	const [progress, setProgress] = useState(0);
 
-	const calculatePaginationCount = () => {
-		if (!items.length || !currentSlidesPerView || typeof currentSlidesPerView !== 'number')
-			return 0;
-		return Math.ceil(items.length / currentSlidesPerView);
-	};
-
-	const paginationCount = calculatePaginationCount();
-	const paginationItems = Array.from({ length: paginationCount }, (_, i) => i);
+	useEffect(() => {
+		setTotalSlides(items.length);
+	}, [items]);
 
 	useEffect(() => {
 		const updateSlidesPerView = () => {
 			if (!swiperRef.current?.swiper) return;
 
 			const width = window.innerWidth;
-
 			let newSlidesPerView = slidesPerView;
 
 			if (width >= 1024 && breakpoints[1024]) {
@@ -108,39 +103,77 @@ export function GenericSwiper<T>({
 				swiper.params.navigation.prevEl = prevRef.current;
 				swiper.params.navigation.nextEl = nextRef.current;
 				swiper.params.navigation.disabledClass = styles.navButtonDisabled;
-
-				if (swiper.navigation) {
-					swiper.navigation.init();
-					swiper.navigation.update();
-				}
+				swiper.navigation.init();
+				swiper.navigation.update();
 			}
-
-			setIsBeginning(swiper.isBeginning);
-			setIsEnd(swiper.isEnd);
 		}
-	}, [items]);
+	}, [items, currentSlidesPerView]);
+
+	useEffect(() => {
+		const calculateProgress = () => {
+			if (!items.length || !currentSlidesPerView || currentSlidesPerView >= items.length) {
+				return isBeginning ? 0 : 1;
+			}
+			
+			const maxIndex = items.length - currentSlidesPerView;
+			if (maxIndex <= 0) return 1;
+			
+			const currentProgress = activeIndex / maxIndex;
+			return Math.min(Math.max(currentProgress, 0), 1);
+		};
+
+		const newProgress = calculateProgress();
+		setProgress(newProgress);
+	}, [activeIndex, currentSlidesPerView, items.length, isBeginning]);
 
 	const handlePrevClick = () => {
-		if (swiperRef.current?.swiper) {
+		if (swiperRef.current?.swiper && !isBeginning) {
 			swiperRef.current.swiper.slidePrev();
 		}
 	};
 
 	const handleNextClick = () => {
-		if (swiperRef.current?.swiper) {
+		if (swiperRef.current?.swiper && !isEnd) {
 			swiperRef.current.swiper.slideNext();
 		}
 	};
 
+	const calculatePaginationDots = () => {
+		if (!items.length || !currentSlidesPerView) return { count: 0, items: [] };
+		
+		const totalGroups = Math.ceil(totalSlides / currentSlidesPerView);
+		const currentGroup = Math.floor(activeIndex / currentSlidesPerView);
+		
+		return {
+			count: totalGroups,
+			currentGroup,
+			items: Array.from({ length: totalGroups }, (_, i) => i)
+		};
+	};
+
+	const pagination = calculatePaginationDots();
+
 	const goToSlide = (paginationIndex: number) => {
-		if (swiperRef.current?.swiper && typeof currentSlidesPerView === 'number') {
-			swiperRef.current.swiper.slideTo(paginationIndex * currentSlidesPerView);
+		if (swiperRef.current?.swiper) {
+			const targetIndex = paginationIndex * currentSlidesPerView;
+			swiperRef.current.swiper.slideTo(Math.min(targetIndex, totalSlides - 1));
 		}
 	};
 
-	const getActivePaginationIndex = () => {
-		if (typeof currentSlidesPerView !== 'number') return 0;
-		return Math.floor(activeIndex / currentSlidesPerView);
+	const handleSlideChange = (swiper: SwiperType) => {
+		setActiveIndex(swiper.activeIndex);
+		setIsBeginning(swiper.isBeginning);
+		setIsEnd(swiper.isEnd);
+		
+		if (items.length && currentSlidesPerView && currentSlidesPerView < items.length) {
+			const maxIndex = items.length - currentSlidesPerView;
+			if (maxIndex > 0) {
+				const currentProgress = swiper.activeIndex / maxIndex;
+				setProgress(Math.min(Math.max(currentProgress, 0), 1));
+			} else {
+				setProgress(1);
+			}
+		}
 	};
 
 	if (loading) {
@@ -215,20 +248,45 @@ export function GenericSwiper<T>({
 						}}
 						breakpoints={breakpoints}
 						className={styles.swiper}
-						onSlideChange={(swiper: SwiperType) => {
-							setActiveIndex(swiper.activeIndex);
-							setIsBeginning(swiper.isBeginning);
-							setIsEnd(swiper.isEnd);
-						}}
+						onSlideChange={handleSlideChange}
 						onInit={(swiper: SwiperType) => {
 							setActiveIndex(swiper.activeIndex);
 							setIsBeginning(swiper.isBeginning);
 							setIsEnd(swiper.isEnd);
-
-							setCurrentSlidesPerView(swiper.params.slidesPerView);
+							setCurrentSlidesPerView(swiper.params.slidesPerView as number);
+							
+							if (items.length && swiper.params.slidesPerView) {
+								const slidesView = swiper.params.slidesPerView as number;
+								if (slidesView < items.length) {
+									const maxIndex = items.length - slidesView;
+									const currentProgress = swiper.activeIndex / maxIndex;
+									setProgress(Math.min(Math.max(currentProgress, 0), 1));
+								} else {
+									setProgress(1);
+								}
+							}
 						}}
 						onBreakpoint={(swiper: SwiperType) => {
-							setCurrentSlidesPerView(swiper.params.slidesPerView);
+							const newSlidesPerView = swiper.params.slidesPerView as number;
+							setCurrentSlidesPerView(newSlidesPerView);
+							
+							if (items.length && newSlidesPerView) {
+								if (newSlidesPerView < items.length) {
+									const maxIndex = items.length - newSlidesPerView;
+									const currentProgress = swiper.activeIndex / maxIndex;
+									setProgress(Math.min(Math.max(currentProgress, 0), 1));
+								} else {
+									setProgress(1);
+								}
+							}
+						}}
+						onReachEnd={(swiper: SwiperType) => {
+							setIsEnd(swiper.isEnd);
+							setProgress(1);
+						}}
+						onReachBeginning={(swiper: SwiperType) => {
+							setIsBeginning(swiper.isBeginning);
+							setProgress(0);
 						}}
 					>
 						{items.map((item, index) => (
@@ -240,22 +298,40 @@ export function GenericSwiper<T>({
 				</div>
 			</div>
 
-			{paginationCount > 1 && (
+			{pagination.count > 1 && (
 				<div className={styles.customPagination}>
-					{paginationItems.map((index) => {
-						const isActive = index === getActivePaginationIndex();
-						return (
-							<button
-								key={index}
-								className={`${styles.paginationDot} ${
-									isActive ? styles.paginationDotActive : ''
-								}`}
-								onClick={() => goToSlide(index)}
-								aria-label={`Przejdź do grupy slajdów ${index + 1}`}
-								aria-current={isActive ? 'page' : undefined}
+					<div className={`${styles.progressContainer} ${styles.desktopOnly}`}>
+						<div 
+							className={styles.progressTrack} 
+							role="progressbar"
+							aria-valuenow={Math.round(progress * 100)}
+							aria-valuemin={0}
+							aria-valuemax={100}
+							aria-label="Postęp przewijania slidera"
+						>
+							<div 
+								className={styles.progressBar} 
+								style={{ width: `${progress * 100}%` }}
 							/>
-						);
-					})}
+						</div>
+					</div>
+					
+					<div className={`${styles.dotsContainer} ${styles.mobileOnly}`}>
+						{pagination.items.map((index) => {
+							const isActive = index === pagination.currentGroup;
+							return (
+								<button
+									key={index}
+									className={`${styles.paginationDot} ${
+										isActive ? styles.paginationDotActive : ''
+									}`}
+									onClick={() => goToSlide(index)}
+									aria-label={`Przejdź do slajdów ${index + 1}`}
+									aria-current={isActive ? 'page' : undefined}
+								/>
+							);
+						})}
+					</div>
 				</div>
 			)}
 		</div>

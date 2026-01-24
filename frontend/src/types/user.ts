@@ -35,6 +35,7 @@ export interface Review {
 	revieweeId: string;
 	createdAt: string;
 	reviewer?: {
+        id: string;
 		name: string;
 		avatarUrl?: string;
 	};

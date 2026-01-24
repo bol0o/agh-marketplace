@@ -57,7 +57,6 @@ export function AddressForm({ user, onSubmit, isSubmitting }: AddressFormProps) 
 
 		if (value.length > 0) {
 			if (value.length <= 3) {
-				// value = value;
 			} else if (value.length <= 6) {
 				value = `${value.slice(0, 3)} ${value.slice(3)}`;
 			} else if (value.length <= 9) {
@@ -127,106 +126,110 @@ export function AddressForm({ user, onSubmit, isSubmitting }: AddressFormProps) 
 			<h2 className={styles.sectionTitle}>Adres dostawy</h2>
 
 			<div className={styles.formGrid}>
-				<div className={styles.formGroup}>
-					<label htmlFor="street" className={styles.label}>
-						Ulica *
-					</label>
-					<input
-						id="street"
-						name="street"
-						type="text"
-						value={formData.street}
-						onChange={handleChange}
-						className={`${styles.input} ${errors.street ? styles.inputError : ''}`}
-						placeholder="np. Mickiewicza"
-						required
-					/>
-					{errors.street && <p className={styles.error}>{errors.street}</p>}
+				<div className={styles.column}>
+					<div className={styles.formGroup}>
+						<label htmlFor="street" className={styles.label}>
+							Ulica *
+						</label>
+						<input
+							id="street"
+							name="street"
+							type="text"
+							value={formData.street}
+							onChange={handleChange}
+							className={`${styles.input} ${errors.street ? styles.inputError : ''}`}
+							placeholder="np. Mickiewicza"
+							required
+						/>
+						{errors.street && <p className={styles.error}>{errors.street}</p>}
+					</div>
+
+					<div className={styles.formGroup}>
+						<label htmlFor="buildingNumber" className={styles.label}>
+							Numer budynku *
+						</label>
+						<input
+							id="buildingNumber"
+							name="buildingNumber"
+							type="text"
+							value={formData.buildingNumber}
+							onChange={handleChange}
+							className={`${styles.input} ${errors.buildingNumber ? styles.inputError : ''}`}
+							placeholder="np. 30"
+							required
+						/>
+						{errors.buildingNumber && (
+							<p className={styles.error}>{errors.buildingNumber}</p>
+						)}
+					</div>
+
+					<div className={styles.formGroup}>
+						<label htmlFor="city" className={styles.label}>
+							Miasto *
+						</label>
+						<input
+							id="city"
+							name="city"
+							type="text"
+							value={formData.city}
+							onChange={handleChange}
+							className={`${styles.input} ${errors.city ? styles.inputError : ''}`}
+							placeholder="np. Kraków"
+							required
+						/>
+						{errors.city && <p className={styles.error}>{errors.city}</p>}
+					</div>
 				</div>
 
-				<div className={styles.formGroup}>
-					<label htmlFor="buildingNumber" className={styles.label}>
-						Numer budynku *
-					</label>
-					<input
-						id="buildingNumber"
-						name="buildingNumber"
-						type="text"
-						value={formData.buildingNumber}
-						onChange={handleChange}
-						className={`${styles.input} ${errors.buildingNumber ? styles.inputError : ''}`}
-						placeholder="np. 30"
-						required
-					/>
-					{errors.buildingNumber && (
-						<p className={styles.error}>{errors.buildingNumber}</p>
-					)}
-				</div>
+				<div className={styles.column}>
+					<div className={styles.formGroup}>
+						<label htmlFor="apartmentNumber" className={styles.label}>
+							Numer mieszkania (opcjonalnie)
+						</label>
+						<input
+							id="apartmentNumber"
+							name="apartmentNumber"
+							type="text"
+							value={formData.apartmentNumber || ''}
+							onChange={handleChange}
+							className={styles.input}
+							placeholder="np. 12"
+						/>
+					</div>
 
-				<div className={styles.formGroup}>
-					<label htmlFor="apartmentNumber" className={styles.label}>
-						Numer mieszkania (opcjonalnie)
-					</label>
-					<input
-						id="apartmentNumber"
-						name="apartmentNumber"
-						type="text"
-						value={formData.apartmentNumber || ''}
-						onChange={handleChange}
-						className={styles.input}
-						placeholder="np. 12"
-					/>
-				</div>
+					<div className={styles.formGroup}>
+						<label htmlFor="zipCode" className={styles.label}>
+							Kod pocztowy *
+						</label>
+						<input
+							id="zipCode"
+							name="zipCode"
+							type="text"
+							value={formData.zipCode}
+							onChange={handleChange}
+							className={`${styles.input} ${errors.zipCode ? styles.inputError : ''}`}
+							placeholder="np. 30-059"
+							required
+						/>
+						{errors.zipCode && <p className={styles.error}>{errors.zipCode}</p>}
+					</div>
 
-				<div className={styles.formGroup}>
-					<label htmlFor="city" className={styles.label}>
-						Miasto *
-					</label>
-					<input
-						id="city"
-						name="city"
-						type="text"
-						value={formData.city}
-						onChange={handleChange}
-						className={`${styles.input} ${errors.city ? styles.inputError : ''}`}
-						placeholder="np. Kraków"
-						required
-					/>
-					{errors.city && <p className={styles.error}>{errors.city}</p>}
-				</div>
-
-				<div className={styles.formGroup}>
-					<label htmlFor="zipCode" className={styles.label}>
-						Kod pocztowy *
-					</label>
-					<input
-						id="zipCode"
-						name="zipCode"
-						type="text"
-						value={formData.zipCode}
-						onChange={handleChange}
-						className={`${styles.input} ${errors.zipCode ? styles.inputError : ''}`}
-						placeholder="np. 30-059"
-						required
-					/>
-					{errors.zipCode && <p className={styles.error}>{errors.zipCode}</p>}
-				</div>
-
-				<div className={styles.formGroup}>
-					<label htmlFor="phone" className={styles.label}>
-						Numer telefonu *
-					</label>
-					<input
-						id="phone"
-						name="phone"
-						type="tel"
-						value={formData.phone}
-						onChange={handlePhoneChange}
-						className={`${styles.input} ${errors.phone ? styles.inputError : ''}`}
-						placeholder="np. +48 123 456 789"
-						required
-					/>
-					{errors.phone && <p className={styles.error}>{errors.phone}</p>}
+					<div className={styles.formGroup}>
+						<label htmlFor="phone" className={styles.label}>
+							Numer telefonu *
+						</label>
+						<input
+							id="phone"
+							name="phone"
+							type="tel"
+							value={formData.phone}
+							onChange={handlePhoneChange}
+							className={`${styles.input} ${errors.phone ? styles.inputError : ''}`}
+							placeholder="np. +48 123 456 789"
+							required
+						/>
+						{errors.phone && <p className={styles.error}>{errors.phone}</p>}
+					</div>
 				</div>
 			</div>
 

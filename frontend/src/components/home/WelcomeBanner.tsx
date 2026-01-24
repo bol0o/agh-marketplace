@@ -6,6 +6,7 @@ import { useAuth } from '@/store/useAuth';
 import { useNotifications } from '@/hooks/useNotifications';
 // import { useMessages } from '@/hooks/useMessages';
 import styles from './WelcomeBanner.module.scss';
+import { useChat } from '@/hooks/useChat';
 
 interface WelcomeBannerProps {
 	className?: string;
@@ -14,8 +15,7 @@ interface WelcomeBannerProps {
 export function WelcomeBanner({ className = '' }: WelcomeBannerProps) {
 	const { user } = useAuth();
 	const { unreadCount: notificationCount } = useNotifications();
-	// const { unreadMessages: messageCount } = useMessages();
-	const messageCount = 1;
+	const { totalUnreadMessages } = useChat();
 
 	if (!user) return null;
 
@@ -26,7 +26,7 @@ export function WelcomeBanner({ className = '' }: WelcomeBannerProps) {
 		? `Witaj ${userFirstName}, co tam na Wydziale ${faculty}?`
 		: `Witaj ${userFirstName}, co tam u Ciebie?`;
 
-	const hasMessages = messageCount > 0;
+	const hasMessages = totalUnreadMessages > 0;
 	const hasNotifications = notificationCount > 0;
 
 	return (
@@ -66,8 +66,8 @@ export function WelcomeBanner({ className = '' }: WelcomeBannerProps) {
 								<span className={styles.statBadge}>
 									<MessageSquare size={16} />
 									<span>
-										{messageCount}{' '}
-										{messageCount > 1 ? 'wiadomości' : 'wiadomość'}
+										{totalUnreadMessages}{' '}
+										{totalUnreadMessages > 1 ? 'wiadomości' : 'wiadomość'}
 									</span>
 								</span>
 							)}

@@ -34,7 +34,7 @@ export const useUser = ({ userId }: UseUserProps = {}) => {
 
 	const searchParams = useSearchParams();
 	const page = searchParams.get('page') || '1';
-	const limit = searchParams.get('limit') || '10';
+	const limit = searchParams.get('limit') || '4';
 
 	const fetchUserData = useCallback(async () => {
 		try {
@@ -53,7 +53,6 @@ export const useUser = ({ userId }: UseUserProps = {}) => {
 
 			setUser(userData);
 
-			// Pobierz opinie z paginacją
 			const reviewsResponse = await api.get<PaginatedResponse>(`/reviews/${userData.id}`, {
 				params: { 
 					page: parseInt(page), 
@@ -83,25 +82,6 @@ export const useUser = ({ userId }: UseUserProps = {}) => {
 		fetchUserData();
 	}, [fetchUserData]);
 
-	const fetchReviewsPage = async (pageNum: number, pageLimit: number = 10) => {
-		try {
-			if (!user) return;
-
-			const response = await api.get<PaginatedResponse>(`/reviews/${user.id}`, {
-				params: { 
-					page: pageNum, 
-					limit: pageLimit 
-				}
-			});
-			
-			setReviews(response.data.reviews || []);
-			setPagination(response.data.pagination);
-		} catch (err: unknown) {
-			console.error('Error fetching reviews page:', err);
-			throw err;
-		}
-	};
-
 	const createReview = async (reviewData: Omit<CreateReviewData, 'revieweeId'>) => {
 		if (!user) throw new Error('No user selected');
 
@@ -111,7 +91,6 @@ export const useUser = ({ userId }: UseUserProps = {}) => {
 				revieweeId: user.id,
 			});
 
-			// Po dodaniu nowej opinii, przeładuj dane (w tym paginację)
 			await fetchUserData();
 
 			if (user) {
@@ -148,7 +127,6 @@ export const useUser = ({ userId }: UseUserProps = {}) => {
 
 			await api.delete(`/reviews/${reviewId}`);
 
-			// Po usunięciu opinii, przeładuj dane
 			await fetchUserData();
 
 			if (user && user.ratingCount > 1) {

@@ -13,10 +13,18 @@ export interface OrderItemSnapshot {
 	price: number;
 }
 
+interface ProductSeller {
+    firstName: string;
+    lastName: string;
+    avgRating: number;
+    reviewsCount: number;
+}
+
 export interface OrderItem {
 	productId: string;
 	quantity: number;
 	snapshot: OrderItemSnapshot;
+    seller: ProductSeller;
 }
 
 export interface Order {

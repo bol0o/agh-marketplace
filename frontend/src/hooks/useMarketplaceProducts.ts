@@ -39,7 +39,7 @@ export const useMarketplaceProducts = (): UseMarketplaceProductsReturn => {
 		if (maxPrice) params.set('maxPrice', maxPrice);
 
 		const type = searchParams.get('type');
-		if (type && type !== 'all') params.set('status', type);
+		if (type && type !== 'all') params.set('type', type);
 
 		const onlyFollowed = searchParams.get('onlyFollowed');
 		if (onlyFollowed) params.set('onlyFollowed', 'true');

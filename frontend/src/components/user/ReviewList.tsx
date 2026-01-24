@@ -141,7 +141,7 @@ export function ReviewList({
 							<div className={styles.reviewHeader}>
 								<div className={styles.reviewerSection}>
 									<Link
-										href={`/user/${review.reviewerId}`}
+										href={`/user/${review.reviewer?.id}`}
 										className={styles.reviewerLink}
 										aria-label={`Profil użytkownika ${review.reviewer?.name || 'Anonim'}`}
 									>
