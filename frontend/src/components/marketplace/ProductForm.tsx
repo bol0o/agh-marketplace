@@ -182,6 +182,13 @@ export function ProductForm({
 				throw new Error('Podaj datę zakończenia aukcji');
 			}
 
+			if (formData.type === 'auction' && formData.endsAt) {
+				const auctionEnd = new Date(formData.endsAt);
+				if (auctionEnd <= new Date()) {
+					throw new Error('Data zakończenia aukcji musi być w przyszłości');
+				}
+			}
+
 			let finalImage = formData.imageUrl || undefined;
 
 			if (selectedImage) {
@@ -193,26 +200,25 @@ export function ProductForm({
 					finalImage = uploadedUrl;
 				} catch (uploadErr: unknown) {
 					console.error('Image upload error:', uploadErr);
-
 					const errorMessage =
 						uploadErr instanceof Error ? uploadErr.message : 'Nieznany błąd';
-
 					throw new Error(`Błąd przesyłania obrazka: ${errorMessage}`);
 				}
 			}
 
-            let endsAtFormatted = undefined;
-            if (formData.type === 'auction' && formData.endsAt) {
-                const localDate = new Date(formData.endsAt);
-                
-                const year = localDate.getFullYear();
-                const month = String(localDate.getMonth() + 1).padStart(2, '0');
-                const day = String(localDate.getDate()).padStart(2, '0');
-                const hours = String(localDate.getHours()).padStart(2, '0');
-                const minutes = String(localDate.getMinutes()).padStart(2, '0');
-                
-                endsAtFormatted = `${year}-${month}-${day}T${hours}:${minutes}:00.000Z`;
-            }
+			let endsAtFormatted = undefined;
+			if (formData.type === 'auction' && formData.endsAt) {
+				const date = new Date(formData.endsAt);
+				endsAtFormatted = date.toISOString();
+
+				console.log('EndsAt data:', {
+					original: formData.endsAt,
+					iso: endsAtFormatted,
+					dateObject: date,
+				});
+			} else if (formData.type === 'buy_now') {
+				endsAtFormatted = null;
+			}
 
 			const apiPayload = {
 				title: formData.title.trim(),
@@ -224,9 +230,10 @@ export function ProductForm({
 				location: formData.location.trim(),
 				stock: Number(formData.stock),
 				imageUrl: finalImage,
-				image: finalImage,
-				endsAt: endsAtFormatted
+				endsAt: endsAtFormatted,
 			};
+
+			console.log('API Payload being sent:', JSON.stringify(apiPayload, null, 2));
 
 			await onSubmit(apiPayload as unknown as ProductFormData);
 		} catch (err: unknown) {
@@ -261,6 +268,11 @@ export function ProductForm({
 			setFormData((prev) => ({
 				...prev,
 				[name]: value === '' ? '' : parseFloat(value),
+			}));
+		} else if (type === 'datetime-local') {
+			setFormData((prev) => ({
+				...prev,
+				[name]: value ? value + ':00' : null,
 			}));
 		} else {
 			setFormData((prev) => ({

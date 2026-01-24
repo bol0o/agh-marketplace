@@ -157,16 +157,7 @@ export const getProducts = async (req: AuthRequest, res: Response) => {
       prisma.product.count({ where }),
     ]);
 
-    const productsWithRating = products.map((product) => ({
-      ...product,
-      seller: {
-        id: product.seller.id,
-        name: `${product.seller.firstName} ${product.seller.lastName}`,
-        avatarUrl: product.seller.avatarUrl,
-        rating: calculateSellerRating(product.seller),
-        reviewsCount: product.seller.reviewsReceived.length,
-      },
-    }));
+    const mappedProducts = products.map((product) => mapProduct(product));
 
     res.json({
       pagination: {
@@ -175,7 +166,7 @@ export const getProducts = async (req: AuthRequest, res: Response) => {
         currentPage: page,
         itemsPerPage: limit,
       },
-      products: productsWithRating,
+      products: mappedProducts,
     });
   } catch (error) {
     console.error(error);
@@ -207,18 +198,7 @@ export const getProductById = async (req: Request, res: Response) => {
       },
     });
 
-    const formattedProduct = {
-      ...product,
-      seller: {
-        id: product.seller.id,
-        name: `${product.seller.firstName} ${product.seller.lastName}`,
-        avatarUrl: product.seller.avatarUrl,
-        rating: calculateSellerRating(product.seller),
-        reviewsCount: product.seller.reviewsReceived.length,
-      },
-    };
-
-    res.json(formattedProduct);
+    res.json(mapProduct(product));
   } catch (error) {
     res.status(404).json({ error: "Produkt nie znaleziony" });
   }
@@ -252,6 +232,12 @@ export const createProduct = async (req: AuthRequest, res: Response) => {
           .json({ error: "Aukcje muszą posiadać datę zakończenia (endsAt)" });
       }
       finalAuctionEnd = new Date(endsAt);
+
+      if (finalAuctionEnd <= new Date()) {
+        return res.status(400).json({
+          error: "Data zakończenia aukcji musi być w przyszłości",
+        });
+      }
     }
 
     const product = await prisma.product.create({
@@ -284,7 +270,7 @@ export const createProduct = async (req: AuthRequest, res: Response) => {
 
     res.status(201).json(mapProduct(product));
   } catch (error) {
-    console.error(error);
+    console.error("Error in createProduct:", error);
     res.status(500).json({ error: "Błąd podczas tworzenia produktu" });
   }
 };
@@ -312,7 +298,11 @@ export const updateProduct = async (req: AuthRequest, res: Response) => {
       include: { bids: true },
     });
 
-    if (!existing || existing.sellerId !== userId) {
+    if (!existing) {
+      return res.status(404).json({ error: "Produkt nie znaleziony" });
+    }
+
+    if (existing.sellerId !== userId) {
       return res
         .status(403)
         .json({ error: "Możesz edytować tylko swoje produkty" });
@@ -362,7 +352,7 @@ export const updateProduct = async (req: AuthRequest, res: Response) => {
 
     res.json(mapProduct(updated));
   } catch (error) {
-    console.error("Update error:", error);
+    console.error("Update error details:", error);
     res.status(500).json({ error: "Błąd aktualizacji produktu" });
   }
 };
