@@ -3,10 +3,9 @@ import { Category } from "@prisma/client";
 
 export const createProductSchema = z.object({
   body: z.object({
-    title: z.string().min(3),
-    description: z.string().min(10),
+    title: z.string().min(3, { message: "Tytuł jest za krótki" }),
+    description: z.string().min(10, { message: "Opis jest za krótki" }),
 
-    // POPRAWKA: Akceptujemy number LUB string (i zamieniamy na number)
     price: z.preprocess(
       (a) => {
         if (typeof a === "string") return parseFloat(a);
@@ -16,23 +15,22 @@ export const createProductSchema = z.object({
       z.number().min(0, { message: "Cena musi być liczbą nieujemną" }),
     ),
 
-    category: z.nativeEnum(Category),
-    condition: z.enum(["new", "used", "damaged"]),
-    location: z.string().min(2),
+    category: z.nativeEnum(Category, {
+      message: "Nieprawidłowa kategoria",
+    }),
+    condition: z.enum(["new", "used", "damaged"], {
+      message: "Wybierz stan: new, used lub damaged",
+    }),
+    location: z.string().min(2, { message: "Lokalizacja jest wymagana" }),
 
-    // POPRAWKA: isAuction może być booleanem (JSON) lub stringiem "true" (FormData)
-    isAuction: z
-      .preprocess((val) => {
-        if (typeof val === "string") return val === "true";
-        return val;
-      }, z.boolean())
-      .optional(),
+    type: z.enum(["auction", "buy_now"], {
+      message: "Typ musi być 'auction' lub 'buy_now'",
+    }),
 
-    auctionEnd: z.string().optional(),
+    endsAt: z.string().optional(),
 
     imageUrl: z.string().optional(),
 
-    // POPRAWKA: stock tak samo jak price
     stock: z
       .preprocess((a) => {
         if (typeof a === "string") return parseInt(a, 10);
