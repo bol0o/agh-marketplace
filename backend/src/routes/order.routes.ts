@@ -6,6 +6,7 @@ import {
   getOrderById,
   payOrder,
   updateOrderStatus,
+  cancelOrder,
 } from "../controllers/order.controller";
 import { authenticateToken } from "../middleware/auth.middleware";
 import { validate } from "../middleware/validate.middleware";
@@ -30,7 +31,8 @@ router.post("/:id/pay", payOrder); // Simulate payment
 router.patch(
   "/:id/status",
   validate(updateOrderStatusSchema),
-  updateOrderStatus
+  updateOrderStatus,
 );
+router.patch("/:id/cancel", cancelOrder);
 
 export default router;

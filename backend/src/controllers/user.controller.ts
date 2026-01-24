@@ -4,13 +4,13 @@ import { AuthRequest } from "../middleware/auth.middleware";
 
 const prisma = new PrismaClient();
 
-//HELPER: Map DB User to Frontend 'User' Interface
-const formatUserResponse = (user: any) => {
-  //Calculate average rating
+// HELPER: Map DB User to Frontend 'User' Interface
+const formatUserResponse = (user: any, soldCount: number = 0) => {
+  // Calculate average rating
   const reviewsCount = user.reviewsReceived.length;
   const ratingSum = user.reviewsReceived.reduce(
     (acc: number, r: any) => acc + r.rating,
-    0
+    0,
   );
   const avgRating = reviewsCount > 0 ? ratingSum / reviewsCount : 0;
 
@@ -30,7 +30,7 @@ const formatUserResponse = (user: any) => {
     ratingCount: reviewsCount,
     joinedAt: user.createdAt,
 
-    //Map flat DB columns to 'Address' object
+    // Map flat DB columns to 'Address' object
     address: user.city
       ? {
           street: user.street,
@@ -42,7 +42,7 @@ const formatUserResponse = (user: any) => {
         }
       : undefined,
 
-    //Map flat DB columns to 'Settings' object
+    // Map flat DB columns to 'Settings' object
     settings: {
       notifications: {
         email: user.notifyEmail,
@@ -51,16 +51,26 @@ const formatUserResponse = (user: any) => {
       },
     },
 
-    //Statistics
+    // Statistics
     listedProductsCount: user._count.products,
-    soldItemsCount: 0,
+    soldItemsCount: soldCount,
   };
+};
+
+const countSoldItems = async (userId: string) => {
+  return await prisma.orderItem.count({
+    where: {
+      product: { sellerId: userId },
+      order: { status: "COMPLETED" },
+    },
+  });
 };
 
 // GET /api/users/me
 export const getMe = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
+    if (!userId) return res.status(401).json({ error: "Unauthorized" });
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -72,7 +82,9 @@ export const getMe = async (req: AuthRequest, res: Response) => {
 
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    res.json(formatUserResponse(user));
+    const soldCount = await countSoldItems(userId);
+
+    res.json(formatUserResponse(user, soldCount));
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Error fetching profile" });
@@ -83,6 +95,8 @@ export const getMe = async (req: AuthRequest, res: Response) => {
 export const updateProfile = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
+    if (!userId) return res.status(401).json({ error: "Unauthorized" });
+
     const { firstName, lastName, avatarUrl, faculty, year } = req.body;
 
     const updatedUser = await prisma.user.update({
@@ -100,7 +114,9 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
       },
     });
 
-    res.json(formatUserResponse(updatedUser));
+    const soldCount = await countSoldItems(userId);
+
+    res.json(formatUserResponse(updatedUser, soldCount));
   } catch (error) {
     res.status(500).json({ error: "Error updating profile" });
   }
@@ -110,6 +126,8 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
 export const updateAddress = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
+    if (!userId) return res.status(401).json({ error: "Unauthorized" });
+
     const { street, city, zipCode, buildingNumber, apartmentNumber, phone } =
       req.body;
 
@@ -129,7 +147,9 @@ export const updateAddress = async (req: AuthRequest, res: Response) => {
       },
     });
 
-    res.json(formatUserResponse(updatedUser));
+    const soldCount = await countSoldItems(userId);
+
+    res.json(formatUserResponse(updatedUser, soldCount));
   } catch (error) {
     res.status(500).json({ error: "Error updating address" });
   }
@@ -139,6 +159,8 @@ export const updateAddress = async (req: AuthRequest, res: Response) => {
 export const updateSettings = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
+    if (!userId) return res.status(401).json({ error: "Unauthorized" });
+
     const { email, push, marketing } = req.body;
 
     const updatedUser = await prisma.user.update({
@@ -154,13 +176,15 @@ export const updateSettings = async (req: AuthRequest, res: Response) => {
       },
     });
 
-    res.json(formatUserResponse(updatedUser));
+    const soldCount = await countSoldItems(userId);
+
+    res.json(formatUserResponse(updatedUser, soldCount));
   } catch (error) {
     res.status(500).json({ error: "Error updating settings" });
   }
 };
 
-//GET /api/users/:id (Public Profile)
+// GET /api/users/:id (Public Profile)
 export const getPublicProfile = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
@@ -175,15 +199,17 @@ export const getPublicProfile = async (req: AuthRequest, res: Response) => {
 
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    //Calculate rating
+    const soldItemsCount = await countSoldItems(id);
+
+    // Calculate rating
     const reviewsCount = user.reviewsReceived.length;
     const ratingSum = user.reviewsReceived.reduce(
       (acc, r) => acc + r.rating,
-      0
+      0,
     );
     const avgRating = reviewsCount > 0 ? ratingSum / reviewsCount : 0;
 
-    //Map to 'PublicUserProfile' interface (Restrict private data)
+    // Map to 'PublicUserProfile' interface (Restrict private data)
     const publicProfile = {
       id: user.id,
       name: `${user.firstName} ${user.lastName}`,
@@ -196,10 +222,12 @@ export const getPublicProfile = async (req: AuthRequest, res: Response) => {
       ratingCount: reviewsCount,
       joinedAt: user.createdAt,
       listedProductsCount: user._count.products,
+      soldItemsCount: soldItemsCount,
     };
 
     res.json(publicProfile);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Error fetching public profile" });
   }
 };

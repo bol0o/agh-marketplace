@@ -136,10 +136,11 @@
 	}
 
 	.mobileAvatar {
+		position: relative;
 		margin-left: $spacing-xs;
 		padding: $spacing-xs;
 		text-decoration: none;
-
+    
 		div {
 			height: 32px;
 			width: 32px;
@@ -154,5 +155,9 @@
 				transform: scale(0.95);
 			}
 		}
+
+        img {
+            border-radius: $radius-circle;
+        }
 	}
 }

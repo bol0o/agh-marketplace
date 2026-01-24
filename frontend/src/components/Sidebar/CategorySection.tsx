@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Tag, Book, Cpu, Headphones, Shirt, Package } from 'lucide-react';
 import styles from './CategorySection.module.scss';
@@ -20,14 +20,11 @@ export default function CategorySection({
 	const router = useRouter();
 	const searchParams = useSearchParams();
 
-	const [localCategory, setLocalCategory] = useState<CategoryType | null>(
-		searchParams.get('cat') as CategoryType | null
-	);
+	const urlCategory = searchParams.get('cat') as CategoryType | null;
 
-	useEffect(() => {
-		const urlCategory = searchParams.get('cat') as CategoryType | null;
-		setLocalCategory(urlCategory);
-	}, [searchParams]);
+	const [internalCategory, setInternalCategory] = useState<CategoryType | null>(urlCategory);
+
+	const activeCategory = immediateUpdate ? urlCategory : internalCategory;
 
 	const categories: Array<{
 		id: CategoryType;
@@ -43,7 +40,9 @@ export default function CategorySection({
 	];
 
 	const handleCategoryClick = (categoryId: CategoryType | null) => {
-		setLocalCategory(categoryId);
+		if (!immediateUpdate) {
+			setInternalCategory(categoryId);
+		}
 
 		if (onCategoryChange) {
 			onCategoryChange(categoryId);
@@ -58,7 +57,10 @@ export default function CategorySection({
 				params.delete('cat');
 			}
 
+			params.delete('page');
+
 			const currentPath = window.location.pathname;
+
 			if (!currentPath.includes('/marketplace')) {
 				router.push(`/marketplace?${params.toString()}`);
 			} else {
@@ -71,7 +73,7 @@ export default function CategorySection({
 		handleCategoryClick(null);
 	};
 
-	const hasActiveCategory = localCategory !== null;
+	const hasActiveCategory = activeCategory !== null;
 
 	return (
 		<div className={styles.categorySection}>
@@ -82,7 +84,7 @@ export default function CategorySection({
 			<div className={styles.categoryList}>
 				<button
 					onClick={clearCategory}
-					className={`${styles.categoryItem} ${!localCategory ? styles.active : ''}`}
+					className={`${styles.categoryItem} ${!activeCategory ? styles.active : ''}`}
 				>
 					<div
 						className={styles.categoryIcon}
@@ -98,17 +100,17 @@ export default function CategorySection({
 						key={category.id}
 						onClick={() => handleCategoryClick(category.id)}
 						className={`${styles.categoryItem} ${
-							localCategory === category.id ? styles.active : ''
+							activeCategory === category.id ? styles.active : ''
 						}`}
 					>
 						<div
 							className={styles.categoryIcon}
 							style={{
 								backgroundColor:
-									localCategory === category.id
+									activeCategory === category.id
 										? category.color
 										: `${category.color}15`,
-								color: localCategory === category.id ? '#fff' : category.color,
+								color: activeCategory === category.id ? '#fff' : category.color,
 							}}
 						>
 							{category.icon}
@@ -122,7 +124,7 @@ export default function CategorySection({
 				<div className={styles.activeCategoryInfo}>
 					<span className={styles.activeCategoryLabel}>
 						Aktywna kategoria:{' '}
-						<strong>{categories.find((c) => c.id === localCategory)?.label}</strong>
+						<strong>{categories.find((c) => c.id === activeCategory)?.label}</strong>
 					</span>
 					<button onClick={clearCategory} className={styles.clearCategoryBtn}>
 						Wyczyść

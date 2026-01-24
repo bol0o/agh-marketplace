@@ -1,14 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { isAxiosError } from 'axios';
 import api from '@/lib/axios';
 import { useCartStore } from '@/store/useCartStore';
 import { useUIStore } from '@/store/uiStore';
-import { CartItem, AddToCartRequest, UpdateCartItemRequest } from '@/types/cart';
+import { AddToCartRequest, UpdateCartItemRequest } from '@/types/cart';
 
 export const useCart = () => {
 	const {
 		items,
 		setCart,
-		addItem: addItemToStore,
 		updateItem: updateItemInStore,
 		removeItem: removeItemFromStore,
 		setLoading,
@@ -18,25 +18,25 @@ export const useCart = () => {
 	const addToast = useUIStore((state) => state.addToast);
 	const [isInitialized, setIsInitialized] = useState(false);
 
-	useEffect(() => {
-		if (!isInitialized) {
-			fetchCart();
-			setIsInitialized(true);
-		}
-	}, [isInitialized]);
-
-	const fetchCart = async () => {
+	const fetchCart = useCallback(async () => {
 		try {
 			setLoading(true);
 			const response = await api.get('/cart');
 			setCart(response.data.items);
-		} catch (err: any) {
+		} catch (err: unknown) {
 			console.error('Error fetching cart:', err);
 			setError('Nie udało się załadować koszyka');
 		} finally {
 			setLoading(false);
 		}
-	};
+	}, [setLoading, setCart, setError]);
+
+	useEffect(() => {
+		if (!isInitialized) {
+			fetchCart();
+			setIsInitialized(true);
+		}
+	}, [isInitialized, fetchCart]);
 
 	const addToCart = async (productId: string, quantity: number = 1) => {
 		try {
@@ -48,10 +48,15 @@ export const useCart = () => {
 
 			addToast('Produkt dodany do koszyka', 'success');
 			return response.data;
-		} catch (err: any) {
+		} catch (err: unknown) {
 			console.error('Error adding to cart:', err);
-			const message =
-				err.response?.data?.message || 'Nie udało się dodać produktu do koszyka';
+
+			let message = 'Nie udało się dodać produktu do koszyka';
+
+			if (isAxiosError(err)) {
+				message = err.response?.data?.message || message;
+			}
+
 			addToast(message, 'error');
 			throw err;
 		} finally {
@@ -73,9 +78,15 @@ export const useCart = () => {
 			updateItemInStore(itemId, quantity);
 			addToast('Zaktualizowano ilość', 'success');
 			return response.data;
-		} catch (err: any) {
+		} catch (err: unknown) {
 			console.error('Error updating cart item:', err);
-			const message = err.response?.data?.message || 'Nie udało się zaktualizować koszyka';
+
+			let message = 'Nie udało się zaktualizować koszyka';
+
+			if (isAxiosError(err)) {
+				message = err.response?.data?.message || message;
+			}
+
 			addToast(message, 'error');
 			throw err;
 		} finally {
@@ -90,10 +101,15 @@ export const useCart = () => {
 
 			removeItemFromStore(itemId);
 			addToast('Usunięto z koszyka', 'success');
-		} catch (err: any) {
+		} catch (err: unknown) {
 			console.error('Error removing cart item:', err);
-			const message =
-				err.response?.data?.message || 'Nie udało się usunąć produktu z koszyka';
+
+			let message = 'Nie udało się usunąć produktu z koszyka';
+
+			if (isAxiosError(err)) {
+				message = err.response?.data?.message || message;
+			}
+
 			addToast(message, 'error');
 			throw err;
 		} finally {
@@ -104,13 +120,11 @@ export const useCart = () => {
 	const clearCart = async () => {
 		try {
 			setLoading(true);
-			for (const item of items) {
-				await api.delete(`/cart/${item.id}`);
-			}
+            await api.delete('/cart');
 
 			setCart([]);
 			addToast('Koszyk został wyczyszczony', 'success');
-		} catch (err: any) {
+		} catch (err: unknown) {
 			console.error('Error clearing cart:', err);
 			addToast('Nie udało się wyczyścić koszyka', 'error');
 			throw err;

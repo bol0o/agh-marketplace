@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { User, Upload, Loader } from 'lucide-react';
 import { User as UserType, UpdateProfileData } from '@/types/user';
@@ -13,7 +14,7 @@ interface ProfileFormProps {
 }
 
 export function ProfileForm({ user, onSubmit, isSubmitting }: ProfileFormProps) {
-	const { uploadImage, uploading: imageUploading, error: imageError } = useImageUpload();
+	const { uploadImage, error: imageError } = useImageUpload();
 
 	const [formData, setFormData] = useState({
 		firstName: user.name.split(' ')[0] || '',
@@ -56,7 +57,6 @@ export function ProfileForm({ user, onSubmit, isSubmitting }: ProfileFormProps) 
 			return;
 		}
 
-		// File type
 		if (!file.type.startsWith('image/')) {
 			setErrors((prev) => ({ ...prev, avatar: 'Plik musi być obrazem.' }));
 			return;
@@ -132,7 +132,6 @@ export function ProfileForm({ user, onSubmit, isSubmitting }: ProfileFormProps) 
 		await onSubmit(data);
 	};
 
-	// Lista wydziałów AGH
 	const faculties = [
 		'Wydział Informatyki',
 		'Wydział Informatyki, Elektroniki i Telekomunikacji',
@@ -156,13 +155,20 @@ export function ProfileForm({ user, onSubmit, isSubmitting }: ProfileFormProps) 
 
 			<div className={styles.avatarSection}>
 				<div className={styles.avatarContainer}>
-					{avatarPreview ? (
-						<img src={avatarPreview} alt="Awatar" className={styles.avatar} />
-					) : (
-						<div className={styles.avatarPlaceholder}>
-							<User size={32} />
-						</div>
-					)}
+					<div className={styles.avatar}>
+						{avatarPreview ? (
+							<Image
+								src={avatarPreview}
+								alt="Awatar"
+								fill
+								sizes="(max-width: 768px) 100px, 150px"
+							/>
+						) : (
+							<div className={styles.avatarPlaceholder}>
+								<User size={48} />
+							</div>
+						)}
+					</div>
 				</div>
 				<div className={styles.avatarUpload}>
 					<label className={styles.uploadButton}>

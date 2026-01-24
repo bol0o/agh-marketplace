@@ -140,9 +140,9 @@ export function ProductCard({ product }: { product: Product }) {
 							/>
 						) : (
 							<div className={styles.avatarPlaceholder}>
-								{product.seller.name
+								{(product.seller?.name || 'Użytkownik')
 									.split(' ')
-									.map((n) => n.charAt(0))
+									.map((n: string) => n.charAt(0))
 									.join('')}
 							</div>
 						)}

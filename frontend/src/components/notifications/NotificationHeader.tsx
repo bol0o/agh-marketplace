@@ -41,7 +41,6 @@ export function NotificationHeader({
 }: NotificationHeaderProps) {
 	return (
 		<header className={styles.header}>
-			{/* Górna część - tytuł i przyciski akcji */}
 			<div className={styles.topSection}>
 				<div className={styles.titleSection}>
 					<Bell size={28} />
@@ -98,7 +97,6 @@ export function NotificationHeader({
 				</div>
 			</div>
 
-			{/* Dolna część - filtry */}
 			<div className={styles.filterSection}>
 				<div className={styles.filterControls}>
 					<div className={styles.filterGroup}>

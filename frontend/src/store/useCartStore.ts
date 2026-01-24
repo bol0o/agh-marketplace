@@ -136,7 +136,6 @@ export const useCartStore = create<CartStore>()(
 				set({ error });
 			},
 
-			// Getters
 			getItem: (productId) => {
 				return get().items.find((item) => item.product.id === productId);
 			},

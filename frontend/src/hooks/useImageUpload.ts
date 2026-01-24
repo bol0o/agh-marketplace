@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { isAxiosError } from 'axios';
 import api from '@/lib/axios';
 
 interface UseImageUploadReturn {
@@ -26,8 +27,17 @@ export function useImageUpload(): UseImageUploadReturn {
 			});
 
 			return response.data.url;
-		} catch (err: any) {
-			const errorMessage = err.response?.data?.error || 'Nie udało się przesłać obrazka';
+		} catch (err: unknown) {
+			console.error('Upload error:', err);
+
+			let errorMessage = 'Nie udało się przesłać obrazka';
+
+			if (isAxiosError(err)) {
+				errorMessage = err.response?.data?.error || errorMessage;
+			} else if (err instanceof Error) {
+				errorMessage = err.message;
+			}
+
 			setError(errorMessage);
 			return null;
 		} finally {

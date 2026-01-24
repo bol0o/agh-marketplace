@@ -31,6 +31,7 @@
 }
 
 .avatar {
+	position: relative;
 	width: 80px;
 	height: 80px;
 	border-radius: $radius-circle;
@@ -41,7 +42,8 @@
 	box-shadow: $shadow-lg;
 	flex-shrink: 0;
 
-	img {
+	.avatarImg {
+        border-radius: $radius-circle;
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
@@ -239,5 +241,46 @@
 	.detailIcon {
 		width: 14px;
 		height: 14px;
+	}
+}
+
+.headerRow {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: $spacing-md;
+	flex-wrap: wrap;
+}
+
+.reportButton {
+	display: flex;
+	align-items: center;
+	gap: $spacing-xs;
+	padding: $spacing-sm $spacing-md;
+	background: $color-white;
+	border: 1px solid $color-border;
+	color: $color-text-light;
+	border-radius: $radius-md;
+	font-weight: 600;
+	font-size: 0.9rem;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	flex-shrink: 0;
+
+	&:hover {
+		background: $color-bg-alt;
+		border-color: $color-primary;
+		color: $color-primary;
+	}
+
+	&:focus-visible {
+		outline: 2px solid $color-primary;
+		outline-offset: 2px;
+	}
+}
+
+.reportText {
+	@media (max-width: $breakpoint-sm) {
+		display: none;
 	}
 }

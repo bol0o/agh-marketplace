@@ -53,6 +53,12 @@ $breakpoint-xxl: 1920px;
 	}
 }
 
+@mixin max-md {
+	@media (max-width: #{$breakpoint-md - 1}) {
+		@content;
+	}
+}
+
 @mixin flex-center {
 	display: flex;
 	align-items: center;

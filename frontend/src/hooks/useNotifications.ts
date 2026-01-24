@@ -17,6 +17,8 @@ interface NotificationState {
 	updateUnreadCount: (change: number) => void;
 }
 
+let globalPollInterval: NodeJS.Timeout | null = null;
+
 export const useNotifications = create<NotificationState>()(
 	persist(
 		(set, get) => ({
@@ -27,6 +29,9 @@ export const useNotifications = create<NotificationState>()(
 
 			fetchUnreadCount: async () => {
 				if (get().isFetching) return get().unreadCount;
+				const now = new Date().getTime();
+				const last = get().lastFetched ? new Date(get().lastFetched!).getTime() : 0;
+				if (now - last < 5000) return get().unreadCount;
 
 				try {
 					set({ isFetching: true });
@@ -43,26 +48,29 @@ export const useNotifications = create<NotificationState>()(
 
 					return count;
 				} catch (error) {
+					set({ isFetching: false });
 					console.error('Error fetching unread count:', error);
-					set({ unreadCount: 0, isFetching: false });
-					return 0;
+					return get().unreadCount;
 				}
 			},
 
-			startPolling: (interval = 30000) => {
-				if (get().isPolling) return () => {};
+			startPolling: (interval = 60000) => {
+				if (globalPollInterval) return () => {};
 
 				set({ isPolling: true });
 
 				get().fetchUnreadCount();
 
-				const pollInterval = setInterval(() => {
+				globalPollInterval = setInterval(() => {
 					get().fetchUnreadCount();
 				}, interval);
 
 				return () => {
-					clearInterval(pollInterval);
-					set({ isPolling: false });
+					if (globalPollInterval) {
+						clearInterval(globalPollInterval);
+						globalPollInterval = null;
+						set({ isPolling: false });
+					}
 				};
 			},
 
@@ -88,7 +96,11 @@ export const useNotifications = create<NotificationState>()(
 			},
 
 			reset: () => {
-				set({ unreadCount: 0, lastFetched: null });
+				if (globalPollInterval) {
+					clearInterval(globalPollInterval);
+					globalPollInterval = null;
+				}
+				set({ unreadCount: 0, lastFetched: null, isPolling: false });
 			},
 		}),
 		{
