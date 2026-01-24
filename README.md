@@ -120,8 +120,14 @@ http://localhost:3000/
 ### Credentials for testing
 
 **Admin accounts:**
+1. bolek@student.agh.edu.pl
+2. kaczmar@student.agh.edu.pl
+3. prowadzacy@student.agh.edu.pl 
 
 **Student accounts:**
+When running `npm run setup:full`, at the end 3 example student emails are given.
+
+**Password are set in /backend/.env file**
 
 ### Common issues
 
