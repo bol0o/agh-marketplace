@@ -1,12 +1,17 @@
 # 🛒 AGH Marketplace - Backend
 
-Final Project: AGH Marketplace with auctions.
 The application enables trading products, real-time bidding, and communication between buyers and sellers exclusively for AGH students.
 
 ## 👥 Authors
 
 - **Kamil Kaczmarczyk** - Backend & Database
 - **Paweł Bolek** - Frontend
+
+## 📚 API Documentation
+
+The project includes a comprehensive **Endpoint documentation** covering all endpoints.
+
+**Location:** `https://drive.google.com/file/d/1S0yf-Rf0bcQOEWZSD5GLgLc5s8Vrr3iM/view?usp=sharing`
 
 ## 🚀 Tech Stack
 
@@ -49,91 +54,6 @@ To run this project, you need:
 1. **Node.js** (v18+)
 2. **Docker Desktop** (to run the database container)
 3. **npm** (comes with Node.js)
-
-## 🛠️ Installation & Setup (Tutorial)
-
-### Step 0: Clone the Repository and navigate
-
-First, clone the project to your local machine:
-
-```bash
-git clone https://github.com/bol0o/agh-marketplace.git
-cd agh-marketplace/backend
-```
-
-### Step 1: Environment Configuration
-
-Create a `.env` file in the root directory and paste the following configuration:
-
-```env
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/agh_marketplace?schema=public"
-JWT_SECRET="key"
-JWT_REFRESH_SECRET="key_refresh"
-ADMIN_PASSWORD="admin123"
-STUDENT_PASSWORD="student123"
-PORT=3001
-# Optional (for images):
-CLOUDINARY_CLOUD_NAME=""
-CLOUDINARY_API_KEY=""
-CLOUDINARY_API_SECRET=""
-```
-
-### Step 2: Install dependencies
-
-```bash
-npm install
-```
-
-### Step 3: Start Database
-
-Start the PostgreSQL container using Docker (ensure Docker Desktop is running):
-
-```bash
-npm run db:up
-# or: docker-compose up -d
-```
-
-Verify the database is running:
-
-```bash
-docker ps
-# Should show a PostgreSQL container
-```
-
-### Step 4: Database Setup & seeding
-
-Run the complete setup command:
-
-```bash
-npm run setup:full
-```
-
-This command will:
-
-1. Generate Prisma Client
-2. Push the database schema
-3. Seed the database with:
-
-- Admin accounts (prowadzacy, kaczmar, bolek)
-- 20 random student accounts
-- 50 sample products
-- Test data for all features
-
-### Step 5: Start the Server
-
-```bash
-npm run dev
-```
-
-### Step 6: Database Preview (Optional)
-
-To see your data (users, products, bids) in a browser, run:
-
-```bash
-npx prisma studio
-```
-
-The server should now be running at `http://localhost:3001`.
 
 ## 📡 API Endpoints
 
@@ -381,9 +301,3 @@ npm run setup:full - Complete setup for new development environment
 3. All user emails must end with @student.agh.edu.pl (AGH students only)
 4. Background jobs automatically close expired auctions and send notifications
 5. Admin accounts can ban users and manage reports
-
-## 📚 API Documentation
-
-The project includes a comprehensive **Endpoint documentation** covering all endpoints.
-
-**Location:** `https://drive.google.com/file/d/1S0yf-Rf0bcQOEWZSD5GLgLc5s8Vrr3iM/view?usp=sharing`
