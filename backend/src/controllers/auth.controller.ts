@@ -20,35 +20,41 @@ if (!process.env.JWT_REFRESH_SECRET) {
 const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
 
-//HELPER
+// HELPER
 const generateAuthResponse = (
   user: any,
   accessToken: string,
-  refreshToken: string
+  refreshToken: string,
+  soldCount: number = 0,
 ) => {
   return {
-    token: accessToken, // Frontend expects 'token'
+    token: accessToken,
     refreshToken,
     user: {
       id: user.id,
       email: user.email,
-      //Map: Combine first and last name into 'name'
       name: `${user.firstName} ${user.lastName}`,
-      //Map: avatarUrl -> avatar
       avatar: user.avatarUrl,
-      //Map: STUDENT -> student (lowercase)
       role: user.role.toLowerCase(),
 
-      // Mocks for fields required by Frontend but not in DB yet
+      address: {
+        street: user.street || null,
+        city: user.city || null,
+        zipCode: user.zipCode || null,
+        buildingNumber: user.buildingNumber || null,
+        apartmentNumber: user.apartmentNumber || null,
+        phone: user.phone || null,
+      },
+
       studentInfo: {
         faculty: user.faculty || null,
-        year: 1, // Placeholder
+        year: user.studentYear || 1,
       },
       rating: 0,
       ratingCount: 0,
       joinedAt: user.createdAt,
       listedProductsCount: 0,
-      soldItemsCount: 0,
+      soldItemsCount: soldCount,
     },
   };
 };
@@ -88,17 +94,17 @@ export const register = async (req: Request, res: Response) => {
       },
     });
 
-    //Auto-login after register (generate tokens immediately)
+    //Auto-login after register
     const accessToken = jwt.sign(
       { userId: user.id, role: user.role },
       JWT_SECRET,
-      { expiresIn: "15m" }
+      { expiresIn: "15m" },
     );
 
     const refreshToken = jwt.sign(
       { userId: user.id, role: user.role },
       JWT_REFRESH_SECRET,
-      { expiresIn: "7d" }
+      { expiresIn: "7d" },
     );
 
     //Save refresh token
@@ -141,18 +147,25 @@ export const login = async (req: Request, res: Response) => {
       return res.status(400).json({ error: "Nieprawidłowy email lub hasło" });
     }
 
+    const soldCount = await prisma.orderItem.count({
+      where: {
+        product: { sellerId: user.id },
+        order: { status: "COMPLETED" },
+      },
+    });
+
     //Generate Access Token (15 min)
     const accessToken = jwt.sign(
       { userId: user.id, role: user.role },
       JWT_SECRET,
-      { expiresIn: "15m" }
+      { expiresIn: "15m" },
     );
 
     //Generate Refresh Token (7 days)
     const refreshToken = jwt.sign(
       { userId: user.id, role: user.role },
       JWT_REFRESH_SECRET,
-      { expiresIn: "7d" }
+      { expiresIn: "7d" },
     );
 
     //Save Refresh Token in DB
@@ -161,7 +174,8 @@ export const login = async (req: Request, res: Response) => {
       data: { refreshToken: refreshToken },
     });
 
-    res.json(generateAuthResponse(user, accessToken, refreshToken));
+    // Pass soldCount to the helper
+    res.json(generateAuthResponse(user, accessToken, refreshToken, soldCount));
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Błąd serwera podczas logowania" });
@@ -171,7 +185,7 @@ export const login = async (req: Request, res: Response) => {
 //REFRESH TOKEN (Get new Access Token)
 export const refreshToken = async (req: Request, res: Response) => {
   try {
-    const { token } = req.body; //Client sends { "token": "REFRESH_TOKEN" }
+    const { token } = req.body;
 
     if (!token) return res.sendStatus(401);
 
@@ -193,7 +207,7 @@ export const refreshToken = async (req: Request, res: Response) => {
       const newAccessToken = jwt.sign(
         { userId: user.id, role: user.role },
         JWT_SECRET,
-        { expiresIn: "15m" }
+        { expiresIn: "15m" },
       );
 
       res.json({ accessToken: newAccessToken });

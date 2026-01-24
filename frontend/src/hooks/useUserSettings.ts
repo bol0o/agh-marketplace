@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { isAxiosError } from 'axios';
 import api from '@/lib/axios';
 import { UpdateProfileData, UpdateAddressData, UpdateSettingsData, User } from '@/types/user';
 
@@ -32,9 +33,15 @@ export const useUserSettings = (user: User | null, options?: UseUserSettingsOpti
 			options?.onSuccess?.(successMsg);
 
 			return response.data;
-		} catch (err: any) {
+		} catch (err: unknown) {
 			console.error('Error updating profile:', err);
-			const errorMsg = err.response?.data?.message || 'Nie udało się zaktualizować profilu';
+
+			let errorMsg = 'Nie udało się zaktualizować profilu';
+
+			if (isAxiosError(err)) {
+				errorMsg = err.response?.data?.message || errorMsg;
+			}
+
 			setError(errorMsg);
 			options?.onError?.(errorMsg);
 			return null;
@@ -63,9 +70,15 @@ export const useUserSettings = (user: User | null, options?: UseUserSettingsOpti
 			options?.onSuccess?.(successMsg);
 
 			return response.data;
-		} catch (err: any) {
+		} catch (err: unknown) {
 			console.error('Error updating address:', err);
-			const errorMsg = err.response?.data?.message || 'Nie udało się zaktualizować adresu';
+
+			let errorMsg = 'Nie udało się zaktualizować adresu';
+
+			if (isAxiosError(err)) {
+				errorMsg = err.response?.data?.message || errorMsg;
+			}
+
 			setError(errorMsg);
 			options?.onError?.(errorMsg);
 			return null;
@@ -87,7 +100,7 @@ export const useUserSettings = (user: User | null, options?: UseUserSettingsOpti
 			setError(null);
 			setSuccess(null);
 
-			const response = await api.patch('/users/me/settings', data);
+			await api.patch('/users/me/settings', data);
 
 			const successMsg = 'Ustawienia powiadomień zostały zaktualizowane pomyślnie';
 			setSuccess(successMsg);
@@ -100,9 +113,15 @@ export const useUserSettings = (user: User | null, options?: UseUserSettingsOpti
 					...data,
 				},
 			};
-		} catch (err: any) {
+		} catch (err: unknown) {
 			console.error('Error updating settings:', err);
-			const errorMsg = err.response?.data?.message || 'Nie udało się zaktualizować ustawień';
+
+			let errorMsg = 'Nie udało się zaktualizować ustawień';
+
+			if (isAxiosError(err)) {
+				errorMsg = err.response?.data?.message || errorMsg;
+			}
+
 			setError(errorMsg);
 			options?.onError?.(errorMsg);
 			return null;

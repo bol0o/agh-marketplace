@@ -38,7 +38,6 @@ export function NotificationList({
 	totalPages,
 	showOnlyUnread,
 	selectedType,
-	notificationTypes,
 	getNotificationType,
 	formatDate,
 	onMarkAsRead,

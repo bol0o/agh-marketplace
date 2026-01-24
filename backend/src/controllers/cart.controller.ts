@@ -76,6 +76,34 @@ export const addToCart = async (req: AuthRequest, res: Response) => {
       return res.status(401).json({ error: "Brak autoryzacji" });
     }
 
+    // Fetch product details first to check ownership and stock
+    const product = await prisma.product.findUnique({
+      where: { id: productId },
+    });
+
+    if (!product) {
+      return res.status(404).json({ error: "Produkt nie znaleziony" });
+    }
+
+    // Check if user is trying to buy their own product
+    if (product.sellerId === userId) {
+      return res
+        .status(400)
+        .json({ error: "Nie możesz dodać własnego produktu do koszyka" });
+    }
+
+    // Check if product is out of stock
+    if (product.stock === 0) {
+      return res.status(400).json({ error: "Produkt jest wyprzedany" });
+    }
+
+    // Check if requested quantity is available
+    if (product.stock < quantity) {
+      return res
+        .status(400)
+        .json({ error: "Brak wystarczającej ilości produktu w magazynie" });
+    }
+
     // Find or create user cart
     let cart = await prisma.cart.findUnique({ where: { userId } });
 
@@ -96,6 +124,13 @@ export const addToCart = async (req: AuthRequest, res: Response) => {
     let resultItem;
 
     if (existingItem) {
+      // Check if total quantity (existing + new) exceeds stock
+      if (existingItem.quantity + quantity > product.stock) {
+        return res.status(400).json({
+          error: "Nie można dodać więcej tego produktu (limit magazynowy)",
+        });
+      }
+
       // Update quantity
       resultItem = await prisma.cartItem.update({
         where: { id: existingItem.id },
@@ -122,7 +157,7 @@ export const addToCart = async (req: AuthRequest, res: Response) => {
 // PATCH /api/cart/:itemId
 export const updateCartItemQuantity = async (
   req: AuthRequest,
-  res: Response
+  res: Response,
 ) => {
   try {
     const { itemId } = req.params;
@@ -177,5 +212,33 @@ export const removeFromCart = async (req: AuthRequest, res: Response) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Nie udało się usunąć produktu" });
+  }
+};
+
+// DELETE /api/cart
+export const clearCart = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      return res.status(401).json({ error: "Brak autoryzacji" });
+    }
+
+    const cart = await prisma.cart.findUnique({
+      where: { userId },
+    });
+
+    if (!cart) {
+      return res.json({ items: [] });
+    }
+
+    await prisma.cartItem.deleteMany({
+      where: { cartId: cart.id },
+    });
+
+    res.json({ items: [] });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Nie udało się wyczyścić koszyka" });
   }
 };

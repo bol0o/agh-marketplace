@@ -9,8 +9,11 @@ import { MobileNav } from './MobileNav';
 import { SearchBar } from './SearchBar';
 import { MobileSearchBar } from './MobileSearchBar';
 import styles from './Header.module.scss';
+import { useAuth } from '@/store/useAuth';
+import Image from 'next/image';
 
 export function Header() {
+	const { user } = useAuth();
 	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 	const [isMobileMenuAnimating, setIsMobileMenuAnimating] = useState(false);
 	const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
@@ -71,13 +74,19 @@ export function Header() {
 								<ShoppingCart size={22} />
 							</Link>
 
-							<Link
-								href="/profile"
-								className={styles.mobileAvatar}
-								aria-label="Profil"
-							>
+							<Link href="/user" className={styles.mobileAvatar} aria-label="Profil">
 								<div>
-									<User size={18} />
+									{user?.avatar ? (
+										<Image
+											src={user.avatar}
+											alt={user.name}
+											fill
+											sizes="64px"
+											style={{ objectFit: 'cover' }}
+										/>
+									) : (
+										<User size={18} />
+									)}
 								</div>
 							</Link>
 						</div>

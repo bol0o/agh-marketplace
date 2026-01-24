@@ -23,7 +23,6 @@ interface NotificationItemProps {
 
 export function NotificationItem({
 	id,
-	type,
 	title,
 	message,
 	timestamp,

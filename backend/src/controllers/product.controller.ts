@@ -5,41 +5,38 @@ import { deleteImageFromCloudinary } from "./upload.controller";
 
 const prisma = new PrismaClient();
 
-// HELPER: Map DB Product to Frontend 'Product' Interface
 const mapProduct = (p: any) => ({
   id: p.id,
   title: p.title,
   description: p.description,
   price: p.price,
   image: p.imageUrl,
-
   category: p.category,
   condition: p.condition,
-
   type: p.isAuction ? "auction" : "buy_now",
-
   location: p.location,
-
   stock: p.stock,
   status: p.status,
-
   seller: {
     id: p.seller.id,
     name: `${p.seller.firstName} ${p.seller.lastName}`,
     avatar: p.seller.avatarUrl,
-    rating: 0,
+    rating: calculateSellerRating(p.seller),
   },
-
   views: p.views,
   createdAt: p.createdAt,
-
   endsAt: p.auctionEnd,
 });
 
-// GET /api/products (With Pagination, Filtering & Social Feed logic)
+const calculateSellerRating = (seller: any) => {
+  const reviews = seller.reviewsReceived || [];
+  if (reviews.length === 0) return 0;
+  const sum = reviews.reduce((acc: number, rev: any) => acc + rev.rating, 0);
+  return Number((sum / reviews.length).toFixed(1));
+};
+
 export const getProducts = async (req: AuthRequest, res: Response) => {
   try {
-    // 1. Pagination Params
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 24;
     const skip = (page - 1) * limit;
@@ -60,7 +57,6 @@ export const getProducts = async (req: AuthRequest, res: Response) => {
       status: "active",
     };
 
-    // 2. Build Search Filters
     if (search) {
       where.OR = [
         { title: { contains: String(search), mode: "insensitive" } },
@@ -70,7 +66,6 @@ export const getProducts = async (req: AuthRequest, res: Response) => {
     if (cat) {
       where.category = String(cat).toUpperCase();
     }
-    // Filter by Condition (e.g., 'new', 'used')
     if (condition) {
       where.condition = String(condition);
     }
@@ -90,7 +85,6 @@ export const getProducts = async (req: AuthRequest, res: Response) => {
       where.location = { contains: String(location), mode: "insensitive" };
     }
 
-    // 3. Social Feed Logic (Filter by followed users)
     if (onlyFollowed === "true") {
       const userId = req.user?.userId;
 
@@ -100,7 +94,6 @@ export const getProducts = async (req: AuthRequest, res: Response) => {
         });
       }
 
-      // Get list of followed user IDs
       const following = await prisma.follow.findMany({
         where: { followerId: userId },
         select: { followingId: true },
@@ -110,7 +103,6 @@ export const getProducts = async (req: AuthRequest, res: Response) => {
       where.sellerId = { in: followingIds };
     }
 
-    // 4. Sorting Logic
     let orderBy: any = { createdAt: "desc" };
 
     switch (sort) {
@@ -144,7 +136,6 @@ export const getProducts = async (req: AuthRequest, res: Response) => {
         orderBy = { createdAt: "desc" };
     }
 
-    // 5. Database Transaction: Fetch Data + Count Total
     const [products, total] = await prisma.$transaction([
       prisma.product.findMany({
         where,
@@ -158,6 +149,7 @@ export const getProducts = async (req: AuthRequest, res: Response) => {
               firstName: true,
               lastName: true,
               avatarUrl: true,
+              reviewsReceived: { select: { rating: true } },
             },
           },
         },
@@ -165,7 +157,8 @@ export const getProducts = async (req: AuthRequest, res: Response) => {
       prisma.product.count({ where }),
     ]);
 
-    // 6. Return Data with Pagination Metadata
+    const mappedProducts = products.map((product) => mapProduct(product));
+
     res.json({
       pagination: {
         totalItems: total,
@@ -173,7 +166,7 @@ export const getProducts = async (req: AuthRequest, res: Response) => {
         currentPage: page,
         itemsPerPage: limit,
       },
-      products: products.map(mapProduct),
+      products: mappedProducts,
     });
   } catch (error) {
     console.error(error);
@@ -181,12 +174,10 @@ export const getProducts = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// GET /api/products/:id (Details)
 export const getProductById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    // Increment view counter
     const product = await prisma.product.update({
       where: { id },
       data: { views: { increment: 1 } },
@@ -197,7 +188,12 @@ export const getProductById = async (req: Request, res: Response) => {
             firstName: true,
             lastName: true,
             avatarUrl: true,
+            reviewsReceived: { select: { rating: true } },
           },
+        },
+        bids: {
+          orderBy: { amount: "desc" },
+          take: 5,
         },
       },
     });
@@ -208,7 +204,6 @@ export const getProductById = async (req: Request, res: Response) => {
   }
 };
 
-// POST /api/products (Create)
 export const createProduct = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
@@ -228,16 +223,21 @@ export const createProduct = async (req: AuthRequest, res: Response) => {
     } = req.body;
 
     const isAuctionBool = type === "auction";
-
     let finalAuctionEnd = null;
 
     if (isAuctionBool) {
       if (!endsAt) {
         return res
           .status(400)
-          .json({ error: "Aukcje muszą posiadać datę zakończenia" });
+          .json({ error: "Aukcje muszą posiadać datę zakończenia (endsAt)" });
       }
       finalAuctionEnd = new Date(endsAt);
+
+      if (finalAuctionEnd <= new Date()) {
+        return res.status(400).json({
+          error: "Data zakończenia aukcji musi być w przyszłości",
+        });
+      }
     }
 
     const product = await prisma.product.create({
@@ -250,11 +250,8 @@ export const createProduct = async (req: AuthRequest, res: Response) => {
         imageUrl: imageUrl || null,
         condition,
         location,
-
         stock: stock ? Number(stock) : 1,
         status: "active",
-
-        // Mapped values for DB
         isAuction: isAuctionBool,
         auctionEnd: finalAuctionEnd,
       },
@@ -265,6 +262,7 @@ export const createProduct = async (req: AuthRequest, res: Response) => {
             firstName: true,
             lastName: true,
             avatarUrl: true,
+            reviewsReceived: { select: { rating: true } },
           },
         },
       },
@@ -272,12 +270,11 @@ export const createProduct = async (req: AuthRequest, res: Response) => {
 
     res.status(201).json(mapProduct(product));
   } catch (error) {
-    console.error(error);
+    console.error("Error in createProduct:", error);
     res.status(500).json({ error: "Błąd podczas tworzenia produktu" });
   }
 };
 
-// PATCH /api/products/:id (Edit)
 export const updateProduct = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
@@ -296,21 +293,22 @@ export const updateProduct = async (req: AuthRequest, res: Response) => {
       endsAt,
     } = req.body;
 
-    // Check ownership and current bids
     const existing = await prisma.product.findUnique({
       where: { id },
-      include: { bids: true }, // Need to check bids
+      include: { bids: true },
     });
 
-    if (!existing || existing.sellerId !== userId) {
+    if (!existing) {
+      return res.status(404).json({ error: "Produkt nie znaleziony" });
+    }
+
+    if (existing.sellerId !== userId) {
       return res
         .status(403)
         .json({ error: "Możesz edytować tylko swoje produkty" });
     }
 
-    // Prevent price editing if auction has bids
     if (existing.isAuction && existing.bids.length > 0) {
-      // If user tries to change price
       if (price && Number(price) !== existing.price) {
         return res.status(400).json({
           error: "Nie można zmienić ceny aukcji, w której są już oferty",
@@ -318,8 +316,11 @@ export const updateProduct = async (req: AuthRequest, res: Response) => {
       }
     }
 
-    // Mapping logic for updates
-    const isAuctionBool = type ? type === "auction" : undefined;
+    let isAuctionBool: boolean | undefined = undefined;
+    if (type) {
+      isAuctionBool = type === "auction";
+    }
+
     const auctionEndDate = endsAt ? new Date(endsAt) : undefined;
 
     const updated = await prisma.product.update({
@@ -331,10 +332,8 @@ export const updateProduct = async (req: AuthRequest, res: Response) => {
         condition,
         location,
         imageUrl,
-
         price: price ? Number(price) : undefined,
         stock: stock ? Number(stock) : undefined,
-
         isAuction: isAuctionBool,
         auctionEnd: auctionEndDate,
       },
@@ -345,6 +344,7 @@ export const updateProduct = async (req: AuthRequest, res: Response) => {
             firstName: true,
             lastName: true,
             avatarUrl: true,
+            reviewsReceived: { select: { rating: true } },
           },
         },
       },
@@ -352,12 +352,11 @@ export const updateProduct = async (req: AuthRequest, res: Response) => {
 
     res.json(mapProduct(updated));
   } catch (error) {
-    console.error("Update error:", error);
+    console.error("Update error details:", error);
     res.status(500).json({ error: "Błąd aktualizacji produktu" });
   }
 };
 
-// DELETE /api/products/:id (Remove)
 export const deleteProduct = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
@@ -368,14 +367,12 @@ export const deleteProduct = async (req: AuthRequest, res: Response) => {
     if (!product)
       return res.status(404).json({ error: "Produkt nie istnieje" });
 
-    // Allow owner OR admin to delete
     if (product.sellerId !== userId && role !== "ADMIN") {
       return res
         .status(403)
         .json({ error: "Brak uprawnień do usunięcia tego produktu" });
     }
 
-    // Logic: Delete image from Cloudinary
     if (product.imageUrl) {
       await deleteImageFromCloudinary(product.imageUrl);
     }

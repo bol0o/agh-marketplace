@@ -6,8 +6,7 @@ import styles from './DesktopNav.module.scss';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useEffect } from 'react';
 import { useCartStore } from '@/store/useCartStore';
-
-const MESSAGE_COUNT = 2;
+import { useChat } from '@/hooks/useChat';
 
 interface DesktopNavProps {
 	pathname: string;
@@ -16,6 +15,7 @@ interface DesktopNavProps {
 export function DesktopNav({ pathname }: DesktopNavProps) {
 	const { unreadCount, fetchUnreadCount, startPolling } = useNotifications();
 	const { totalItems } = useCartStore();
+    const {totalUnreadMessages} = useChat();
 
 	useEffect(() => {
 		fetchUnreadCount();
@@ -48,10 +48,10 @@ export function DesktopNav({ pathname }: DesktopNavProps) {
 				</Link>
 
 				<IconButton
-					href="/chats"
+					href="/messages"
 					icon={<MessageSquare size={20} />}
 					isActive={isActive('/chats')}
-					badge={MESSAGE_COUNT}
+					badge={totalUnreadMessages}
 					title="Wiadomości"
 				/>
 

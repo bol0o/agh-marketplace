@@ -10,6 +10,8 @@ import {
 	TrendingUp,
 	ShoppingCart,
 	MessageSquare,
+	XCircle,
+	Loader,
 } from 'lucide-react';
 import { isAxiosError } from 'axios';
 import api from '@/lib/axios';
@@ -80,7 +82,7 @@ interface ApiResponse {
 export default function NotificationsPage() {
 	const searchParams = useSearchParams();
 	const page = searchParams.get('page') || '1';
-	const limit = searchParams.get('limit') || '12';
+	const limit = searchParams.get('limit') || '6';
 
 	const {
 		unreadCount: storeUnreadCount,
@@ -102,6 +104,7 @@ export default function NotificationsPage() {
 	});
 	const [markingAll, setMarkingAll] = useState(false);
 	const [deletingAll, setDeletingAll] = useState(false);
+	const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
 	const fetchNotifications = useCallback(async () => {
 		try {
@@ -189,11 +192,11 @@ export default function NotificationsPage() {
 		}
 	};
 
-	const handleDeleteAllRead = async () => {
-		if (!confirm('Czy na pewno chcesz usunąć wszystkie przeczytane powiadomienia?')) {
-			return;
-		}
+	const handleDeleteAllRead = () => {
+		setShowDeleteConfirm(true);
+	};
 
+	const confirmDeleteAllRead = async () => {
 		try {
 			setDeletingAll(true);
 
@@ -213,7 +216,12 @@ export default function NotificationsPage() {
 			console.error('Error deleting read notifications:', err);
 		} finally {
 			setDeletingAll(false);
+			setShowDeleteConfirm(false);
 		}
+	};
+
+	const cancelDeleteAllRead = () => {
+		setShowDeleteConfirm(false);
 	};
 
 	const formatDate = (dateString: string) => {
@@ -265,42 +273,84 @@ export default function NotificationsPage() {
 	}
 
 	return (
-		<div className={styles.container}>
-			<NotificationHeader
-				unreadCount={storeUnreadCount}
-				totalCount={pagination.totalItems}
-				markingAll={markingAll}
-				deletingAll={deletingAll}
-				hasReadNotifications={hasReadNotifications}
-				selectedType={selectedType}
-				showOnlyUnread={showOnlyUnread}
-				notificationTypes={NOTIFICATION_TYPES}
-				onMarkAllAsRead={handleMarkAllAsRead}
-				onDeleteAllRead={handleDeleteAllRead}
-				onTypeChange={setSelectedType}
-				onToggleUnread={() => setShowOnlyUnread(!showOnlyUnread)}
-			/>
+		<>
+			<div className={styles.container}>
+				<NotificationHeader
+					unreadCount={storeUnreadCount}
+					totalCount={pagination.totalItems}
+					markingAll={markingAll}
+					deletingAll={deletingAll}
+					hasReadNotifications={hasReadNotifications}
+					selectedType={selectedType}
+					showOnlyUnread={showOnlyUnread}
+					notificationTypes={NOTIFICATION_TYPES}
+					onMarkAllAsRead={handleMarkAllAsRead}
+					onDeleteAllRead={handleDeleteAllRead}
+					onTypeChange={setSelectedType}
+					onToggleUnread={() => setShowOnlyUnread(!showOnlyUnread)}
+				/>
 
-			{error && (
-				<div className={styles.errorAlert}>
-					<AlertCircle size={20} />
-					<span>{error}</span>
-					<button onClick={fetchNotifications}>Spróbuj ponownie</button>
+				{error && (
+					<div className={styles.errorAlert}>
+						<AlertCircle size={20} />
+						<span>{error}</span>
+						<button onClick={fetchNotifications}>Spróbuj ponownie</button>
+					</div>
+				)}
+
+				<div className={styles.mainContent}>
+					<NotificationList
+						notifications={notifications}
+						totalPages={pagination.totalPages}
+						showOnlyUnread={showOnlyUnread}
+						selectedType={selectedType}
+						notificationTypes={NOTIFICATION_TYPES}
+						getNotificationType={getNotificationType}
+						formatDate={formatDate}
+						onMarkAsRead={handleMarkAsRead}
+					/>
+				</div>
+			</div>
+
+			{showDeleteConfirm && (
+				<div className={styles.modalOverlay}>
+					<div className={styles.modal}>
+						<div className={styles.modalHeader}>
+							<XCircle className={styles.modalWarningIcon} size={24} />
+							<h3 className={styles.modalTitle}>Usunąć przeczytane powiadomienia?</h3>
+						</div>
+						
+						<p className={styles.modalMessage}>
+							Czy na pewno chcesz usunąć wszystkie przeczytane powiadomienia? 
+							Tej operacji nie można cofnąć.
+						</p>
+
+						<div className={styles.modalActions}>
+							<button
+								onClick={cancelDeleteAllRead}
+								className={styles.modalCancel}
+								disabled={deletingAll}
+							>
+								Anuluj
+							</button>
+							<button
+								onClick={confirmDeleteAllRead}
+								className={styles.modalDelete}
+								disabled={deletingAll}
+							>
+								{deletingAll ? (
+									<>
+										<Loader className={styles.modalSpinner} size={16} />
+										<span>Usuwanie...</span>
+									</>
+								) : (
+									'Tak, usuń'
+								)}
+							</button>
+						</div>
+					</div>
 				</div>
 			)}
-
-			<div className={styles.mainContent}>
-				<NotificationList
-					notifications={notifications}
-					totalPages={pagination.totalPages}
-					showOnlyUnread={showOnlyUnread}
-					selectedType={selectedType}
-					notificationTypes={NOTIFICATION_TYPES}
-					getNotificationType={getNotificationType}
-					formatDate={formatDate}
-					onMarkAsRead={handleMarkAsRead}
-				/>
-			</div>
-		</div>
+		</>
 	);
 }

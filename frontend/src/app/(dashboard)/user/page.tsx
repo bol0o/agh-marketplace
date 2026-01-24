@@ -3,6 +3,7 @@
 import { UserProfileHeader } from '@/components/user/UserProfileHeader';
 import { UserStats } from '@/components/user/UserStats';
 import { ReviewList } from '@/components/user/ReviewList';
+import { Pagination } from '@/components/shared/Pagination';
 import { AlertCircle } from 'lucide-react';
 import { useUser } from '@/hooks/useUser';
 import { useAuth } from '@/store/useAuth';
@@ -11,7 +12,13 @@ import { PageLoading } from '@/components/shared/PageLoading';
 
 export default function CurrentUserPage() {
 	const { user } = useAuth();
-	const { user: profileUser, reviews, loading, error } = useUser();
+	const { 
+		user: profileUser, 
+		reviews, 
+		pagination, 
+		loading, 
+		error 
+	} = useUser();
 
 	if (loading) {
 		return <PageLoading text={'Ładowanie użytkownika...'} />;
@@ -32,7 +39,18 @@ export default function CurrentUserPage() {
 			<UserProfileHeader user={profileUser} isCurrentUser />
 			<UserStats user={profileUser} />
 
-			<ReviewList reviews={reviews} showAddReview={false} currentUserId={user?.id} />
+			<ReviewList 
+				reviews={reviews} 
+				showAddReview={false} 
+				currentUserId={user?.id} 
+				paginationInfo={pagination}
+			/>
+			
+			{pagination.totalPages > 1 && (
+				<div className={styles.paginationWrapper}>
+					<Pagination totalPages={pagination.totalPages} />
+				</div>
+			)}
 		</div>
 	);
 }

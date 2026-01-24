@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { PrismaClient, NotificationType } from "@prisma/client"; // <--- Added NotificationType
+import { PrismaClient, NotificationType } from "@prisma/client";
 import { AuthRequest } from "../middleware/auth.middleware";
 
 const prisma = new PrismaClient();
@@ -12,28 +12,45 @@ const formatOrderResponse = (order: any) => {
     status: order.status.toLowerCase(),
     buyerId: order.userId,
 
-    // Map DB 'totalPrice' to Frontend 'totalAmount'
     totalAmount: order.totalPrice,
     shippingCost: order.shippingCost,
 
-    // Reconstruct Address Object from flat DB structure
     shippingAddress: {
       street: order.shippingStreet,
+      buildingNumber: order.shippingBuildingNumber,
+      apartmentNumber: order.shippingApartmentNumber,
       city: order.shippingCity,
       zipCode: order.shippingZipCode,
       phone: order.shippingPhone,
     },
 
     // Map Items and Snapshots
-    items: order.items.map((item: any) => ({
-      productId: item.productId,
-      quantity: item.quantity,
-      snapshot: {
-        title: item.snapshotTitle,
-        image: item.snapshotImage, // Cloudinary URL
-        price: item.priceAtTime,
-      },
-    })),
+    items: order.items.map((item: any) => {
+      const reviews = item.product?.seller?.reviewsReceived || [];
+      const avgRating =
+        reviews.length > 0
+          ? reviews.reduce((acc: number, rev: any) => acc + rev.rating, 0) /
+            reviews.length
+          : 0;
+      return {
+        productId: item.productId,
+        quantity: item.quantity,
+        snapshot: {
+          title: item.snapshotTitle,
+          image: item.snapshotImage, // Cloudinary URL
+          price: item.priceAtTime,
+        },
+        seller: item.product?.seller
+          ? {
+              id: item.product.seller.id,
+              firstName: item.product.seller.firstName,
+              lastName: item.product.seller.lastName,
+              avgRating: Number(avgRating.toFixed(1)),
+              reviewsCount: reviews.length,
+            }
+          : null,
+      };
+    }),
 
     paymentId: "mock_payment_id",
   };
@@ -76,7 +93,7 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
 
         if (product.stock < item.quantity) {
           throw new Error(
-            `Produkt "${product.title}" jest niedostępny w wybranej ilości.`
+            `Produkt "${product.title}" jest niedostępny w wybranej ilości.`,
           );
         }
 
@@ -111,6 +128,8 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
           shippingCost: SHIPPING_COST,
           status: "PENDING",
           shippingStreet: address.street,
+          shippingBuildingNumber: address.buildingNumber,
+          shippingApartmentNumber: address.apartmentNumber || null,
           shippingCity: address.city,
           shippingZipCode: address.zipCode,
           shippingPhone: address.phone,
@@ -154,7 +173,19 @@ export const getOrders = async (req: AuthRequest, res: Response) => {
 
     const orders = await prisma.order.findMany({
       where: { userId },
-      include: { items: true },
+      include: {
+        items: {
+          include: {
+            product: {
+              include: {
+                seller: {
+                  include: { reviewsReceived: true },
+                },
+              },
+            },
+          },
+        },
+      },
       orderBy: { createdAt: "desc" },
     });
 
@@ -169,7 +200,6 @@ export const getSales = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
 
-    // Find orders containing items sold by this user
     const orders = await prisma.order.findMany({
       where: {
         items: {
@@ -178,7 +208,19 @@ export const getSales = async (req: AuthRequest, res: Response) => {
           },
         },
       },
-      include: { items: true },
+      include: {
+        items: {
+          include: {
+            product: {
+              include: {
+                seller: {
+                  include: { reviewsReceived: true },
+                },
+              },
+            },
+          },
+        },
+      },
       orderBy: { createdAt: "desc" },
     });
 
@@ -196,14 +238,31 @@ export const getOrderById = async (req: AuthRequest, res: Response) => {
 
     const order = await prisma.order.findUnique({
       where: { id },
-      include: { items: true },
+      include: {
+        items: {
+          include: {
+            product: {
+              include: {
+                seller: {
+                  include: { reviewsReceived: true },
+                },
+              },
+            },
+          },
+        },
+      },
     });
 
     if (!order)
       return res.status(404).json({ error: "Zamówienie nie istnieje" });
 
-    // Security: Only buyer or admin can access details
-    if (order.userId !== userId && req.user?.role !== "ADMIN") {
+    const isBuyer = order.userId === userId;
+    const isAdmin = req.user?.role === "ADMIN";
+    const isSeller = order.items.some(
+      (item) => item.product.sellerId === userId,
+    );
+
+    if (!isBuyer && !isAdmin && !isSeller) {
       return res.status(403).json({ error: "Brak dostępu do tego zamówienia" });
     }
 
@@ -213,7 +272,7 @@ export const getOrderById = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// POST /api/orders/:id/pay (Simulate Payment)
+// POST /api/orders/:id/pay
 export const payOrder = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
@@ -235,7 +294,19 @@ export const payOrder = async (req: AuthRequest, res: Response) => {
     const updatedOrder = await prisma.order.update({
       where: { id },
       data: { status: "COMPLETED" },
-      include: { items: true },
+      include: {
+        items: {
+          include: {
+            product: {
+              include: {
+                seller: {
+                  include: { reviewsReceived: true },
+                },
+              },
+            },
+          },
+        },
+      },
     });
 
     res.json(formatOrderResponse(updatedOrder));
@@ -253,7 +324,19 @@ export const updateOrderStatus = async (req: AuthRequest, res: Response) => {
     const updatedOrder = await prisma.order.update({
       where: { id },
       data: { status },
-      include: { items: true },
+      include: {
+        items: {
+          include: {
+            product: {
+              include: {
+                seller: {
+                  include: { reviewsReceived: true },
+                },
+              },
+            },
+          },
+        },
+      },
     });
 
     // Notify buyer about status change
@@ -270,5 +353,55 @@ export const updateOrderStatus = async (req: AuthRequest, res: Response) => {
     res.json(formatOrderResponse(updatedOrder));
   } catch (error) {
     res.status(500).json({ error: "Błąd aktualizacji statusu" });
+  }
+};
+
+// PATCH /api/orders/:id/cancel
+export const cancelOrder = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    const { id } = req.params;
+
+    const order = await prisma.order.findUnique({
+      where: { id },
+    });
+
+    if (!order)
+      return res.status(404).json({ error: "Zamówienie nie istnieje" });
+    if (order.userId !== userId)
+      return res
+        .status(403)
+        .json({ error: "Nie możesz anulować cudzego zamówienia" });
+
+    if (order.status !== "PENDING") {
+      return res
+        .status(400)
+        .json({ error: "Nie można anulować zamówienia w tym statusie" });
+    }
+
+    await prisma.$transaction(async (tx) => {
+      await tx.order.update({
+        where: { id },
+        data: { status: "CANCELLED" },
+      });
+
+      const orderItems = await tx.orderItem.findMany({
+        where: { orderId: id },
+      });
+
+      for (const item of orderItems) {
+        await tx.product.update({
+          where: { id: item.productId },
+          data: {
+            stock: { increment: item.quantity },
+            status: "active",
+          },
+        });
+      }
+    });
+
+    res.json({ message: "Zamówienie zostało anulowane" });
+  } catch (error) {
+    res.status(500).json({ error: "Błąd podczas anulowania zamówienia" });
   }
 };

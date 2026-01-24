@@ -1,5 +1,4 @@
 @use '@/styles/variables' as *;
-@use '@/styles/mixins' as *;
 
 .container {
 	background-color: $color-white;
@@ -18,7 +17,7 @@
 
 .header {
 	margin-bottom: $spacing-lg;
-	padding-right: 20px;
+	padding-right: 80px;
 }
 
 .title {
@@ -38,28 +37,28 @@
 	position: relative;
 	width: 100%;
 	height: auto;
-	padding-bottom: 0;
-	margin-bottom: 0;
+	margin: 0;
+	display: flex;
+	align-items: center;
 }
 
 .swiperContainer {
-	width: 100%;
+	width: calc(100% - 100px);
+	margin: 0 auto;
 	position: relative;
 	overflow: hidden;
-	padding-bottom: 0;
 }
 
 .swiper {
 	width: 100%;
 	height: 100%;
-	padding: 4px 0;
 }
 
 .slide {
 	height: auto;
 	display: flex;
 	justify-content: center;
-
+	
 	> * {
 		width: 100%;
 		max-width: 100%;
@@ -70,16 +69,65 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	gap: 8px;
-	margin-top: $spacing-lg;
+	margin-top: $spacing-xl;
 	padding-top: $spacing-md;
 	width: 100%;
 	min-height: 28px;
 }
 
+/* Progress bar - tylko desktop */
+.progressContainer {
+	width: 100%;
+	max-width: 300px;
+	display: none;
+	
+	&.desktopOnly {
+		display: none;
+		
+		@media (min-width: 768px) {
+			display: block;
+		}
+	}
+}
+
+.progressTrack {
+	width: 100%;
+	height: 4px;
+	background: $color-border;
+	border-radius: 2px;
+	overflow: hidden;
+	position: relative;
+}
+
+.progressBar {
+	height: 100%;
+	background: $color-primary;
+	border-radius: 2px;
+	transition: width 0.4s ease;
+	position: absolute;
+	left: 0;
+	top: 0;
+}
+
+/* Kropki paginacji - tylko mobile */
+.dotsContainer {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 8px;
+	
+	&.mobileOnly {
+		display: flex;
+		
+		@media (min-width: 768px) {
+			display: none;
+		}
+	}
+}
+
 .paginationDot {
-	width: 10px;
-	height: 10px;
+	width: 8px;
+	height: 8px;
 	border-radius: 50%;
 	background: $color-border;
 	border: none;
@@ -92,7 +140,7 @@
 	&:hover {
 		opacity: 0.8;
 		background: rgba($color-primary, 0.2);
-		transform: scale(1.1);
+		transform: scale(1.2);
 	}
 
 	&:focus-visible {
@@ -104,8 +152,8 @@
 .paginationDotActive {
 	background: $color-primary;
 	opacity: 1;
-	width: 28px;
-	border-radius: 5px;
+	width: 24px;
+	border-radius: 12px;
 
 	&:hover {
 		background: $color-primary;
@@ -117,8 +165,8 @@
 	position: absolute;
 	top: 50%;
 	transform: translateY(-50%);
-	width: 44px;
-	height: 44px;
+	width: 48px;
+	height: 48px;
 	border-radius: 50%;
 	background: $color-white;
 	border: 2px solid $color-primary;
@@ -128,31 +176,31 @@
 	align-items: center;
 	justify-content: center;
 	z-index: 30;
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+	box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 	transition: all 0.2s ease;
 
 	&:hover:not(:disabled) {
 		background: $color-primary;
 		color: $color-white;
-		transform: translateY(-50%) scale(1.1);
+		transform: translateY(-50%) scale(1.05);
+		box-shadow: 0 8px 20px rgba($color-primary, 0.3);
 	}
 
 	&:disabled {
 		opacity: 0.3;
 		cursor: not-allowed;
 		pointer-events: none;
+		border-color: $color-border;
+		color: $color-border;
+		box-shadow: none;
 	}
 
 	&.prevButton {
-		left: 10px;
+		left: -24px;
 	}
 
 	&.nextButton {
-		right: 10px;
-	}
-
-	@media (max-width: 640px) {
-		display: none;
+		right: -24px;
 	}
 }
 
@@ -160,6 +208,9 @@
 	opacity: 0.3 !important;
 	cursor: not-allowed !important;
 	pointer-events: none !important;
+	border-color: $color-border !important;
+	color: $color-border !important;
+	box-shadow: none !important;
 }
 
 .loading,
@@ -186,13 +237,58 @@
 	}
 }
 
-@media (max-width: 640px) {
+/* Media queries */
+
+@media (max-width: 768px) {
+	.header {
+		padding-right: 0;
+	}
+	
+	.swiperContainer {
+		width: calc(100% - 40px);
+	}
+	
+	.navButton {
+		width: 36px;
+		height: 36px;
+		
+		&.prevButton {
+			left: -18px;
+		}
+		
+		&.nextButton {
+			right: -18px;
+		}
+	}
+	
 	.customPagination {
-		margin-top: $spacing-md;
+		min-height: 24px;
+	}
+}
+
+@media (max-width: 640px) {
+	.container {
+		padding: $spacing-lg;
+	}
+	
+	.swiperContainer {
+		width: calc(100% - 20px);
+	}
+	
+	.navButton {
+		display: none;
+	}
+	
+	.customPagination {
+		margin-top: $spacing-lg;
 		padding-top: $spacing-sm;
+		min-height: 20px;
+	}
+	
+	.dotsContainer {
 		gap: 6px;
 	}
-
+	
 	.paginationDot {
 		width: 8px;
 		height: 8px;

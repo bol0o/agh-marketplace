@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import Link from 'next/link';
 import {
 	X,
@@ -16,6 +17,9 @@ import { MobileLink } from './MobileLink';
 import styles from './MobileNav.module.scss';
 import { useState, useCallback } from 'react';
 import { useAuth } from '@/store/useAuth';
+import Image from 'next/image';
+import { useNotifications } from '@/hooks/useNotifications';
+import { useChat } from '@/hooks/useChat';
 
 interface MobileNavProps {
 	isOpen: boolean;
@@ -25,10 +29,17 @@ interface MobileNavProps {
 
 export function MobileNav({ isOpen, onClose, isAnimating }: MobileNavProps) {
 	const [isLoggingOut, setIsLoggingOut] = useState(false);
-
 	const { user, logout } = useAuth();
-	const hasUnreadMessages = 2;
-	const hasUnreadNotifications = 5;
+	const { unreadCount, fetchUnreadCount, startPolling } = useNotifications();
+    const {totalUnreadMessages} = useChat();
+
+	useEffect(() => {
+		fetchUnreadCount();
+
+		const cleanup = startPolling(30000);
+
+		return cleanup;
+	}, [fetchUnreadCount, startPolling]);
 
 	const handleLogout = async () => {
 		if (isLoggingOut) return;
@@ -112,10 +123,10 @@ export function MobileNav({ isOpen, onClose, isAnimating }: MobileNavProps) {
 							<p>Społeczność</p>
 							<nav>
 								<MobileLink
-									href="/chats"
+									href="/messages"
 									icon={<MessageSquare size={20} />}
 									onClick={onClose}
-									badge={hasUnreadMessages}
+									badge={totalUnreadMessages}
 								>
 									Wiadomości
 								</MobileLink>
@@ -123,7 +134,7 @@ export function MobileNav({ isOpen, onClose, isAnimating }: MobileNavProps) {
 									href="/notifications"
 									icon={<Bell size={20} />}
 									onClick={onClose}
-									badge={hasUnreadNotifications}
+									badge={unreadCount}
 								>
 									Powiadomienia
 								</MobileLink>
@@ -189,8 +200,18 @@ export function MobileNav({ isOpen, onClose, isAnimating }: MobileNavProps) {
 							>
 								{user?.role === 'admin' ? (
 									<Shield size={20} />
+								) : user?.avatar ? (
+									<Image
+										src={user.avatar}
+										alt={user.name || 'User'}
+										fill
+										sizes="64px"
+										style={{ objectFit: 'cover', borderRadius: 999 }}
+									/>
 								) : (
-									user?.name?.charAt(0).toUpperCase() || 'U'
+									<span className={styles.avatarFallback}>
+										{user?.name?.charAt(0).toUpperCase() || 'U'}
+									</span>
 								)}
 							</div>
 							<div className={styles.text}>

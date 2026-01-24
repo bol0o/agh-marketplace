@@ -182,6 +182,13 @@ export function ProductForm({
 				throw new Error('Podaj datę zakończenia aukcji');
 			}
 
+			if (formData.type === 'auction' && formData.endsAt) {
+				const auctionEnd = new Date(formData.endsAt);
+				if (auctionEnd <= new Date()) {
+					throw new Error('Data zakończenia aukcji musi być w przyszłości');
+				}
+			}
+
 			let finalImage = formData.image || undefined;
 
 			if (selectedImage) {
@@ -193,12 +200,18 @@ export function ProductForm({
 					finalImage = uploadedUrl;
 				} catch (uploadErr: unknown) {
 					console.error('Image upload error:', uploadErr);
-
 					const errorMessage =
 						uploadErr instanceof Error ? uploadErr.message : 'Nieznany błąd';
-
 					throw new Error(`Błąd przesyłania obrazka: ${errorMessage}`);
 				}
+			}
+
+			let endsAtFormatted = undefined;
+			if (formData.type === 'auction' && formData.endsAt) {
+				const date = new Date(formData.endsAt);
+				endsAtFormatted = date.toISOString();
+			} else if (formData.type === 'buy_now') {
+				endsAtFormatted = null;
 			}
 
 			const apiPayload = {
@@ -211,12 +224,7 @@ export function ProductForm({
 				location: formData.location.trim(),
 				stock: Number(formData.stock),
 				imageUrl: finalImage,
-				image: finalImage,
-
-				endsAt:
-					formData.type === 'auction' && formData.endsAt
-						? new Date(formData.endsAt).toISOString()
-						: undefined,
+				endsAt: endsAtFormatted,
 			};
 
 			await onSubmit(apiPayload as unknown as ProductFormData);
@@ -252,6 +260,11 @@ export function ProductForm({
 			setFormData((prev) => ({
 				...prev,
 				[name]: value === '' ? '' : parseFloat(value),
+			}));
+		} else if (type === 'datetime-local') {
+			setFormData((prev) => ({
+				...prev,
+				[name]: value ? value + ':00' : null,
 			}));
 		} else {
 			setFormData((prev) => ({
@@ -509,7 +522,6 @@ export function ProductForm({
 					</div>
 				</div>
 
-				{/* Typ oferty */}
 				<div className={styles.offerSection}>
 					<h2 className={styles.sectionTitle}>Typ oferty</h2>
 
@@ -610,7 +622,6 @@ export function ProductForm({
 				</div>
 			</div>
 
-			{/* Błędy */}
 			{submitError && (
 				<div className={styles.errorMessage}>
 					<AlertCircle size={18} />

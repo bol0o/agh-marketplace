@@ -6,6 +6,7 @@ import { User, Settings, LogOut, Package, Lock, Shield } from 'lucide-react';
 import styles from './UserDropdown.module.scss';
 import { useAuth } from '@/store/useAuth';
 import { useUIStore } from '@/store/uiStore';
+import Image from 'next/image';
 
 export function UserDropdown() {
 	const [isOpen, setIsOpen] = useState(false);
@@ -51,13 +52,26 @@ export function UserDropdown() {
 				aria-expanded={isOpen}
 				aria-label="Moje konto"
 			>
-				<div className={styles.avatarPlaceholder}>
-					{user?.role === 'admin' ? (
-						<Shield size={18} className={styles.adminIcon} />
-					) : (
-						<User size={18} />
-					)}
-				</div>
+				 <div
+                    className={styles.avatarPlaceholder}
+                >
+                    {user?.role === 'admin' ? (
+                        <Shield size={20} />
+                    ) : user?.avatar ? (
+                        <Image
+                            src={user.avatar}
+                            alt={user.name || 'User'}
+                            fill
+                            sizes="64px"
+                            style={{ objectFit: 'cover', borderRadius: 999 }}
+                        />
+                    ) : (
+                        <span className={styles.avatarFallback}>
+                            {user?.name?.charAt(0).toUpperCase() || 'U'}
+                        </span>
+                    )}
+                </div>
+
 				<span>Moje Konto</span>
 			</button>
 

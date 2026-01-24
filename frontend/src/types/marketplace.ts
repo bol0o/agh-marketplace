@@ -4,7 +4,9 @@ export type ProductStatus = 'active' | 'sold' | 'ended' | 'reserved';
 
 export interface Seller {
 	id: string;
-	name: string;
+    name: string;
+	firstName: string;
+	lastName: string;
 	avatar: string | null;
 	rating: string;
 }
@@ -14,7 +16,7 @@ export interface Product {
 	title: string;
 	description: string;
 	price: number;
-	image?: string;
+	imageUrl?: string;
 	category: ProductCategory;
 	condition: ProductCondition;
 	type: 'auction' | 'buy_now';

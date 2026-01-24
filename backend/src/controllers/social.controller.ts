@@ -115,3 +115,61 @@ export const getFeed = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ message: "Nie udało się pobrać feedu" });
   }
 };
+
+// GET /api/social/follow/status/:id
+export const getFollowStatus = async (req: AuthRequest, res: Response) => {
+  try {
+    const followerId = req.user?.userId;
+    const { id: followingId } = req.params; // ID of the user we are checking
+
+    if (!followerId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    // Check if follow record exists in DB
+    const follow = await prisma.follow.findUnique({
+      where: {
+        followerId_followingId: {
+          followerId,
+          followingId,
+        },
+      },
+    });
+
+    return res.status(200).json({
+      isFollowing: !!follow, // Returns true if record exists, false otherwise
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Error checking follow status" });
+  }
+};
+
+// DELETE /api/social/unfollow/:id
+export const unfollowUser = async (req: AuthRequest, res: Response) => {
+  try {
+    const followerId = req.user?.userId;
+    const { id: followingId } = req.params;
+
+    if (!followerId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    // Attempt to delete the follow record
+    // We use deleteMany to avoid errors if the record doesn't exist
+    const deleteResult = await prisma.follow.deleteMany({
+      where: {
+        followerId,
+        followingId,
+      },
+    });
+
+    return res.status(200).json({
+      message: "Successfully unfollowed user",
+      isFollowing: false,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Error during unfollow process" });
+  }
+};

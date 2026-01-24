@@ -51,7 +51,7 @@ export default function LoginPage() {
 			const currentUser = useAuth.getState().user;
 			const name = currentUser?.name?.split(' ')[0] || 'Studencie';
 
-			addToast(`Witaj spowrotem, ${name}`, 'success');
+			addToast(`Witaj z powrotem, ${name}`, 'success');
 
 			const redirectTo = searchParams.get('redirect');
 			if (redirectTo) {
@@ -60,7 +60,7 @@ export default function LoginPage() {
 				if (currentUser?.role.toUpperCase() === 'ADMIN') {
 					router.push('/admin');
 				} else {
-					router.push('/marketplace');
+					router.push('/home');
 				}
 			}
 		} catch (error: unknown) {
