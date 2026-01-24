@@ -97,7 +97,7 @@ export function ProductForm({
 		type: 'buy_now',
 		location: '',
 		stock: 1,
-		image: undefined,
+		imageUrl: undefined,
 		endsAt: null,
 	});
 
@@ -115,14 +115,14 @@ export function ProductForm({
 				type: initialData.type || 'buy_now',
 				location: initialData.location || '',
 				stock: initialData.stock || 1,
-				image: initialData.image || undefined,
+				imageUrl: initialData.imageUrl || undefined,
 				endsAt: initialData.endsAt || null,
 			};
 
 			setFormData(transformedData);
 
-			if (initialData.image) {
-				setImagePreview(initialData.image);
+			if (initialData.imageUrl) {
+				setImagePreview(initialData.imageUrl);
 			}
 		}
 	}, [initialData]);
@@ -182,7 +182,7 @@ export function ProductForm({
 				throw new Error('Podaj datę zakończenia aukcji');
 			}
 
-			let finalImage = formData.image || undefined;
+			let finalImage = formData.imageUrl || undefined;
 
 			if (selectedImage) {
 				try {
@@ -201,6 +201,19 @@ export function ProductForm({
 				}
 			}
 
+            let endsAtFormatted = undefined;
+            if (formData.type === 'auction' && formData.endsAt) {
+                const localDate = new Date(formData.endsAt);
+                
+                const year = localDate.getFullYear();
+                const month = String(localDate.getMonth() + 1).padStart(2, '0');
+                const day = String(localDate.getDate()).padStart(2, '0');
+                const hours = String(localDate.getHours()).padStart(2, '0');
+                const minutes = String(localDate.getMinutes()).padStart(2, '0');
+                
+                endsAtFormatted = `${year}-${month}-${day}T${hours}:${minutes}:00.000Z`;
+            }
+
 			const apiPayload = {
 				title: formData.title.trim(),
 				description: formData.description.trim(),
@@ -212,11 +225,7 @@ export function ProductForm({
 				stock: Number(formData.stock),
 				imageUrl: finalImage,
 				image: finalImage,
-
-				endsAt:
-					formData.type === 'auction' && formData.endsAt
-						? new Date(formData.endsAt).toISOString()
-						: undefined,
+				endsAt: endsAtFormatted
 			};
 
 			await onSubmit(apiPayload as unknown as ProductFormData);
@@ -509,7 +518,6 @@ export function ProductForm({
 					</div>
 				</div>
 
-				{/* Typ oferty */}
 				<div className={styles.offerSection}>
 					<h2 className={styles.sectionTitle}>Typ oferty</h2>
 
@@ -610,7 +618,6 @@ export function ProductForm({
 				</div>
 			</div>
 
-			{/* Błędy */}
 			{submitError && (
 				<div className={styles.errorMessage}>
 					<AlertCircle size={18} />

@@ -1,4 +1,3 @@
-// src/components/admin/ReportsTable.tsx
 import { Report } from '@/types/report';
 import styles from './AdminDashboard.module.scss';
 

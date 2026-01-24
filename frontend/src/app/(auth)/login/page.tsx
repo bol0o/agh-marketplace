@@ -60,7 +60,7 @@ export default function LoginPage() {
 				if (currentUser?.role.toUpperCase() === 'ADMIN') {
 					router.push('/admin');
 				} else {
-					router.push('/marketplace');
+					router.push('/home');
 				}
 			}
 		} catch (error: unknown) {

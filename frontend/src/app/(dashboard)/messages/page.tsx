@@ -82,12 +82,11 @@ export default function MessagesPage() {
                             </div>
                         ))}
                         {chats.length === 0 && (
-                            <p className={styles.noChats}>Brak rozpoczętych rozmów.</p>
+                            <p className={styles.empty}>Brak rozpoczętych rozmów.</p>
                         )}
                     </div>
                 </aside>
 
-                {/* OKNO CZATU */}
                 <main className={`${styles.chatWindow} ${!selectedId ? styles.hiddenOnMobile : ''}`}>
                     {selectedId && activeChat ? (
                         <>

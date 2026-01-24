@@ -100,7 +100,7 @@ export default function SettingsPage() {
 			{activeTab === 'notifications' && (
 				<NotificationsForm
 					user={user}
-					onSubmit={handleNotificationsSubmit} // Używamy wrappera
+					onSubmit={handleNotificationsSubmit}
 					isSubmitting={isUpdating}
 				/>
 			)}

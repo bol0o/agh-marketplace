@@ -18,7 +18,6 @@ export function BidHistory({ productId, currentPrice }: BidHistoryProps) {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
-	// 2. Używamy useCallback dla fetchBids
 	const fetchBids = useCallback(async (): Promise<void> => {
 		try {
 			setLoading(true);
@@ -27,7 +26,6 @@ export function BidHistory({ productId, currentPrice }: BidHistoryProps) {
 			const sortedBids = response.data.sort((a, b) => b.amount - a.amount);
 			setBids(sortedBids);
 		} catch (err: unknown) {
-			// 3. Zmiana any na unknown
 			setError('Nie udało się pobrać historii ofert');
 			console.error('Błąd pobierania ofert:', err);
 		} finally {

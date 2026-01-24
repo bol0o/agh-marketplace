@@ -1,4 +1,3 @@
-// src/types/admin.ts
 export interface DashboardStats {
 	totalUsers: number;
 	activeListings: number;

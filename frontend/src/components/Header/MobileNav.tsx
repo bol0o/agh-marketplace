@@ -206,7 +206,7 @@ export function MobileNav({ isOpen, onClose, isAnimating }: MobileNavProps) {
 										alt={user.name || 'User'}
 										fill
 										sizes="64px"
-										style={{ objectFit: 'cover' }}
+										style={{ objectFit: 'cover', borderRadius: 999 }}
 									/>
 								) : (
 									<span className={styles.avatarFallback}>

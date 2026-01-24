@@ -345,7 +345,6 @@ $color-status-red-bg: #fee2e2;
 		transform: translateY(0);
 	}
 
-	// Style dla ReportsTable
 	&.banButton {
 		background-color: $color-status-red;
 		color: $color-white;
@@ -361,7 +360,6 @@ $color-status-red-bg: #fee2e2;
 		}
 	}
 
-	// Style dla UsersTable
 	&.ban {
 		background: $color-status-red-bg;
 		color: $color-status-red;

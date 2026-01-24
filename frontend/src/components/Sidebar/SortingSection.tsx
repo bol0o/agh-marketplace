@@ -74,7 +74,6 @@ export default function SortingSection({
 					<button
 						key={option.value}
 						onClick={() => handleSortChange(option.value)}
-						// Używamy activeSort zamiast localSort
 						className={`${styles.sortOption} ${
 							activeSort === option.value ? styles.active : ''
 						}`}

@@ -9,7 +9,6 @@ import styles from './AdminDashboard.module.scss';
 
 type Tab = 'overview' | 'users' | 'reports';
 
-// --- TYPY POMOCNICZE DLA API ---
 interface APIReport extends Omit<Report, 'reporter'> {
 	reporter: {
 		id: string;
@@ -24,16 +23,13 @@ const AdminDashboard = () => {
 	const [activeTab, setActiveTab] = useState<Tab>('reports');
 	const { addToast } = useUIStore();
 
-	// Data State
 	const [stats, setStats] = useState<DashboardStats | null>(null);
 	const [reports, setReports] = useState<Report[]>([]);
 	const [users, setUsers] = useState<User[]>([]);
 
-	// Loading States
 	const [loading, setLoading] = useState(true);
 	const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-	// 1. Fetch Dashboard Data
 	const fetchAllData = useCallback(async () => {
 		try {
 			setLoading(true);
@@ -75,7 +71,6 @@ const AdminDashboard = () => {
 		fetchAllData();
 	}, [fetchAllData, refreshTrigger]);
 
-	// 2. Actions
 	const handleResolveReport = async (reportId: string, action: 'ban' | 'dismiss') => {
 		try {
 			await axios.patch(`/admin/reports/${reportId}/resolve`, { action });

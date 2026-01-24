@@ -42,7 +42,7 @@ export default function ProductPage() {
 	const { user, isLoading: authLoading, isAuthenticated } = useAuth();
 	const { addToCart } = useCart();
 	const { addToast } = useUIStore();
-	const { createReport, loading: isReporting } = useReport(); // Dodano
+	const { createReport, loading: isReporting } = useReport();
 
 	const [product, setProduct] = useState<Product | null>(null);
 	const [loading, setLoading] = useState(true);
@@ -53,7 +53,7 @@ export default function ProductPage() {
 	const [isAddingToCart, setIsAddingToCart] = useState(false);
 	const [isFollowingSeller, setIsFollowingSeller] = useState(false);
 	const [isFollowingLoading, setIsFollowingLoading] = useState(false);
-	const [showReportModal, setShowReportModal] = useState(false); // Dodano
+	const [showReportModal, setShowReportModal] = useState(false);
 
 	const isOwner = !!(user && product && product.seller.id === user.id);
 
@@ -323,7 +323,7 @@ export default function ProductPage() {
 			<div className={styles.mainContent}>
 				<div className={styles.leftColumn}>
 					<ProductImageSection
-						imageUrl={product.image}
+						imageUrl={product.imageUrl}
 						type={product.type}
 						status={product.status}
 						title={product.title}

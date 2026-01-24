@@ -2,7 +2,7 @@
 @use '@/styles/mixins' as *;
 
 .container {
-	height: calc(100vh - 80px); // Dostosuj 80px do wysokości twojego Navbara
+	height: calc(100vh - 80px);
 	width: 100%;
 	max-width: 1200px;
 	margin: 0 auto;
@@ -10,7 +10,7 @@
 
 	@media (max-width: 768px) {
 		padding: 0;
-		height: calc(100vh - 60px); // Mobile navbar height
+		height: calc(100vh - 60px);
 	}
 }
 
@@ -24,7 +24,6 @@
 	border: 1px solid #e5e7eb;
 }
 
-// --- SIDEBAR ---
 .sidebar {
 	width: 320px;
 	border-right: 1px solid #e5e7eb;
@@ -33,11 +32,11 @@
 	background: #f9fafb;
 
 	@media (max-width: 768px) {
-		width: 100%; // Na mobile sidebar zajmuje całą szerokość
+		width: 100%;
 		border-right: none;
 
 		&.hiddenOnMobile {
-			display: none; // Ukrywamy, gdy jesteśmy w czacie
+			display: none;
 		}
 	}
 }
@@ -92,6 +91,7 @@
 	flex-shrink: 0;
 
 	img {
+        border-radius: $radius-circle;
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
@@ -100,7 +100,7 @@
 
 .info {
 	flex: 1;
-	min-width: 0; // Ważne dla text-overflow
+	min-width: 0;
 }
 
 .infoTop {
@@ -147,7 +147,6 @@
 	margin: 0;
 }
 
-// --- CHAT WINDOW ---
 .chatWindow {
 	flex: 1;
 	display: flex;
@@ -158,7 +157,7 @@
 		width: 100%;
 
 		&.hiddenOnMobile {
-			display: none; // Ukrywamy okno, gdy jesteśmy na liście
+			display: none;
 		}
 	}
 }
@@ -171,7 +170,6 @@
 	background: #fff;
 	gap: 0.5rem;
 
-	// Przycisk powrotu tylko na mobile
 	.backButton {
 		display: none;
 		background: none;
@@ -232,7 +230,7 @@
 	align-self: flex-end;
 
 	.bubble {
-		background: #2563eb; // Niebieski kolor (dostosuj do brandu)
+		background: #2563eb;
 		color: #fff;
 		border-radius: 12px 12px 0 12px;
 	}
@@ -301,10 +299,11 @@
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
+    padding-top: 20px;
 	color: #6b7280;
 
 	@media (max-width: 768px) {
-		display: none; // Na mobile pusty stan nie jest potrzebny, bo widzimy listę
+		display: none;
 	}
 }
 

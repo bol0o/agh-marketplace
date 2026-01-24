@@ -1,4 +1,3 @@
-// hooks/useReport.ts
 import { useState } from 'react';
 import { isAxiosError } from 'axios';
 import api from '@/lib/axios';

@@ -173,7 +173,6 @@ export default function MobileFilterDrawer({ isOpen, onClose }: MobileFilterDraw
 		}
 	};
 
-	// 4. POPRAWKA: handleClose jest teraz stabilny dzięki useCallback
 	useEffect(() => {
 		const handleEscape = (e: KeyboardEvent) => {
 			if (e.key === 'Escape' && isOpen && !isClosing) {

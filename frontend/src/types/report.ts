@@ -9,7 +9,7 @@ export interface Reporter {
 export interface Report {
 	id: string;
 	reason: string;
-	details?: string; // Prisma: description
+	details?: string;
 	status: ReportStatus;
 	createdAt: string;
 	updatedAt: string;

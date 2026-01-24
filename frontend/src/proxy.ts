@@ -24,7 +24,8 @@ export function proxy(request: NextRequest) {
 		pathname.startsWith('/marketplace') ||
 		pathname.startsWith('/user') ||
 		pathname.startsWith('/notifications') ||
-		pathname.startsWith('/orders');
+		pathname.startsWith('/orders') ||
+        pathname.startsWith('/messages') 
 
 	if (isProtectedRoute && !accessToken) {
 		const loginUrl = new URL('/login', request.url);

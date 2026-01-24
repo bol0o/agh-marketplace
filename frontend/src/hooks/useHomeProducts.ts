@@ -37,7 +37,6 @@ export const useHomeProducts = ({
 			const response = await api.get<ProductsResponse>(`/products?${params}`);
 			setProducts(response.data.products || []);
 		} catch (err: unknown) {
-			// 2. Zmiana any na unknown
 			console.error('Error fetching home products:', err);
 			setError('Nie udało się pobrać produktów');
 			setProducts([]);

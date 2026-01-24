@@ -5,7 +5,6 @@ import styles from './Home.module.scss';
 export default function Home() {
 	return (
 		<div className={styles.container}>
-			{/* 1. NAVBAR */}
 			<nav className={styles.navbar}>
 				<div className={styles.navContainer}>
 					<div className={styles.logo}>
@@ -23,7 +22,6 @@ export default function Home() {
 				</div>
 			</nav>
 
-			{/* 2. HERO SECTION */}
 			<section className={styles.heroSection}>
 				<div className={styles.content}>
 					<h1 className={styles.headline}>
@@ -60,7 +58,6 @@ export default function Home() {
 				</div>
 			</section>
 
-			{/* 3. FEATURES GRID */}
 			<section className={styles.featuresSection}>
 				<div className={styles.gridContainer}>
 					<div className={styles.featureCard}>
