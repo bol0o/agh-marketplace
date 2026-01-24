@@ -85,18 +85,20 @@ async function main() {
 
   // 8. Generate 20 random students
   const users = [kaczmar, bolek, lecturer];
+  const createdStudents = [];
 
   for (let i = 0; i < 20; i++) {
     const firstName = faker.person.firstName();
     const lastName = faker.person.lastName();
+    const email = faker.internet.email({
+      firstName,
+      lastName,
+      provider: "student.agh.edu.pl",
+    });
 
     const user = await prisma.user.create({
       data: {
-        email: faker.internet.email({
-          firstName,
-          lastName,
-          provider: "student.agh.edu.pl",
-        }),
+        email,
         passwordHash: studentPassword,
         firstName,
         lastName,
@@ -105,6 +107,7 @@ async function main() {
       },
     });
     users.push(user);
+    createdStudents.push(email);
   }
 
   //PRODUCTS
@@ -212,6 +215,10 @@ async function main() {
   console.log("Seeding finished successfully!");
   console.log(`Admin Password: ${rawAdminPass}`);
   console.log(`Student Password: ${rawStudentPass}`);
+
+  console.log("\nExample Student Accounts");
+  createdStudents.slice(0, 3).forEach((email) => console.log(email));
+  console.log("--------------------------------");
 }
 
 main()
