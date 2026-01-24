@@ -8,14 +8,19 @@ const prisma = new PrismaClient();
 export const getDashboardStats = async (req: AuthRequest, res: Response) => {
   try {
     const totalUsers = await prisma.user.count();
-    const activeListings = await prisma.product.count();
+    const activeListings = await prisma.product.count({
+      where: { status: "active" },
+    });
 
     // Calculate total revenue (sum of completed orders)
     const revenueAgg = await prisma.order.aggregate({
       _sum: { totalPrice: true },
       where: { status: "COMPLETED" },
     });
-    const totalRevenue = revenueAgg._sum.totalPrice || 0;
+
+    const totalRevenue = revenueAgg._sum.totalPrice
+      ? Number(revenueAgg._sum.totalPrice)
+      : 0;
 
     const pendingReports = await prisma.report.count({
       where: { status: "open" },
@@ -62,9 +67,10 @@ export const resolveReport = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ error: "Zgłoszenie nie istnieje" });
     }
 
-    await prisma.$transaction(async (tx) => {
-      const newStatus = action === "ban" ? "resolved" : "dismissed";
+    // Status 'resolved' dla bana, 'dismissed' dla odrzucenia
+    const newStatus = action === "ban" ? "resolved" : "dismissed";
 
+    await prisma.$transaction(async (tx) => {
       await tx.report.update({
         where: { id },
         data: { status: newStatus },
@@ -87,6 +93,7 @@ export const resolveReport = async (req: AuthRequest, res: Response) => {
 
     res.json({
       message: `Zgłoszenie rozpatrzone: ${action === "ban" ? "Zablokowano obiekt" : "Odrzucono zgłoszenie"}`,
+      status: newStatus,
     });
   } catch (error) {
     console.error(error);
@@ -97,12 +104,10 @@ export const resolveReport = async (req: AuthRequest, res: Response) => {
 // GET /api/admin/users (With Pagination)
 export const getAllUsers = async (req: AuthRequest, res: Response) => {
   try {
-    // 1. Pagination Params
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 20;
     const skip = (page - 1) * limit;
 
-    // 2. Database Transaction: Fetch Users + Count Total
     const [users, total] = await prisma.$transaction([
       prisma.user.findMany({
         skip,
@@ -123,7 +128,6 @@ export const getAllUsers = async (req: AuthRequest, res: Response) => {
       prisma.user.count(),
     ]);
 
-    // 3. Return Data with Pagination Metadata
     res.json({
       data: users,
       pagination: {
@@ -138,6 +142,7 @@ export const getAllUsers = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ error: "Błąd pobierania użytkowników" });
   }
 };
+
 // PATCH /api/admin/users/:userId/status (Ban/Unban)
 export const toggleBlockUser = async (req: AuthRequest, res: Response) => {
   try {

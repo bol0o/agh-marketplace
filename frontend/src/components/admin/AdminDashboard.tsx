@@ -9,7 +9,6 @@ import styles from './AdminDashboard.module.scss';
 
 type Tab = 'overview' | 'users' | 'reports';
 
-// --- TYPY POMOCNICZE DLA API ---
 interface APIReport extends Omit<Report, 'reporter'> {
 	reporter: {
 		id: string;
@@ -31,9 +30,9 @@ const AdminDashboard = () => {
 
 	// Loading States
 	const [loading, setLoading] = useState(true);
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-	// 1. Fetch Dashboard Data
 	const fetchAllData = useCallback(async () => {
 		try {
 			setLoading(true);
@@ -75,7 +74,6 @@ const AdminDashboard = () => {
 		fetchAllData();
 	}, [fetchAllData, refreshTrigger]);
 
-	// 2. Actions
 	const handleResolveReport = async (reportId: string, action: 'ban' | 'dismiss') => {
 		try {
 			await axios.patch(`/admin/reports/${reportId}/resolve`, { action });
@@ -84,6 +82,19 @@ const AdminDashboard = () => {
 				action === 'ban' ? 'Zablokowano i zamknięto' : 'Zgłoszenie odrzucone',
 				'success'
 			);
+
+			setReports((prevReports) =>
+				prevReports.map((report) => {
+					if (report.id === reportId) {
+						return {
+							...report,
+							status: 'closed' as const,
+						};
+					}
+					return report;
+				})
+			);
+
 			setRefreshTrigger((prev) => prev + 1);
 		} catch (err) {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -116,7 +127,6 @@ const AdminDashboard = () => {
 
 	return (
 		<div className={styles.dashboard}>
-			{/* HEADER & STATS */}
 			<header className={styles.header}>
 				<div>
 					<h1 className={styles.title}>Panel Administratora</h1>
@@ -143,7 +153,6 @@ const AdminDashboard = () => {
 				</div>
 			</header>
 
-			{/* TABS NAVIGATION */}
 			<div className={styles.tabsContainer}>
 				<button
 					className={`${styles.tabButton} ${activeTab === 'reports' ? styles.active : ''}`}
@@ -159,7 +168,6 @@ const AdminDashboard = () => {
 				</button>
 			</div>
 
-			{/* MAIN CONTENT AREA */}
 			<main className={styles.content}>
 				{activeTab === 'reports' && (
 					<ReportsTable
