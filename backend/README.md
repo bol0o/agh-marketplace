@@ -386,4 +386,4 @@ npm run setup:full - Complete setup for new development environment
 
 The project includes a comprehensive **Endpoint documentation** covering all endpoints.
 
-**Location:** `postman/AGH_marketplace.postman_collection.json`
+**Location:** `https://drive.google.com/file/d/1S0yf-Rf0bcQOEWZSD5GLgLc5s8Vrr3iM/view?usp=sharing`
