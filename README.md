@@ -1,6 +1,10 @@
 ![motto](./images/motto.jpg)
 
 ### Made for AGH Intro to Web Applications course
+📚 API Documentation
+The project includes a comprehensive Endpoint documentation covering all endpoints.
+
+Location: https://drive.google.com/file/d/1S0yf-Rf0bcQOEWZSD5GLgLc5s8Vrr3iM/view?usp=sharing
 
 ## 1. Overview
 
